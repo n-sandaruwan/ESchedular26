@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { weeklyTimetable } from '../data/timetableData';
-import { exportSemesterScheduleCSV } from '../data/scheduleStore';
 
 function TimetablePage() {
   const days = [
@@ -11,7 +10,6 @@ function TimetablePage() {
     { fullName: 'Friday', short: 'Fri', key: 'Friday' }
   ];
 
-  // Determine current day of week to default active tab
   const getTodayDayName = () => {
     const d = new Date().getDay();
     const dayMap = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -20,186 +18,239 @@ function TimetablePage() {
   };
 
   const [activeDay, setActiveDay] = useState(getTodayDayName());
-  const [viewMode, setViewMode] = useState('day'); // 'day' | 'week'
+  const [selectedModule, setSelectedModule] = useState('All');
+  const [selectedHall, setSelectedHall] = useState('All');
+
+  const activeDayIndex = days.findIndex(d => d.key === activeDay);
 
   const defaultTimetable = weeklyTimetable;
 
-  const getTypeBadgeClass = (type) => {
-    switch (type?.toLowerCase()) {
-      case 'lecture': return 'bg-electric-blue/15 text-electric-blue border-electric-blue/30';
-      case 'practical': case 'lab': return 'bg-emerald-glow/15 text-emerald-glow border-emerald-glow/30';
-      case 'tutorial': return 'bg-[#FBBF24]/15 text-[#FBBF24] border-[#FBBF24]/30';
-      default: return 'bg-coral-vibe/15 text-coral-vibe border-coral-vibe/30';
+  const handleDirectDownloadPDF = () => {
+    const link = document.createElement('a');
+    link.href = './TimeTable-Elec.pdf';
+    link.download = 'TimeTable-Elec.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Filter slots by selected dropdown criteria
+  const daySlots = (defaultTimetable[activeDay] || []).filter((slot) => {
+    if (selectedModule !== 'All' && !slot.module.toLowerCase().includes(selectedModule.toLowerCase())) return false;
+    if (selectedHall !== 'All' && !slot.hall.toLowerCase().includes(selectedHall.toLowerCase())) return false;
+    return true;
+  });
+
+  // Split into morning and afternoon for lunch break divider placement
+  const morningSlots = daySlots.filter(s => (s.startMin || 0) < 720);
+  const afternoonSlots = daySlots.filter(s => (s.startMin || 0) >= 720);
+
+  const renderSlotCard = (slot, index) => {
+    const now = new Date();
+    const nowMin = now.getHours() * 60 + now.getMinutes();
+    const isToday = getTodayDayName() === activeDay;
+    const startMin = slot.startMin || 510;
+    const endMin = slot.endMin || 630;
+
+    let status = slot.status || 'Scheduled';
+    if (isToday) {
+      if (nowMin > endMin) status = 'Conducted';
+      else if (nowMin >= startMin && nowMin <= endMin) status = 'Ongoing';
+      else status = 'Upcoming';
     }
+
+    const isOngoing = status === 'Ongoing';
+    const isUpcoming = status === 'Upcoming';
+
+    // Time formatting
+    const [startTimeStr, endTimeStr] = slot.time.split(' - ');
+
+    return (
+      <div key={index} className="lecture-item mb-3 relative">
+        {/* Timeline Node */}
+        {isOngoing ? (
+          <div className="absolute -left-[30px] top-6 w-4 h-4 bg-secondary rounded-full border-4 border-surface z-10 shadow-[0_0_15px_rgba(78,222,163,0.8)] animate-pulse"></div>
+        ) : isUpcoming ? (
+          <div className="absolute -left-[30px] top-6 w-4 h-4 bg-surface rounded-full border-2 border-primary z-10 flex items-center justify-center">
+            <div className="w-1.5 h-1.5 bg-primary rounded-full"></div>
+          </div>
+        ) : (
+          <div className="absolute -left-[30px] top-6 w-4 h-4 bg-surface-container border-2 border-outline-variant rounded-full z-10"></div>
+        )}
+
+        {/* Glass Card */}
+        <div className={`rounded-2xl p-5 border transition-all ${
+          isOngoing ? 'glass-card ongoing-glow border-secondary/30' : 'glass-card border-white/5 hover:bg-white/5'
+        }`}>
+          <div className="flex justify-between items-start mb-3">
+            <div className="space-y-0.5">
+              <p className={`font-label-bold text-label-bold ${isOngoing ? 'text-secondary' : 'text-primary'}`}>
+                {startTimeStr}
+              </p>
+              <p className="text-on-surface-variant/60 text-label-sm">{endTimeStr}</p>
+            </div>
+
+            <span className={`px-3 py-1 rounded-full font-label-bold text-[10px] uppercase tracking-wider border ${
+              isOngoing
+                ? 'bg-secondary-container/20 text-secondary border-secondary/30'
+                : isUpcoming
+                ? 'bg-primary-container/20 text-primary border-primary/20'
+                : 'bg-surface-container-high text-on-surface-variant border-white/5'
+            }`}>
+              {status}
+            </span>
+          </div>
+
+          <h3 className="font-headline-md text-headline-md text-on-surface mb-3 leading-snug">
+            {slot.module}: {slot.name}
+          </h3>
+
+          <div className="flex items-center gap-1.5 text-on-surface-variant/70 text-label-sm">
+            <span className="material-symbols-outlined text-[18px] text-primary">location_on</span>
+            <span>Venue: <b className="text-on-surface font-normal">{slot.hall}</b></span>
+          </div>
+
+          {/* Ongoing Live Progress Bar */}
+          {isOngoing && (
+            <div className="w-full h-1.5 bg-surface-container-high rounded-full overflow-hidden mt-4">
+              <div
+                className="h-full bg-secondary shadow-[0_0_8px_rgba(78,222,163,0.6)] transition-all duration-500"
+                style={{
+                  width: `${Math.min(100, Math.max(0, Math.round(((nowMin - startMin) / (endMin - startMin)) * 100)))}%`
+                }}
+              ></div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
   };
 
   return (
-    <div className="flex flex-col gap-5">
-      {/* Header Banner */}
-      <div className="glass-panel p-5 rounded-xl flex flex-col md:flex-row justify-between md:items-center gap-4">
-        <div>
-          <span className="font-label-mono text-[10px] sm:text-xs text-electric-blue bg-electric-blue/10 px-2.5 py-1 rounded-full uppercase tracking-wider font-semibold">
-            Semester 3 Schedule
-          </span>
-          <h1 className="font-display-lg text-2xl sm:text-3xl font-bold text-on-surface mt-1">Master Timetable</h1>
-          <p className="text-on-surface-variant text-xs sm:text-sm mt-0.5">Mobile-optimized weekly timetable for Engineering students.</p>
-        </div>
+    <div className="flex-grow pt-4 pb-12 max-w-2xl mx-auto w-full">
+      {/* Header & Filters */}
+      <section className="mb-stack-lg space-y-gutter">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h2 className="font-headline-md text-headline-md text-on-surface">Weekly Schedule</h2>
+            <p className="text-xs text-on-surface-variant mt-0.5">Filter by module or lecture venue</p>
+          </div>
 
-        <div className="flex flex-wrap items-center gap-3 self-start md:self-auto">
-          {/* Download Full Schedule Button */}
-          <button
-            onClick={exportSemesterScheduleCSV}
-            className="btn-electric px-3.5 py-2 rounded-lg text-xs font-bold font-label-mono flex items-center gap-1.5 cursor-pointer shadow-[0_0_12px_rgba(0,212,255,0.3)] hover:scale-105 transition-all"
-            title="Download full semester schedule with live reschedules & cancellations"
-          >
-            <span className="material-symbols-outlined text-sm">download</span> Download Live Schedule (.csv)
-          </button>
-
-          {/* View Mode Switcher (Day vs Full Week) */}
-          <div className="flex items-center bg-surface-container-lowest p-1 rounded-lg border border-glass-stroke">
+          <div className="flex flex-wrap items-center gap-2">
             <button
-              onClick={() => setViewMode('day')}
-              className={`px-3 py-1.5 rounded-md text-xs font-label-mono font-bold transition-all cursor-pointer ${
-                viewMode === 'day'
-                  ? 'bg-electric-blue text-slate-900 shadow-[0_0_10px_rgba(0,212,255,0.4)]'
-                  : 'text-on-surface-variant hover:text-on-surface'
-              }`}
+              onClick={handleDirectDownloadPDF}
+              className="flex items-center gap-1.5 text-xs text-on-primary bg-primary border border-primary/40 px-3.5 py-2 rounded-xl hover:opacity-90 transition-all font-label-bold cursor-pointer shadow-[0_0_12px_rgba(56,189,248,0.3)]"
             >
-              Day View
+              <span className="material-symbols-outlined text-sm">download</span> Download Official Timetable (PDF)
             </button>
-            <button
-              onClick={() => setViewMode('week')}
-              className={`px-3 py-1.5 rounded-md text-xs font-label-mono font-bold transition-all cursor-pointer ${
-                viewMode === 'week'
-                  ? 'bg-electric-blue text-slate-900 shadow-[0_0_10px_rgba(0,212,255,0.4)]'
-                  : 'text-on-surface-variant hover:text-on-surface'
-              }`}
-            >
-              Full Week
-            </button>
+            <div className="hidden sm:flex items-center gap-1.5 text-primary/80 bg-primary/10 px-3 py-2 rounded-xl border border-primary/20 text-xs font-label-bold">
+              <span className="material-symbols-outlined text-[16px]">calendar_today</span>
+              <span>Semester 3 Matrix</span>
+            </div>
           </div>
         </div>
+
+        {/* Sleek Modern Filter Chips */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {/* Module Filter Chip */}
+          <div className="filter-chip flex items-center gap-2 px-4 py-2 rounded-xl flex-shrink-0">
+            <span className="material-symbols-outlined text-[18px] text-primary">auto_stories</span>
+            <select
+              value={selectedModule}
+              onChange={(e) => setSelectedModule(e.target.value)}
+              className="bg-transparent border-none p-0 text-label-bold text-on-surface focus:ring-0 appearance-none w-full text-xs cursor-pointer"
+            >
+              <option value="All" className="bg-surface-container text-on-surface">All Modules</option>
+              <option value="EE3301" className="bg-surface-container text-on-surface">EE3301 - Analog Electronics</option>
+              <option value="EE3202" className="bg-surface-container text-on-surface">EE3202 - Data Structures</option>
+              <option value="EE3203" className="bg-surface-container text-on-surface">EE3203 - Measurements</option>
+              <option value="EE3304" className="bg-surface-container text-on-surface">EE3304 - Electromagnetism</option>
+              <option value="EE3205" className="bg-surface-container text-on-surface">EE3205 - Power & Energy</option>
+              <option value="EE3306" className="bg-surface-container text-on-surface">EE3306 - Signals & Systems</option>
+              <option value="IS3301" className="bg-surface-container text-on-surface">IS3301 - Complex Analysis</option>
+              <option value="IS3321" className="bg-surface-container text-on-surface">IS3321 - Management</option>
+              <option value="IS3322" className="bg-surface-container text-on-surface">IS3322 - Society & Engineers</option>
+            </select>
+            <span className="material-symbols-outlined text-[16px] text-outline pointer-events-none">expand_more</span>
+          </div>
+
+          {/* Hall Filter Chip */}
+          <div className="filter-chip flex items-center gap-2 px-4 py-2 rounded-xl flex-shrink-0">
+            <span className="material-symbols-outlined text-[18px] text-primary">meeting_room</span>
+            <select
+              value={selectedHall}
+              onChange={(e) => setSelectedHall(e.target.value)}
+              className="bg-transparent border-none p-0 text-label-bold text-on-surface focus:ring-0 appearance-none w-full text-xs cursor-pointer"
+            >
+              <option value="All" className="bg-surface-container text-on-surface">All Venues / Halls</option>
+              <option value="NCC" className="bg-surface-container text-on-surface">NCC</option>
+              <option value="LT1" className="bg-surface-container text-on-surface">LT1</option>
+              <option value="LT2" className="bg-surface-container text-on-surface">LT2</option>
+              <option value="AUD" className="bg-surface-container text-on-surface">AUD (Auditorium)</option>
+              <option value="NLH2" className="bg-surface-container text-on-surface">NLH2</option>
+            </select>
+            <span className="material-symbols-outlined text-[16px] text-outline pointer-events-none">expand_more</span>
+          </div>
+        </div>
+      </section>
+
+      {/* Segmented Control Day Switcher */}
+      <nav className="segmented-control p-1 rounded-full flex items-center mb-stack-lg relative overflow-hidden">
+        <div
+          className="day-tab-active-bg"
+          style={{
+            width: 'calc(20% - 4px)',
+            left: `calc(${activeDayIndex * 20}% + 4px)`
+          }}
+        ></div>
+
+        {days.map((d) => {
+          const isActive = activeDay === d.key;
+          return (
+            <button
+              key={d.key}
+              onClick={() => setActiveDay(d.key)}
+              className={`relative z-10 flex-1 py-2.5 text-center font-label-bold transition-colors duration-300 cursor-pointer text-xs sm:text-sm ${
+                isActive ? 'text-on-primary font-bold' : 'text-on-surface-variant/80 hover:text-on-surface'
+              }`}
+            >
+              {d.short}
+            </button>
+          );
+        })}
+      </nav>
+
+      {/* Dynamic Timeline Container */}
+      <div className="relative pl-10">
+        {/* Enhanced Vertical Line */}
+        <div className="absolute left-4 top-0 bottom-0 w-[2px] timeline-line"></div>
+
+        {daySlots.length === 0 ? (
+          <div className="p-8 text-center glass-card rounded-2xl border border-white/5">
+            <span className="material-symbols-outlined text-4xl text-on-surface-variant mb-2">event_busy</span>
+            <p className="text-on-surface font-semibold">No Lectures Found</p>
+            <p className="text-xs text-on-surface-variant mt-1">No sessions match your filter on this day.</p>
+          </div>
+        ) : (
+          <>
+            {/* Morning Sessions */}
+            {morningSlots.map((slot, idx) => renderSlotCard(slot, idx))}
+
+            {/* Lunch Break Divider (Only if there are afternoon slots or standard day) */}
+            {morningSlots.length > 0 && (
+              <div className="relative py-6 flex items-center gap-4 opacity-50 my-2">
+                <div className="h-px flex-grow bg-outline-variant"></div>
+                <span className="material-symbols-outlined text-[18px] text-primary">restaurant</span>
+                <span className="font-label-bold text-[10px] uppercase tracking-[0.2em] text-on-surface-variant">Lunch Break (11:30 - 12:30)</span>
+                <div className="h-px flex-grow bg-outline-variant"></div>
+              </div>
+            )}
+
+            {/* Afternoon Sessions */}
+            {afternoonSlots.map((slot, idx) => renderSlotCard(slot, idx + 100))}
+          </>
+        )}
       </div>
-
-      {viewMode === 'day' ? (
-        <>
-          {/* Mobile-First Segmented Day Pills */}
-          <div className="glass-panel p-1.5 rounded-xl border border-glass-stroke flex items-center justify-between gap-1 overflow-x-auto">
-            {days.map((d) => {
-              const isActive = activeDay === d.key;
-              const isToday = getTodayDayName() === d.key;
-              const slotCount = defaultTimetable[d.key]?.length || 0;
-
-              return (
-                <button
-                  key={d.key}
-                  onClick={() => setActiveDay(d.key)}
-                  className={`flex-1 min-w-[64px] py-2.5 px-2 rounded-lg transition-all duration-200 cursor-pointer flex flex-col items-center justify-center gap-0.5 relative ${
-                    isActive
-                      ? 'bg-electric-blue text-slate-900 font-bold shadow-[0_0_12px_rgba(0,212,255,0.5)]'
-                      : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60'
-                  }`}
-                >
-                  <div className="flex items-center gap-1">
-                    <span className="font-body-md text-xs font-bold">{d.short}</span>
-                    {isToday && (
-                      <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-slate-900' : 'bg-emerald-glow animate-pulse'}`}></span>
-                    )}
-                  </div>
-                  <span className={`font-label-mono text-[9px] ${isActive ? 'text-slate-800 font-bold' : 'text-on-surface-variant/70'}`}>
-                    {slotCount} Class{slotCount > 1 ? 'es' : ''}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Daily Schedule Cards View */}
-          <div className="glass-panel rounded-xl p-4 sm:p-6 flex flex-col gap-3.5">
-            <div className="flex justify-between items-center pb-3 border-b border-glass-stroke">
-              <h3 className="font-headline-md text-lg font-bold text-on-surface flex items-center gap-2">
-                <span className="material-symbols-outlined text-electric-blue">event_note</span>
-                {activeDay}'s Schedule
-              </h3>
-              <span className="text-xs font-label-mono text-electric-blue bg-electric-blue/10 px-2.5 py-1 rounded border border-electric-blue/30 font-semibold">
-                {defaultTimetable[activeDay]?.length} Sessions
-              </span>
-            </div>
-
-            <div className="flex flex-col gap-3">
-              {defaultTimetable[activeDay]?.map((slot, index) => (
-                <div
-                  key={index}
-                  className="bg-surface-container/60 border border-glass-stroke hover:border-electric-blue/40 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all"
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="bg-surface-container-lowest px-3 py-2 rounded-lg border border-glass-stroke text-center min-w-[110px]">
-                      <span className="font-label-mono text-xs font-bold text-electric-blue flex items-center justify-center gap-1">
-                        <span className="material-symbols-outlined text-xs">schedule</span>
-                        {slot.time}
-                      </span>
-                    </div>
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h4 className="font-body-md font-bold text-on-surface text-base">{slot.module}</h4>
-                        <span className={`text-[10px] font-label-mono px-2 py-0.5 rounded border ${getTypeBadgeClass(slot.type)}`}>
-                          {slot.type}
-                        </span>
-                      </div>
-                      <p className="text-on-surface-variant text-xs mt-0.5 font-medium">{slot.name}</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between sm:justify-end gap-3 text-xs text-on-surface-variant border-t sm:border-t-0 border-glass-stroke pt-2 sm:pt-0">
-                    <div className="flex items-center gap-1 bg-surface-container-lowest px-2.5 py-1 rounded border border-glass-stroke">
-                      <span className="material-symbols-outlined text-electric-blue text-xs">location_on</span>
-                      <span className="font-label-mono text-xs font-bold text-on-surface">{slot.hall}</span>
-                    </div>
-                    {slot.instructor && (
-                      <span className="text-xs text-on-surface-variant">{slot.instructor}</span>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </>
-      ) : (
-        /* Full Week Mobile Accordion Timeline View */
-        <div className="flex flex-col gap-4">
-          {days.map((d) => (
-            <div key={d.key} className="glass-panel rounded-xl p-4 flex flex-col gap-3">
-              <div className="flex justify-between items-center pb-2 border-b border-glass-stroke">
-                <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-electric-blue text-base">today</span>
-                  <h3 className="font-headline-md text-base font-bold text-on-surface">{d.fullName}</h3>
-                </div>
-                <span className="font-label-mono text-xs text-emerald-glow bg-emerald-glow/10 px-2 py-0.5 rounded font-bold">
-                  {defaultTimetable[d.key]?.length} Classes
-                </span>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                {defaultTimetable[d.key]?.map((slot, index) => (
-                  <div key={index} className="bg-surface-container/50 p-3 rounded-lg border border-glass-stroke flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-label-mono text-xs text-electric-blue font-bold">{slot.time}</span>
-                        <span className="font-body-md font-bold text-on-surface text-sm">{slot.module}</span>
-                      </div>
-                      <p className="text-xs text-on-surface-variant mt-0.5">{slot.name}</p>
-                    </div>
-                    <div className="flex items-center gap-1.5 bg-surface-container-lowest px-2.5 py-1 rounded border border-glass-stroke self-end sm:self-auto">
-                      <span className="material-symbols-outlined text-xs text-electric-blue">location_on</span>
-                      <span className="font-label-mono text-xs font-bold text-on-surface">{slot.hall}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { getStoredDailyLogs, saveStoredDailyLogs, addAuditLog } from './dailyLog
 
 // Initial Schedule Overrides (Cancellations, Reschedules, Swaps per date)
 export const initialOverrides = [
-  { id: 1, date: '2026-07-29', module: 'ALL', status: 'Canceled', reason: 'Department Holiday', time: 'All Day' }
+  { id: 1, date: '2026-07-29', module: 'ALL', status: 'Canceled', reason: 'Esala Full Moon Poya Day Holiday', time: 'All Day' }
 ];
 
 export const getStoredOverrides = () => {
@@ -21,7 +21,7 @@ export const saveStoredOverrides = (overrides) => {
 
 // Initial Notices Feed
 export const initialNotices = [
-  { id: 1, title: 'Department Holiday Notice', date: '2026-07-29', type: 'Holiday', content: 'Wednesday July 29 is a department holiday. Regular lectures resume Thursday July 30.' },
+  { id: 1, title: 'Department Holiday Notice', date: '2026-07-29', type: 'Holiday', content: 'Wednesday July 29 is Esala Full Moon Poya Day. Regular physical lectures resume Thursday July 30.' },
   { id: 2, title: 'Semester Started 27th July', date: '2026-07-27', type: 'Announcement', content: 'Semester 3 academic lectures are officially in progress.' }
 ];
 
@@ -62,6 +62,39 @@ export const updateNotice = (id, title, content) => {
   return updated;
 };
 
+// Helper: Parse time range string like "08:30 - 10:30" or "08:30 AM - 10:30 AM" into minutes from midnight
+export const parseTimeRangeToMinutes = (timeStr) => {
+  if (!timeStr) return { startMin: 510, endMin: 630 };
+
+  const convertToMin = (str) => {
+    const s = str.trim().toUpperCase();
+    const isPM = s.includes('PM');
+    const isAM = s.includes('AM');
+    const clean = s.replace(/AM|PM/g, '').trim();
+    const parts = clean.split(':');
+    let h = parseInt(parts[0], 10) || 0;
+    const m = parseInt(parts[1], 10) || 0;
+
+    if (isPM && h < 12) h += 12;
+    if (isAM && h === 12) h = 0;
+
+    // Heuristic: If 1 <= h <= 6 without explicit AM/PM, treat as afternoon PM
+    if (!isPM && !isAM && h >= 1 && h <= 6) {
+      h += 12;
+    }
+
+    return h * 60 + m;
+  };
+
+  const parts = timeStr.split('-');
+  if (parts.length < 2) return { startMin: 510, endMin: 630 };
+
+  const startMin = convertToMin(parts[0]);
+  const endMin = convertToMin(parts[1]);
+
+  return { startMin, endMin };
+};
+
 // Helper: Get Day Name from YYYY-MM-DD string (Timezone Independent)
 export const getDayNameFromDate = (dateStr) => {
   if (!dateStr) return 'Monday';
@@ -74,7 +107,7 @@ export const getDayNameFromDate = (dateStr) => {
   return days[d.getDay()] || 'Monday';
 };
 
-// Helper: Get Modules Scheduled on a Specific Date (Including Overrides)
+// Helper: Get Modules Scheduled on a Specific Date (Including Overrides & Minutes)
 export const getModulesForDate = (dateStr) => {
   if (!dateStr) return [];
   const dayName = getDayNameFromDate(dateStr);
@@ -84,34 +117,56 @@ export const getModulesForDate = (dateStr) => {
   const result = [];
   baseSlots.forEach(slot => {
     const override = overrides.find(o => o.module === slot.module || o.module === 'ALL');
+    
+    let timeRange = slot.time;
+    let venue = slot.hall;
+    let status = 'Scheduled';
+    let reason = '';
+    let swapModule = '';
+
     if (override) {
-      if (override.status === 'Canceled') {
-        result.push({ ...slot, status: 'Canceled', reason: override.reason });
-      } else if (override.status === 'Rescheduled') {
-        result.push({ ...slot, status: 'Rescheduled', newTime: override.time, newVenue: override.venue });
-      } else if (override.status === 'Swapped') {
-        result.push({ ...slot, status: 'Swapped', swapModule: override.swapModule });
-      } else {
-        result.push({ ...slot, status: override.status });
-      }
-    } else {
-      result.push({ ...slot, status: 'Scheduled' });
+      status = override.status;
+      reason = override.reason || '';
+      swapModule = override.swapModule || '';
+      if (override.time) timeRange = override.time;
+      if (override.venue) venue = override.venue;
     }
+
+    const { startMin, endMin } = parseTimeRangeToMinutes(timeRange);
+
+    result.push({
+      ...slot,
+      time: timeRange,
+      hall: venue,
+      status,
+      reason,
+      swapModule,
+      startMin: slot.startMin || startMin,
+      endMin: slot.endMin || endMin
+    });
   });
 
   // Include any extra rescheduled slots for this date
   overrides.forEach(o => {
     if (o.status === 'Rescheduled' && !result.some(r => r.module === o.module)) {
+      const timeRange = o.time || '10:30 - 12:30';
+      const { startMin, endMin } = parseTimeRangeToMinutes(timeRange);
       result.push({
-        time: o.time || '10:30 - 12:30',
+        time: timeRange,
         module: o.module,
         name: `Rescheduled ${o.module}`,
         hall: o.venue || 'LT1',
         type: 'Lecture',
-        status: 'Rescheduled'
+        status: 'Rescheduled',
+        reason: o.reason || '',
+        startMin,
+        endMin
       });
     }
   });
+
+  // Sort chronologically by startMin
+  result.sort((a, b) => a.startMin - b.startMin);
 
   return result;
 };

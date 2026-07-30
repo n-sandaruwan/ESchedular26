@@ -1,59 +1,61 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { getStoredModuleHours, resetToInitialHours } from '../data/moduleHoursData';
-import { getModulesForDate, getStoredNotices, getDayNameFromDate, removeNotice, updateNotice, exportSemesterScheduleCSV } from '../data/scheduleStore';
+import { Link, useNavigate } from 'react-router-dom';
+import { getStoredModuleHours, saveStoredModuleHours } from '../data/moduleHoursData';
+import { 
+  getModulesForDate, 
+  getStoredNotices, 
+  getDayNameFromDate, 
+  exportSemesterScheduleCSV,
+  modifyScheduleSlot
+} from '../data/scheduleStore';
+import { getHolidayForDate } from '../data/sriLankaHolidaysData';
+import { getStoredDailyLogs, saveStoredDailyLogs, addAuditLog } from '../data/dailyLogsData';
 import SriLankanCalendarWidget from '../components/SriLankanCalendarWidget';
 
 function StudentDashboard() {
+  const navigate = useNavigate();
   const [notices, setNotices] = useState([]);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [moduleHours, setModuleHours] = useState([]);
-  const [editingNotice, setEditingNotice] = useState(null);
+  const [statusFilter, setStatusFilter] = useState('ALL');
+  const [adminActionMsg, setAdminActionMsg] = useState('');
 
   const role = localStorage.getItem('mis_role');
   const isAdmin = role === 'admin';
 
   const todayDateStr = currentTime.toISOString().split('T')[0];
   const selectedDayName = getDayNameFromDate(selectedDate);
+  const selectedHoliday = getHolidayForDate(selectedDate);
+  const isViewingToday = selectedDate === todayDateStr;
 
   useEffect(() => {
-    // Load module hours & notices
     setModuleHours(getStoredModuleHours());
     setNotices(getStoredNotices());
 
-    // Live clock timer update every 30 seconds
     const interval = setInterval(() => {
-      const now = new Date();
-      setCurrentTime(now);
+      setCurrentTime(new Date());
       setNotices(getStoredNotices());
       setModuleHours(getStoredModuleHours());
-    }, 30000);
+    }, 1000);
 
     return () => clearInterval(interval);
   }, []);
 
-  const handleResetHours = () => {
-    const res = resetToInitialHours();
-    setModuleHours(res);
+  const getGreeting = () => {
+    const hrs = currentTime.getHours();
+    if (hrs < 12) return 'Good Morning';
+    if (hrs < 17) return 'Good Afternoon';
+    return 'Good Evening';
   };
 
-  const handleDeleteNotice = (id) => {
-    if (window.confirm("Are you sure you want to remove this notice?")) {
-      const updated = removeNotice(id);
-      setNotices(updated);
-    }
-  };
+  const formattedLiveTime = currentTime.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true
+  });
 
-  const handleSaveNoticeEdit = (e) => {
-    e.preventDefault();
-    if (!editingNotice) return;
-    const updated = updateNotice(editingNotice.id, editingNotice.title, editingNotice.content);
-    setNotices(updated);
-    setEditingNotice(null);
-  };
-
-  // Date Stepper Handlers (Timezone & Month boundary safe)
   const handleStepDate = (offsetDays) => {
     const parts = selectedDate.split('-');
     const year = parseInt(parts[0], 10);
@@ -71,7 +73,47 @@ function StudentDashboard() {
     setSelectedDate(todayDateStr);
   };
 
-  // Compute live lecture status for selected date (past, present, future)
+  const handleQuickCancelClass = (moduleCode) => {
+    if (window.confirm(`Are you sure you want to CANCEL the ${moduleCode} lecture on ${selectedDate}?`)) {
+      modifyScheduleSlot({
+        date: selectedDate,
+        module: moduleCode,
+        status: 'Canceled',
+        reason: 'Canceled via Quick Admin Action on Dashboard'
+      });
+      setAdminActionMsg(`Canceled ${moduleCode} on ${selectedDate}`);
+      setTimeout(() => setAdminActionMsg(''), 3500);
+    }
+  };
+
+  const handleQuickLogHours = (moduleCode, hours = 2) => {
+    const currentLogs = getStoredDailyLogs();
+    const newLog = {
+      id: Date.now(),
+      date: selectedDate,
+      module: moduleCode,
+      hours: hours,
+      topic: 'Regular Lecture Session Completed',
+      venue: 'LT1',
+      instructor: 'Department Lecturer'
+    };
+    saveStoredDailyLogs([newLog, ...currentLogs]);
+
+    const currentHours = getStoredModuleHours();
+    const updatedHours = currentHours.map(m => {
+      if (m.code === moduleCode) {
+        return { ...m, conductedHours: Math.min(m.targetHours, m.conductedHours + hours) };
+      }
+      return m;
+    });
+    saveStoredModuleHours(updatedHours);
+    setModuleHours(updatedHours);
+
+    addAuditLog('Quick Log', `Logged +${hours} hrs for ${moduleCode} on ${selectedDate}`);
+    setAdminActionMsg(`Logged +${hours} hrs for ${moduleCode}!`);
+    setTimeout(() => setAdminActionMsg(''), 3500);
+  };
+
   const getComputedSchedule = (dateStr) => {
     const rawSlots = getModulesForDate(dateStr);
     const nowMin = currentTime.getHours() * 60 + currentTime.getMinutes();
@@ -81,389 +123,474 @@ function StudentDashboard() {
 
     return rawSlots.map((slot) => {
       let liveStatus = slot.status || 'Scheduled';
+      let progressPercent = 0;
+      let minsRemaining = 0;
+      let minsUntilStart = 0;
 
       if (slot.status === 'Canceled' || slot.status === 'Rescheduled' || slot.status === 'Swapped') {
         liveStatus = slot.status;
-      } else if (dateStr === '2026-07-29') {
+      } else if (selectedHoliday) {
         liveStatus = 'Holiday';
       } else if (isPast) {
         liveStatus = 'Done';
       } else if (isFuture) {
-        liveStatus = 'Scheduled';
+        liveStatus = 'Upcoming';
       } else if (isToday) {
-        if (nowMin > slot.endMin) {
+        const start = slot.startMin || 510;
+        const end = slot.endMin || 630;
+
+        if (nowMin > end) {
           liveStatus = 'Done';
-        } else if (nowMin >= slot.startMin && nowMin <= slot.endMin) {
+        } else if (nowMin >= start && nowMin <= end) {
           liveStatus = 'Ongoing';
+          const totalDuration = Math.max(1, end - start);
+          progressPercent = Math.min(100, Math.max(0, Math.round(((nowMin - start) / totalDuration) * 100)));
+          minsRemaining = Math.max(0, end - nowMin);
         } else {
           liveStatus = 'Upcoming';
+          minsUntilStart = Math.max(0, start - nowMin);
         }
       }
-      return { ...slot, liveStatus };
+
+      return {
+        ...slot,
+        liveStatus,
+        progressPercent,
+        minsRemaining,
+        minsUntilStart
+      };
     });
   };
 
-  const currentSchedule = getComputedSchedule(selectedDate);
+  const computedSchedule = getComputedSchedule(selectedDate);
 
-  // Visual style badge mappings for CANCELED, RESCHEDULED, SWAPPED, ONGOING, DONE, SCHEDULED
-  const getStatusBadge = (status) => {
-    switch (status?.toLowerCase()) {
-      case 'canceled':
-        return {
-          bar: 'bg-coral-vibe shadow-[0_0_10px_rgba(255,107,107,0.8)]',
-          text: 'text-coral-vibe font-bold',
-          label: 'Canceled',
-          bg: 'bg-coral-vibe/15 border-coral-vibe/40',
-          card: 'border-coral-vibe/30 bg-coral-vibe/5'
-        };
-      case 'rescheduled':
-        return {
-          bar: 'bg-[#FBBF24] shadow-[0_0_10px_rgba(251,191,36,0.8)]',
-          text: 'text-[#FBBF24] font-bold',
-          label: 'Rescheduled',
-          bg: 'bg-[#FBBF24]/15 border-[#FBBF24]/40',
-          card: 'border-[#FBBF24]/30 bg-[#FBBF24]/5'
-        };
-      case 'swapped':
-        return {
-          bar: 'bg-purple-400 shadow-[0_0_10px_rgba(192,132,252,0.8)]',
-          text: 'text-purple-300 font-bold',
-          label: 'Swapped',
-          bg: 'bg-purple-500/15 border-purple-500/40',
-          card: 'border-purple-500/30 bg-purple-500/5'
-        };
-      case 'holiday':
-        return {
-          bar: 'bg-coral-vibe',
-          text: 'text-coral-vibe font-semibold',
-          label: 'Holiday',
-          bg: 'bg-coral-vibe/10 border-coral-vibe/30',
-          card: 'border-glass-stroke'
-        };
-      case 'ongoing':
-        return {
-          bar: 'bg-emerald-glow shadow-[0_0_12px_rgba(52,211,153,0.9)] animate-pulse',
-          text: 'text-emerald-glow font-bold animate-pulse',
-          label: 'Ongoing Now',
-          bg: 'bg-emerald-glow/15 border-emerald-glow/40',
-          card: 'border-emerald-glow/50 bg-emerald-glow/5 shadow-[0_0_15px_rgba(52,211,153,0.15)]'
-        };
-      case 'done':
-        return {
-          bar: 'bg-emerald-glow shadow-[0_0_8px_rgba(52,211,153,0.8)]',
-          text: 'text-emerald-glow font-bold',
-          label: 'Completed / Done',
-          bg: 'bg-emerald-glow/15 border-emerald-glow/40',
-          card: 'border-emerald-glow/30 bg-emerald-glow/5'
-        };
-      default:
-        return {
-          bar: 'bg-electric-blue shadow-[0_0_8px_rgba(0,212,255,0.6)]',
-          text: 'text-electric-blue font-bold',
-          label: 'Scheduled',
-          bg: 'bg-electric-blue/15 border-electric-blue/40',
-          card: 'border-glass-stroke hover:bg-surface-container'
-        };
-    }
-  };
+  const filteredSchedule = computedSchedule.filter(slot => {
+    if (statusFilter === 'ALL') return true;
+    if (statusFilter === 'ONGOING') return slot.liveStatus === 'Ongoing';
+    if (statusFilter === 'UPCOMING') return slot.liveStatus === 'Upcoming';
+    if (statusFilter === 'DONE') return slot.liveStatus === 'Done';
+    if (statusFilter === 'CANCELED') return slot.liveStatus === 'Canceled';
+    return true;
+  });
 
-  // Helper: Format YYYY-MM-DD to clean DD/MM
-  const formatDDMM = (dateStr) => {
-    if (!dateStr) return '';
-    const parts = dateStr.split('-');
-    if (parts.length < 3) return dateStr;
-    return `${parts[2]}/${parts[1]}`;
-  };
+  const activeOngoingCount = computedSchedule.filter(s => s.liveStatus === 'Ongoing').length;
+  const totalTodayClasses = computedSchedule.length;
+
+  const formattedDisplayDate = new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric'
+  });
 
   return (
-    <div className="flex flex-col gap-[24px]">
-      {/* Welcome & Live Banner */}
-      <div className="flex flex-col md:flex-row justify-between md:items-end gap-4 mb-2">
+    <div className="space-y-3 max-w-[1440px] mx-auto">
+      
+      {/* Top Welcome & Live Clock Header */}
+      <section className="flex flex-col md:flex-row md:items-center justify-between gap-stack-md">
         <div>
-          <h1 className="font-display-lg text-[32px] md:text-[44px] font-bold text-on-surface mb-1">Welcome Back.</h1>
-          <p className="font-body-lg text-[16px] md:text-[18px] text-on-surface-variant">
-            Semester Started: <span className="text-emerald-glow font-semibold">27th July 2026</span> | Today is <span className="text-electric-blue font-semibold">{getDayNameFromDate(todayDateStr)}</span> ({formatDDMM(todayDateStr)})
+          <div className="flex items-center gap-2">
+            <h2 className="font-headline-lg text-headline-lg text-on-surface">
+              {getGreeting()}{isAdmin ? ', Administrator' : ''}
+            </h2>
+            {activeOngoingCount > 0 && (
+              <span className="bg-secondary/20 text-secondary border border-secondary/30 px-2.5 py-0.5 rounded-full text-xs font-label-bold flex items-center gap-1 animate-pulse">
+                <span className="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                {activeOngoingCount} Class Ongoing
+              </span>
+            )}
+          </div>
+          <p className="text-on-surface-variant flex flex-wrap items-center gap-2 text-xs sm:text-sm font-body-md mt-1">
+            <span className="flex items-center gap-1.5">
+              <span className="material-symbols-outlined text-sm text-primary">school</span> 
+              Faculty of Engineering • Semester 3
+            </span>
+            <span className="text-outline-variant/60 hidden sm:inline">•</span>
+            <span className="flex items-center gap-1.5 bg-primary/10 text-primary border border-primary/20 px-3 py-0.5 rounded-full text-xs font-label-mono shadow-[0_0_12px_rgba(56,189,248,0.2)]">
+              <span className="material-symbols-outlined text-xs animate-spin" style={{ animationDuration: '6s' }}>schedule</span>
+              <span className="font-bold">{formattedLiveTime}</span>
+            </span>
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <button
-            onClick={exportSemesterScheduleCSV}
-            className="px-3 py-1.5 rounded-full bg-surface-container-high border border-glass-stroke text-xs text-electric-blue font-semibold hover:text-on-surface cursor-pointer flex items-center gap-1.5"
-            title="Download full schedule"
-          >
-            <span className="material-symbols-outlined text-[16px]">download</span> Export
-          </button>
-          <button
-            onClick={handleResetHours}
-            title="Reset hours to actual completed totals"
-            className="px-3 py-1.5 rounded-full bg-surface-container-high border border-glass-stroke text-xs text-on-surface-variant hover:text-on-surface cursor-pointer"
-          >
-            Reset Hours
-          </button>
-          <div className="bg-surface-container-high rounded-full px-4 py-2 border border-glass-stroke flex items-center gap-2.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-glow shadow-[0_0_8px_rgba(52,211,153,0.8)] animate-pulse"></span>
-            <span className="font-label-mono text-[13px] text-on-surface-variant">
-              Live Time: <span className="text-on-surface font-bold">{currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-            </span>
-          </div>
-        </div>
-      </div>
+        {/* Date Stepper & Quick Return to Today */}
+        <div className="flex items-center justify-center md:justify-end gap-2 w-full md:w-auto">
+          
+          {/* Quick Return to Today Button (Visible when viewing past/future dates) */}
+          {!isViewingToday && (
+            <button
+              onClick={handleGoToToday}
+              className="flex items-center gap-1.5 text-xs font-label-bold px-3 py-2.5 rounded-xl bg-primary text-on-primary hover:opacity-90 transition-all shadow-[0_0_12px_rgba(56,189,248,0.5)] cursor-pointer shrink-0 animate-pulse"
+              title="Return to Today's Schedule"
+            >
+              <span className="material-symbols-outlined text-sm">today</span>
+              <span>Return to Today</span>
+            </button>
+          )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-[24px]">
-        {/* Lecture Schedule Window with Dynamic Stepper Navigation */}
-        <div className="glass-panel rounded-xl p-6 lg:col-span-2 flex flex-col min-h-[440px]">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-            <div>
-              <h3 className="font-headline-md text-[22px] font-semibold text-on-surface flex items-center gap-2">
-                <span className="material-symbols-outlined text-electric-blue">calendar_today</span>
-                Schedule for {selectedDayName} <span className="font-label-mono text-electric-blue font-bold text-lg">({formatDDMM(selectedDate)})</span>
-              </h3>
-              <p className="text-xs font-body-md text-on-surface-variant mt-0.5">Toggle previous/upcoming dates or reset to today.</p>
+          {/* Date Stepper Container */}
+          <div className="flex items-center justify-between bg-surface-container-low rounded-xl p-1 border border-white/5 shadow-sm max-w-xs w-full sm:w-auto">
+            <button
+              onClick={() => handleStepDate(-1)}
+              className="w-touch-target h-touch-target flex items-center justify-center text-on-surface-variant hover:bg-white/5 rounded-lg active:scale-95 transition-all cursor-pointer"
+              title="Previous Day"
+            >
+              <span className="material-symbols-outlined">chevron_left</span>
+            </button>
+
+            <div 
+              onClick={handleGoToToday}
+              className="px-stack-md flex flex-col items-center min-w-[120px] cursor-pointer hover:opacity-80 transition-opacity"
+              title="Click to reset to Today"
+            >
+              <span className="font-label-bold text-label-bold text-primary uppercase tracking-widest text-[11px]">
+                {isViewingToday ? 'Today' : selectedDayName}
+              </span>
+              <span className="font-body-md text-xs font-semibold text-on-surface">
+                {formattedDisplayDate}
+              </span>
             </div>
 
-            {/* Date Navigation & Touch-Friendly DD/MM Stepper Controls */}
-            <div className="flex items-center gap-1.5 bg-surface-container-lowest p-1 rounded-xl border border-glass-stroke self-start sm:self-auto">
-              <button
-                onClick={() => handleStepDate(-1)}
-                title="Previous Day"
-                className="w-9 h-9 sm:w-8 sm:h-8 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer flex items-center justify-center"
-              >
-                <span className="material-symbols-outlined text-lg">chevron_left</span>
-              </button>
+            <button
+              onClick={() => handleStepDate(1)}
+              className="w-touch-target h-touch-target flex items-center justify-center text-on-surface-variant hover:bg-white/5 rounded-lg active:scale-95 transition-all cursor-pointer"
+              title="Next Day"
+            >
+              <span className="material-symbols-outlined">chevron_right</span>
+            </button>
+          </div>
+        </div>
+      </section>
 
-              <span className="font-label-mono text-xs font-bold text-electric-blue px-3 py-1.5 rounded-lg bg-electric-blue/10 border border-electric-blue/30">
-                {formatDDMM(selectedDate)}
-              </span>
+      {/* Admin Quick Toast Notification */}
+      {adminActionMsg && (
+        <div className="bg-secondary/20 border border-secondary text-secondary p-3 rounded-xl text-center font-label-bold text-xs animate-bounce">
+          {adminActionMsg}
+        </div>
+      )}
 
-              <button
-                onClick={() => handleStepDate(1)}
-                title="Next Day"
-                className="w-9 h-9 sm:w-8 sm:h-8 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer flex items-center justify-center"
-              >
-                <span className="material-symbols-outlined text-lg">chevron_right</span>
-              </button>
+      {/* Main Bento Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+        
+        {/* Daily Lectures Timeline (Column 1-8) */}
+        <div className="lg:col-span-8 flex flex-col gap-gutter">
+          <div className="glass-card rounded-xl p-stack-md">
+            
+            {/* Header Controls & Status Filters */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-stack-sm mb-stack-md border-b border-white/5 pb-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-headline-md text-headline-md text-on-surface">Daily Lectures</h3>
+                  <span className="text-xs text-on-surface-variant font-label-mono">({totalTodayClasses} Sessions)</span>
+                </div>
+                <p className="text-base sm:text-lg font-headline-md text-primary font-bold mt-1 tracking-tight flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-lg">calendar_month</span>
+                  <span>{formattedDisplayDate}</span>
+                </p>
+              </div>
 
-              {selectedDate !== todayDateStr && (
-                <button
-                  onClick={handleGoToToday}
-                  title="Reset to Today"
-                  className="px-2.5 py-1.5 rounded-lg bg-electric-blue/15 text-electric-blue border border-electric-blue/30 font-label-mono text-[11px] font-bold hover:bg-electric-blue/25 transition-all cursor-pointer ml-1"
-                >
-                  Today
-                </button>
+              {/* Status Filter Chips */}
+              <div className="flex items-center gap-1 overflow-x-auto no-scrollbar pt-1 sm:pt-0">
+                {[
+                  { label: 'All', key: 'ALL' },
+                  { label: 'Ongoing', key: 'ONGOING' },
+                  { label: 'Upcoming', key: 'UPCOMING' },
+                  { label: 'Completed', key: 'DONE' },
+                  { label: 'Canceled', key: 'CANCELED' }
+                ].map(chip => (
+                  <button
+                    key={chip.key}
+                    onClick={() => setStatusFilter(chip.key)}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-label-bold transition-all cursor-pointer whitespace-nowrap ${
+                      statusFilter === chip.key
+                        ? 'bg-primary/20 text-primary border border-primary/40'
+                        : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5'
+                    }`}
+                  >
+                    {chip.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Holiday Special Banner if Selected Date is a Sri Lankan Holiday */}
+            {selectedHoliday && (
+              <div className="mb-stack-md p-4 rounded-xl bg-tertiary/10 border border-tertiary/30 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">{selectedHoliday.icon}</span>
+                  <div>
+                    <h4 className="font-headline-md text-sm text-tertiary font-bold">{selectedHoliday.name}</h4>
+                    <p className="text-xs text-on-surface-variant">{selectedHoliday.type} — Physical lectures postponed.</p>
+                  </div>
+                </div>
+                <span className="poya-badge px-3 py-1 rounded-full text-xs font-label-bold">
+                  Department Holiday
+                </span>
+              </div>
+            )}
+
+            {/* Timeline List View */}
+            <div className="relative pl-8">
+              {/* Vertical Glowing Line */}
+              <div className="absolute left-[15px] top-4 bottom-4 w-[2px] timeline-line rounded-full"></div>
+
+              {filteredSchedule.length === 0 ? (
+                <div className="p-8 text-center glass-card rounded-xl border border-white/5 my-4">
+                  <span className="material-symbols-outlined text-4xl text-on-surface-variant mb-2">event_busy</span>
+                  <p className="text-on-surface font-semibold">No Lectures Found</p>
+                  <p className="text-xs text-on-surface-variant mt-1">No sessions match your filter criteria on this date.</p>
+                </div>
+              ) : (
+                filteredSchedule.map((slot, index) => {
+                  const isOngoing = slot.liveStatus === 'Ongoing';
+                  const isDone = slot.liveStatus === 'Done';
+                  const isCanceled = slot.liveStatus === 'Canceled';
+                  const isSwapped = slot.liveStatus === 'Swapped' || slot.liveStatus === 'Rescheduled';
+                  const isHoliday = slot.liveStatus === 'Holiday';
+
+                  return (
+                    <div key={index} className="relative mb-stack-lg last:mb-0 group">
+                      {/* Timeline Node Pill */}
+                      <div className={`absolute -left-[23px] top-3.5 w-4 h-4 rounded-full border-4 border-surface ${
+                        isOngoing 
+                          ? 'bg-primary shadow-[0_0_10px_rgba(56,189,248,0.8)] animate-pulse-glow'
+                          : isCanceled
+                          ? 'bg-error'
+                          : isDone
+                          ? 'bg-secondary opacity-60'
+                          : isSwapped
+                          ? 'bg-tertiary'
+                          : 'bg-on-surface-variant'
+                      }`}></div>
+
+                      {/* Main Lecture Card */}
+                      <div className={`glass-card rounded-xl p-stack-md transition-all ${
+                        isOngoing ? 'border-primary/40 bg-primary/5 active-glow' : 'hover:bg-white/5'
+                      }`}>
+                        
+                        {/* Slot Header */}
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-stack-sm mb-2">
+                          <div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className={`font-label-bold text-xs uppercase tracking-wider ${
+                                isCanceled ? 'text-error line-through' : isOngoing ? 'text-primary' : 'text-on-surface-variant'
+                              }`}>
+                                {slot.time}
+                              </span>
+
+                              {/* Live Countdown Indicators */}
+                              {isOngoing && (
+                                <span className="text-[11px] text-primary font-label-bold bg-primary/10 px-2 py-0.5 rounded-full border border-primary/20">
+                                  Ends in {slot.minsRemaining} mins
+                                </span>
+                              )}
+                              {slot.liveStatus === 'Upcoming' && slot.minsUntilStart > 0 && slot.minsUntilStart <= 120 && (
+                                <span className="text-[11px] text-secondary font-label-bold bg-secondary/10 px-2 py-0.5 rounded-full border border-secondary/20">
+                                  Starts in {slot.minsUntilStart} mins
+                                </span>
+                              )}
+                            </div>
+
+                            <h4 className={`font-headline-md text-headline-md text-on-surface leading-tight ${
+                              isCanceled ? 'line-through opacity-50' : ''
+                            }`}>
+                              <Link to={`/modules/${slot.module}`} className="hover:text-primary transition-colors">
+                                {slot.module}: {slot.name}
+                              </Link>
+                            </h4>
+                          </div>
+
+                          {/* Live Status Badge */}
+                          <div className="shrink-0 flex items-center gap-2">
+                            {isOngoing && (
+                              <span className="bg-primary/20 text-primary border border-primary/30 px-3 py-1 rounded-lg font-label-bold text-xs flex items-center gap-1.5">
+                                <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                                Live Ongoing
+                              </span>
+                            )}
+                            {isDone && (
+                              <span className="bg-secondary/10 text-secondary border border-secondary/20 px-3 py-1 rounded-lg font-label-bold text-xs">
+                                ✓ Conducted
+                              </span>
+                            )}
+                            {slot.liveStatus === 'Upcoming' && (
+                              <span className="bg-surface-container-highest text-on-surface-variant px-3 py-1 rounded-lg font-label-bold text-xs">
+                                Upcoming
+                              </span>
+                            )}
+                            {isCanceled && (
+                              <span className="bg-error/20 text-error border border-error/30 px-3 py-1 rounded-lg font-label-bold text-xs">
+                                Canceled
+                              </span>
+                            )}
+                            {isSwapped && (
+                              <span className="bg-tertiary/20 text-tertiary border border-tertiary/30 px-3 py-1 rounded-lg font-label-bold text-xs">
+                                {slot.liveStatus}
+                              </span>
+                            )}
+                            {isHoliday && (
+                              <span className="poya-badge px-3 py-1 rounded-lg font-label-bold text-xs">
+                                Holiday
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Lecture Meta Details */}
+                        <div className="flex flex-wrap gap-x-6 gap-y-2 text-on-surface-variant text-xs mt-3">
+                          <span className="flex items-center gap-1.5">
+                            <span className="material-symbols-outlined text-sm text-primary">location_on</span>
+                            Venue: <b className="text-on-surface">{slot.hall}</b>
+                          </span>
+                        </div>
+
+                        {/* Live Session Progress Bar for Ongoing Lectures */}
+                        {isOngoing && (
+                          <div className="mt-4 pt-3 border-t border-white/5 space-y-1">
+                            <div className="flex justify-between text-[11px] font-label-bold">
+                              <span className="text-primary flex items-center gap-1">
+                                <span className="material-symbols-outlined text-xs">schedule</span>
+                                Live Lecture Progress
+                              </span>
+                              <span className="text-secondary">{slot.progressPercent}% Completed</span>
+                            </div>
+                            <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-primary rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(56,189,248,0.6)]"
+                                style={{ width: `${slot.progressPercent}%` }}
+                              ></div>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Reason / Remarks if Canceled or Rescheduled */}
+                        {slot.reason && (
+                          <p className="mt-3 text-xs text-error italic bg-error/5 p-2 rounded-lg border border-error/10">
+                            Note: {slot.reason}
+                          </p>
+                        )}
+
+                        {/* Inline Admin Controls (Only visible to Admin) */}
+                        {isAdmin && (
+                          <div className="mt-3 pt-3 border-t border-white/5 flex flex-wrap items-center justify-end gap-2">
+                            <span className="text-[10px] font-label-bold text-on-surface-variant mr-auto">Admin Controls:</span>
+                            <button
+                              onClick={() => handleQuickLogHours(slot.module, 2)}
+                              className="px-2.5 py-1 rounded bg-secondary/10 text-secondary border border-secondary/20 text-xs font-label-bold hover:bg-secondary/20 cursor-pointer"
+                              title="Log 2 hours for this class into Daily Logs"
+                            >
+                              + Log 2h to Logs
+                            </button>
+                            <button
+                              onClick={() => navigate('/admin')}
+                              className="px-2.5 py-1 rounded bg-primary/10 text-primary border border-primary/20 text-xs font-label-bold hover:bg-primary/20 cursor-pointer"
+                            >
+                              Reschedule
+                            </button>
+                            <button
+                              onClick={() => handleQuickCancelClass(slot.module)}
+                              className="px-2.5 py-1 rounded bg-error/10 text-error border border-error/20 text-xs font-label-bold hover:bg-error/20 cursor-pointer"
+                            >
+                              Cancel Class
+                            </button>
+                          </div>
+                        )}
+
+                      </div>
+                    </div>
+                  );
+                })
               )}
             </div>
           </div>
+        </div>
 
-          <div className="flex flex-col gap-3 flex-1 overflow-y-auto pr-1">
-            {currentSchedule.length === 0 ? (
-              <div className="flex flex-col items-center justify-center flex-1 text-center p-8 border border-dashed border-glass-stroke rounded-xl">
-                <span className="material-symbols-outlined text-on-surface-variant text-4xl mb-2">event_busy</span>
-                <p className="text-on-surface font-semibold">No classes scheduled for {selectedDate}</p>
-                <p className="text-on-surface-variant text-xs mt-1">Use arrow controls above to view other days.</p>
-              </div>
-            ) : (
-              currentSchedule.map((lec, idx) => {
-                const badge = getStatusBadge(lec.liveStatus);
-                const isCanceled = lec.liveStatus === 'Canceled';
+        {/* Right Sidebar Section (Column 9-12) */}
+        <div className="lg:col-span-4 flex flex-col gap-gutter">
+          
+          {/* 1. Module Completion Progress */}
+          <div className="glass-card rounded-xl p-stack-md space-y-stack-md">
+            <div className="flex items-center justify-between pb-3 border-b border-white/5">
+              <h3 className="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-widest text-xs">
+                Course Progress
+              </h3>
+              <Link to="/modules" className="text-xs text-primary hover:underline font-label-bold">
+                View All
+              </Link>
+            </div>
+
+            <div className="space-y-stack-md">
+              {moduleHours.slice(0, 4).map((mod) => {
+                const percent = Math.min(100, Math.round((mod.conductedHours / mod.targetHours) * 100));
+                const isHigh = percent >= 75;
+                const isMedium = percent >= 45 && percent < 75;
+
                 return (
-                  <div
-                    key={idx}
-                    className={`bg-surface-container/50 border rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 transition-all duration-200 ${badge.card}`}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className={`w-1.5 h-12 rounded-full ${badge.bar}`}></div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h4 className={`font-body-md font-bold text-base ${isCanceled ? 'line-through text-on-surface-variant' : 'text-on-surface'}`}>
-                            {lec.module}
-                          </h4>
-                          <span className="text-xs text-on-surface-variant">({lec.name})</span>
-                        </div>
-                        <p className="text-on-surface-variant text-xs flex items-center gap-2 mt-1">
-                          <span className="flex items-center gap-1 font-label-mono text-electric-blue">
-                            <span className="material-symbols-outlined text-[14px]">schedule</span> {lec.newTime || lec.time}
-                          </span>
-                          <span>•</span>
-                          <span className="flex items-center gap-1">
-                            <span className="material-symbols-outlined text-[14px]">location_on</span> {lec.newVenue || lec.hall}
-                          </span>
-                        </p>
-                        {lec.reason && <p className="text-coral-vibe text-[11px] mt-0.5 font-semibold">Notice: {lec.reason}</p>}
-                      </div>
-                    </div>
-
-                    <div className={`px-3 py-1 rounded-full border ${badge.bg}`}>
-                      <span className={`font-label-mono text-[11px] uppercase ${badge.text}`}>
-                        {badge.label}
+                  <div key={mod.code}>
+                    <div className="flex justify-between text-xs mb-1 font-label-bold">
+                      <span className="text-on-surface">{mod.code}: {mod.title}</span>
+                      <span className={isHigh ? 'text-secondary' : isMedium ? 'text-primary' : 'text-tertiary'}>
+                        {percent}% ({mod.conductedHours}/{mod.targetHours}h)
                       </span>
+                    </div>
+                    <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full transition-all duration-500 ${
+                          isHigh ? 'bg-secondary shadow-[0_0_10px_rgba(78,222,163,0.3)]' : isMedium ? 'bg-primary shadow-[0_0_10px_rgba(56,189,248,0.3)]' : 'bg-tertiary shadow-[0_0_10px_rgba(255,188,191,0.3)]'
+                        }`}
+                        style={{ width: `${percent}%` }}
+                      ></div>
                     </div>
                   </div>
                 );
-              })
-            )}
+              })}
+            </div>
           </div>
-        </div>
 
-        {/* Right Column: Sri Lanka Calendar & Notices */}
-        <div className="flex flex-col gap-[24px]">
-          <SriLankanCalendarWidget selectedDate={selectedDate} onSelectDate={setSelectedDate} />
+          {/* 2. Calendar Widget */}
+          <SriLankanCalendarWidget selectedDate={selectedDate} onSelectDate={(d) => setSelectedDate(d)} />
 
-          {/* Live Notices Feed */}
-          <div className="glass-panel-elevated rounded-xl p-6 flex flex-col relative overflow-hidden">
-            <h3 className="font-headline-md text-[22px] font-semibold text-on-surface flex items-center gap-2 mb-6">
-              <span className="material-symbols-outlined text-coral-vibe">campaign</span>
-              Notices & Alerts
-            </h3>
-            <div className="flex flex-col gap-4 flex-1 overflow-y-auto max-h-80">
+          {/* 3. Department Announcements Feed */}
+          <div className="glass-card rounded-xl p-stack-md space-y-stack-md">
+            <div className="flex items-center justify-between pb-3 border-b border-white/5">
+              <h3 className="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-widest text-xs">
+                Announcements
+              </h3>
+              {isAdmin && (
+                <Link to="/admin" className="text-xs text-secondary hover:underline flex items-center gap-0.5 font-label-bold">
+                  <span className="material-symbols-outlined text-xs">add</span> Post Notice
+                </Link>
+              )}
+            </div>
+
+            <div className="space-y-stack-md">
               {notices.map((notice) => (
-                <div key={notice.id} className="border-b border-glass-stroke pb-4 last:border-0">
-                  <div className="flex items-center justify-between">
-                    <span className="font-label-mono text-[11px] text-electric-blue bg-electric-blue/10 px-2 py-0.5 rounded font-bold">
-                      {notice.date}
+                <div key={notice.id} className="flex gap-stack-md p-2.5 hover:bg-white/5 rounded-xl transition-colors group border border-white/5">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                    notice.type === 'Holiday' ? 'bg-tertiary/20 text-tertiary' : notice.type === 'Canceled' ? 'bg-error/20 text-error' : 'bg-primary/20 text-primary'
+                  }`}>
+                    <span className="material-symbols-outlined text-xl">
+                      {notice.type === 'Holiday' ? 'brightness_3' : notice.type === 'Canceled' ? 'event_busy' : 'campaign'}
                     </span>
-                    <div className="flex items-center gap-1.5">
-                      {notice.type && (
-                        <span className={`text-[10px] font-label-mono px-2 py-0.5 rounded font-bold uppercase ${
-                          notice.type === 'Canceled' ? 'bg-coral-vibe/20 text-coral-vibe border border-coral-vibe/30' : 'bg-emerald-glow/20 text-emerald-glow border border-emerald-glow/30'
-                        }`}>
-                          {notice.type}
-                        </span>
-                      )}
-
-                      {/* Admin-Only Edit & Remove Controls */}
-                      {isAdmin && (
-                        <div className="flex items-center gap-1 ml-2">
-                          <button
-                            onClick={() => setEditingNotice(notice)}
-                            className="p-1 text-on-surface-variant hover:text-electric-blue rounded transition-colors cursor-pointer"
-                            title="Edit Notice (Admin)"
-                          >
-                            <span className="material-symbols-outlined text-xs">edit</span>
-                          </button>
-                          <button
-                            onClick={() => handleDeleteNotice(notice.id)}
-                            className="p-1 text-on-surface-variant hover:text-coral-vibe rounded transition-colors cursor-pointer"
-                            title="Remove Notice (Admin)"
-                          >
-                            <span className="material-symbols-outlined text-xs">delete</span>
-                          </button>
-                        </div>
-                      )}
-                    </div>
                   </div>
-                  <h4 className="font-body-md font-bold text-on-surface mt-1.5 text-sm">{notice.title}</h4>
-                  <p className="text-on-surface-variant text-xs mt-1 leading-relaxed">{notice.content}</p>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-1 mb-1">
+                      <h5 className="font-headline-md text-on-surface leading-tight text-xs font-bold truncate">
+                        {notice.title}
+                      </h5>
+                      <span className="text-[10px] text-on-surface-variant/60 whitespace-nowrap font-label-mono">
+                        {notice.date}
+                      </span>
+                    </div>
+                    <p className="text-xs text-on-surface-variant line-clamp-2">
+                      {notice.content}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Admin Edit Notice Modal Popup */}
-      {editingNotice && (
-        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <form onSubmit={handleSaveNoticeEdit} className="glass-panel p-6 rounded-xl max-w-md w-full flex flex-col gap-4 border border-electric-blue/40 shadow-[0_0_25px_rgba(0,212,255,0.2)]">
-            <div className="flex justify-between items-center pb-2 border-b border-glass-stroke">
-              <h3 className="font-headline-md text-lg font-bold text-on-surface flex items-center gap-2">
-                <span className="material-symbols-outlined text-electric-blue">edit_note</span> Edit Notice (Admin)
-              </h3>
-              <button
-                type="button"
-                onClick={() => setEditingNotice(null)}
-                className="text-on-surface-variant hover:text-on-surface cursor-pointer"
-              >
-                <span className="material-symbols-outlined text-sm">close</span>
-              </button>
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <label className="text-[11px] font-label-mono uppercase text-on-surface-variant">Title</label>
-              <input
-                className="bg-surface-container-lowest border border-glass-stroke text-on-surface rounded-lg p-2.5 text-xs outline-none focus:border-electric-blue font-body-md"
-                required
-                value={editingNotice.title}
-                onChange={e => setEditingNotice({ ...editingNotice, title: e.target.value })}
-              />
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <label className="text-[11px] font-label-mono uppercase text-on-surface-variant">Notice Content</label>
-              <textarea
-                className="bg-surface-container-lowest border border-glass-stroke text-on-surface rounded-lg p-2.5 text-xs outline-none focus:border-electric-blue font-body-md h-28 resize-none"
-                required
-                value={editingNotice.content}
-                onChange={e => setEditingNotice({ ...editingNotice, content: e.target.value })}
-              />
-            </div>
-
-            <div className="flex justify-end gap-2 pt-2">
-              <button
-                type="button"
-                onClick={() => setEditingNotice(null)}
-                className="px-4 py-2 rounded-lg bg-surface-container-high border border-glass-stroke text-xs font-bold text-on-surface-variant hover:text-on-surface cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="btn-electric px-5 py-2 rounded-lg text-xs font-bold font-label-mono cursor-pointer"
-              >
-                Save Changes
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      {/* Module Lecture Hours Tracker Grid */}
-      <div className="mt-4">
-        <div className="flex justify-between items-end mb-6">
-          <div>
-            <h2 className="font-headline-md text-[22px] font-semibold text-on-surface">Module Lecture Hours Tracker</h2>
-            <p className="text-xs text-on-surface-variant mt-1">Real-time conducted lecture hours since Semester Start (27th July 2026).</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-          {moduleHours.map((mod) => {
-            const pct = Math.min(100, Math.round((mod.conductedHours / mod.targetHours) * 100));
-            return (
-              <Link
-                key={mod.code}
-                to={`/modules/${mod.code}`}
-                className="glass-panel rounded-xl p-5 hover:-translate-y-1 transition-transform duration-300 group block"
-              >
-                <div className="flex justify-between items-start mb-3">
-                  <span className="font-label-mono text-xs px-2.5 py-1 bg-electric-blue/15 text-electric-blue border border-electric-blue/30 rounded font-bold">
-                    {mod.code}
-                  </span>
-                  <span className="font-label-mono text-xs font-bold text-emerald-glow">
-                    {mod.conductedHours} / {mod.targetHours} hrs ({pct}%)
-                  </span>
-                </div>
-
-                <h4 className="font-body-lg text-[16px] font-bold text-on-surface group-hover:text-electric-blue transition-colors leading-snug">
-                  {mod.title}
-                </h4>
-
-                {/* Progress bar */}
-                <div className="w-full bg-surface-container-lowest rounded-full h-2.5 mt-4 overflow-hidden border border-glass-stroke">
-                  <div
-                    className="bg-gradient-to-r from-electric-blue to-emerald-glow h-full rounded-full transition-all duration-300"
-                    style={{ width: `${pct}%` }}
-                  ></div>
-                </div>
-
-                <div className="flex justify-between items-center text-xs text-on-surface-variant font-label-mono mt-3">
-                  <span>Completed: <b className="text-emerald-glow">{mod.conductedHours} hrs</b></span>
-                  <span>Target: <b className="text-on-surface">{mod.targetHours} hrs</b></span>
-                </div>
-              </Link>
-            );
-          })}
         </div>
       </div>
     </div>

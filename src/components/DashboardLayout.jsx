@@ -1,21 +1,32 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import InteractiveShaderBackground from './InteractiveShaderBackground';
 
 function DashboardLayout({ children }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  
   const role = localStorage.getItem('mis_role') || 'student';
   const isAdmin = role === 'admin';
 
-  const navItems = [
-    { name: 'Dashboard', icon: 'dashboard', path: '/' },
-    { name: 'Semester Timetable', icon: 'calendar_month', path: '/timetable' },
-    { name: 'Daily Logs Grid', icon: 'table_chart', path: '/logs' },
-    { name: 'Student Portal', icon: 'person_search', path: '/student-lookup' },
-    { name: 'Audit Trail', icon: 'history', path: '/audit' },
-    { name: 'Admin Portal', icon: 'admin_panel_settings', path: '/admin', protected: true }
+  const allNavItems = [
+    { name: 'Home Dashboard', icon: 'home', path: '/' },
+    { name: 'Weekly Schedule', icon: 'calendar_month', path: '/timetable' },
+    { name: 'Module Tracker', icon: 'view_module', path: '/modules' },
+    { name: 'Daily Lecture Logs', icon: 'history_edu', path: '/logs', adminOnly: true },
+    { name: 'Audit Trail', icon: 'history', path: '/audit', adminOnly: true },
+    { name: 'Admin Portal', icon: 'admin_panel_settings', path: '/admin', adminOnly: true }
   ];
+
+  const navItems = allNavItems.filter(item => !item.adminOnly || isAdmin);
+
+  const handleLeaveAdmin = () => {
+    localStorage.setItem('mis_role', 'student');
+    localStorage.removeItem('mis_user');
+    navigate('/');
+    window.location.reload();
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('mis_role');
@@ -25,80 +36,86 @@ function DashboardLayout({ children }) {
 
   return (
     <>
-      {/* Desktop Top Header Navigation */}
-      <header className="bg-surface/80 backdrop-blur-xl fixed top-0 w-full z-50 border-b border-glass-stroke shadow-sm hidden md:block">
-        <div className="flex justify-between items-center h-16 px-[40px] w-full max-w-[1440px] mx-auto">
-          <div className="flex items-center gap-4">
-            <span className="font-display-lg text-[26px] text-electric-blue tracking-tight leading-none font-bold">Academic MIS</span>
-            <span className={`text-[10px] font-label-mono px-2.5 py-0.5 rounded-full border font-bold uppercase ${
-              isAdmin
-                ? 'bg-emerald-glow/20 text-emerald-glow border-emerald-glow/40'
-                : 'bg-electric-blue/20 text-electric-blue border-electric-blue/40'
-            }`}>
-              {isAdmin ? 'Admin Mode' : 'Student Read-Only'}
-            </span>
+      <InteractiveShaderBackground />
+      {/* Top Navigation Bar */}
+      <header className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-b border-white/5 shadow-[0_0_15px_rgba(56,189,248,0.1)]">
+        <div className="flex items-center justify-between px-margin-mobile md:px-margin-desktop h-touch-target max-w-[1440px] mx-auto">
+          {/* Left Logo & Menu Button */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="material-symbols-outlined text-primary hover:opacity-80 transition-opacity cursor-pointer p-1 rounded-lg hover:bg-white/5"
+              aria-label="Toggle Mobile Menu"
+            >
+              {mobileMenuOpen ? 'close' : 'menu'}
+            </button>
+            <Link to="/" className="flex items-center gap-2">
+              <h1 className="font-headline-lg-mobile md:font-headline-md font-bold text-primary tracking-tight">
+                ESchedular26
+              </h1>
+              {isAdmin && (
+                <span className="text-[10px] font-label-bold px-2 py-0.5 rounded-full border uppercase bg-secondary/10 text-secondary border-secondary/30">
+                  Admin
+                </span>
+              )}
+            </Link>
           </div>
 
-          <div className="flex items-center gap-4">
+          {/* Right Controls */}
+          <div className="flex items-center gap-3 md:gap-4">
             {isAdmin ? (
-              <div className="flex items-center gap-2 bg-emerald-glow/10 border border-emerald-glow/30 px-3 py-1.5 rounded-full text-xs font-label-mono text-emerald-glow">
-                <span className="w-2 h-2 rounded-full bg-emerald-glow animate-pulse"></span>
-                Authenticated Admin
-              </div>
+              <button
+                onClick={handleLeaveAdmin}
+                className="hidden sm:flex items-center gap-1.5 bg-error/10 border border-error/30 hover:bg-error/20 px-3 py-1 rounded-full text-xs font-label-bold text-error transition-colors cursor-pointer"
+                title="Exit Admin Mode and return to Basic View"
+              >
+                <span className="material-symbols-outlined text-sm">logout</span> Leave Admin Mode
+              </button>
             ) : (
               <Link
                 to="/login"
-                className="btn-electric px-3.5 py-1.5 rounded-full text-xs font-bold font-label-mono flex items-center gap-1.5"
+                className="hidden sm:flex items-center gap-1.5 btn-electric px-3 py-1 rounded-full text-xs font-label-bold"
               >
                 <span className="material-symbols-outlined text-sm">login</span> Admin Login
               </Link>
             )}
 
-            <div className="w-9 h-9 rounded-full bg-surface-container-high border border-glass-stroke overflow-hidden cursor-pointer">
-              <img alt="User Avatar" className="w-full h-full object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80" />
+            <button className="material-symbols-outlined text-primary hover:opacity-80 transition-opacity cursor-pointer text-xl sm:text-2xl">
+              notifications
+            </button>
+
+            {/* Avatar */}
+            <div 
+              onClick={() => navigate(isAdmin ? '/admin' : '/login')}
+              className="w-8 h-8 rounded-full overflow-hidden border border-primary/30 cursor-pointer hover:border-primary transition-colors shrink-0"
+              title={isAdmin ? "Logged in as Admin" : "Click to Login"}
+            >
+              <img
+                className="w-full h-full object-cover"
+                alt="User Avatar"
+                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80"
+              />
             </div>
           </div>
         </div>
       </header>
 
-      {/* Mobile Top Header Navigation */}
-      <header className="bg-surface/90 backdrop-blur-xl fixed top-0 w-full z-50 border-b border-glass-stroke shadow-md md:hidden px-4 h-14 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-1.5 rounded-lg bg-surface-container border border-glass-stroke text-electric-blue cursor-pointer"
-            aria-label="Toggle Mobile Menu"
-          >
-            <span className="material-symbols-outlined text-lg">{mobileMenuOpen ? 'close' : 'menu'}</span>
-          </button>
-          <span className="font-display-lg text-base text-electric-blue font-bold tracking-tight">Academic MIS</span>
-        </div>
-
-        <span className={`text-[9px] font-label-mono px-2 py-0.5 rounded-full border font-bold uppercase ${
-          isAdmin
-            ? 'bg-emerald-glow/20 text-emerald-glow border-emerald-glow/40'
-            : 'bg-electric-blue/20 text-electric-blue border-electric-blue/40'
-        }`}>
-          {isAdmin ? 'Admin' : 'Student'}
-        </span>
-      </header>
-
-      {/* Mobile Slide-out Drawer Overlay */}
+      {/* Slide-out Sidebar Drawer Menu (Desktop & Mobile Drawer) */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-40 md:hidden flex">
+        <div className="fixed inset-0 z-40 flex">
           <div
             onClick={() => setMobileMenuOpen(false)}
-            className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm"
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm"
           ></div>
 
-          <nav className="relative bg-surface-container-lowest border-r border-glass-stroke w-4/5 max-w-xs h-full flex flex-col py-6 px-4 gap-y-4 pt-16 z-50 overflow-y-auto shadow-2xl">
+          <nav className="relative bg-surface-container border-r border-white/10 w-4/5 max-w-xs h-full flex flex-col py-6 px-4 gap-y-4 pt-16 z-50 overflow-y-auto shadow-2xl">
             <div className="flex items-center gap-3 px-2 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-primary/10 border border-electric-blue/30 flex items-center justify-center">
-                <span className="material-symbols-outlined text-electric-blue text-xl">school</span>
+              <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center">
+                <span className="material-symbols-outlined text-primary text-xl">school</span>
               </div>
               <div>
                 <h2 className="font-headline-md text-sm text-on-surface font-bold leading-tight">Faculty of Engineering</h2>
-                <p className="text-on-surface-variant text-[11px]">Department MIS</p>
+                <p className="text-on-surface-variant text-[11px]">ESchedular26 MIS</p>
               </div>
             </div>
 
@@ -110,141 +127,169 @@ function DashboardLayout({ children }) {
                     key={item.name}
                     to={item.path}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg transition-all text-sm font-medium ${
+                    className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all text-sm font-label-bold ${
                       isActive
-                        ? 'bg-electric-blue/15 text-electric-blue font-bold border border-electric-blue/30'
-                        : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
+                        ? 'bg-primary/10 text-primary border border-primary/30 active-glow'
+                        : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5'
                     }`}
                   >
-                    <span className="material-symbols-outlined text-lg">{item.icon}</span>
+                    <span className="material-symbols-outlined text-xl">{item.icon}</span>
                     <span>{item.name}</span>
-                    {item.protected && !isAdmin && (
-                      <span className="material-symbols-outlined text-xs text-coral-vibe ml-auto">lock</span>
-                    )}
                   </Link>
                 );
               })}
             </div>
 
-            <div className="pt-4 border-t border-glass-stroke">
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  handleLogout();
-                }}
-                className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all text-sm font-medium cursor-pointer"
-              >
-                <span className="material-symbols-outlined text-lg">logout</span>
-                <span>{isAdmin ? 'Logout Admin' : 'Switch Role / Login'}</span>
-              </button>
+            <div className="pt-4 border-t border-white/10">
+              {isAdmin ? (
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    handleLeaveAdmin();
+                  }}
+                  className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-error/10 border border-error/20 text-error hover:bg-error/20 transition-all text-sm font-label-bold cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-xl">logout</span>
+                  <span>Leave Admin Mode</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    handleLogout();
+                  }}
+                  className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all text-sm font-label-bold cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-xl">login</span>
+                  <span>Admin Login</span>
+                </button>
+              )}
             </div>
           </nav>
         </div>
       )}
 
-      {/* Desktop Sidebar Navigation */}
-      <nav className="bg-surface-container-lowest/60 backdrop-blur-xl fixed left-0 top-0 h-full w-[280px] z-40 border-r border-glass-stroke shadow-lg hidden md:flex flex-col py-8 px-4 gap-y-4 pt-24">
-        <div className="flex items-center gap-4 px-4 mb-6">
-          <div className="w-12 h-12 rounded-lg bg-primary/10 border border-electric-blue/30 flex items-center justify-center overflow-hidden">
-            <span className="material-symbols-outlined text-electric-blue" style={{ fontSize: '28px' }}>school</span>
+      {/* Desktop Persistent Sidebar Navigation */}
+      <aside className="bg-surface-container/40 backdrop-blur-xl fixed left-0 top-0 h-full w-[260px] z-40 border-r border-white/5 hidden lg:flex flex-col py-8 px-4 gap-y-4 pt-20">
+        <div className="flex items-center gap-3 px-3 mb-4">
+          <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center">
+            <span className="material-symbols-outlined text-primary text-xl">school</span>
           </div>
           <div>
-            <h2 className="font-headline-md text-[17px] text-on-surface leading-tight font-bold">Faculty of Engineering</h2>
-            <p className="text-on-surface-variant text-xs font-body-md mt-0.5">Department MIS</p>
+            <h2 className="font-headline-md text-sm text-on-surface font-bold leading-tight">Faculty of Eng.</h2>
+            <p className="text-on-surface-variant text-[11px]">ESchedular26 MIS</p>
           </div>
         </div>
-        
+
         <div className="flex flex-col gap-1 flex-1">
           {navItems.map((item) => {
             const isActive = location.pathname === item.path;
             return (
-              <Link 
-                key={item.name} 
-                to={item.path} 
-                className={`flex items-center gap-3 px-4 py-3 rounded-r-full transition-all duration-200 group cursor-pointer ${
+              <Link
+                key={item.name}
+                to={item.path}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group cursor-pointer text-sm font-label-bold ${
                   isActive
-                    ? 'bg-primary-container/20 text-electric-blue border-r-4 border-electric-blue font-bold'
-                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/50'
+                    ? 'bg-primary/10 text-primary border border-primary/30 active-glow'
+                    : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5'
                 }`}
               >
-                <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform" style={isActive ? { fontVariationSettings: "'FILL' 1" } : {}}>
+                <span className="material-symbols-outlined group-hover:scale-110 transition-transform text-xl">
                   {item.icon}
                 </span>
-                <span className="font-body-md text-sm">{item.name}</span>
-                {item.protected && !isAdmin && (
-                  <span className="material-symbols-outlined text-xs text-coral-vibe ml-auto" title="Admin Auth Required">lock</span>
-                )}
+                <span>{item.name}</span>
               </Link>
             );
           })}
         </div>
-        
-        <div className="mt-auto border-t border-glass-stroke pt-4 px-4">
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-r-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/50 transition-all duration-200 group cursor-pointer"
-          >
-            <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">logout</span>
-            <span className="font-body-md text-sm">{isAdmin ? 'Logout Admin' : 'Switch Role / Login'}</span>
-          </button>
-        </div>
-      </nav>
 
-      {/* Mobile Bottom Quick Navigation Dock */}
-      <nav className="fixed bottom-0 left-0 w-full bg-surface-container-lowest/95 backdrop-blur-2xl border-t border-glass-stroke z-40 md:hidden flex items-center justify-around px-2 py-1.5 shadow-2xl">
+        <div className="mt-auto border-t border-white/10 pt-4 px-2">
+          {isAdmin ? (
+            <button
+              onClick={handleLeaveAdmin}
+              className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl bg-error/10 border border-error/20 text-error hover:bg-error/20 transition-all text-sm font-label-bold cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-xl">logout</span>
+              <span>Leave Admin Mode</span>
+            </button>
+          ) : (
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all text-sm font-label-bold cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-xl">login</span>
+              <span>Admin Login</span>
+            </button>
+          )}
+        </div>
+      </aside>
+
+      {/* Mobile Bottom Navigation Shell */}
+      <nav className="lg:hidden fixed bottom-0 w-full z-50 bg-surface/90 backdrop-blur-xl border-t border-white/5 shadow-[0_-4px_20px_rgba(0,0,0,0.5)] rounded-t-xl h-[72px] flex justify-around items-center px-2 pb-safe">
         <Link
           to="/"
-          className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg transition-colors ${
-            location.pathname === '/' ? 'text-electric-blue font-bold' : 'text-on-surface-variant'
+          className={`flex flex-col items-center justify-center transition-all duration-200 active:scale-90 ${
+            location.pathname === '/' ? 'text-primary drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]' : 'text-on-surface-variant/60 hover:text-primary/80'
           }`}
         >
-          <span className="material-symbols-outlined text-xl">dashboard</span>
-          <span className="text-[10px] font-label-mono">Home</span>
+          <span className="material-symbols-outlined text-xl">home</span>
+          <span className="font-label-sm text-[11px]">Home</span>
         </Link>
 
         <Link
           to="/timetable"
-          className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg transition-colors ${
-            location.pathname === '/timetable' ? 'text-electric-blue font-bold' : 'text-on-surface-variant'
+          className={`flex flex-col items-center justify-center transition-all duration-200 active:scale-90 ${
+            location.pathname === '/timetable' ? 'text-primary drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]' : 'text-on-surface-variant/60 hover:text-primary/80'
           }`}
         >
           <span className="material-symbols-outlined text-xl">calendar_month</span>
-          <span className="text-[10px] font-label-mono">Schedule</span>
+          <span className="font-label-sm text-[11px]">Schedule</span>
         </Link>
 
         <Link
-          to="/logs"
-          className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg transition-colors ${
-            location.pathname === '/logs' ? 'text-electric-blue font-bold' : 'text-on-surface-variant'
+          to="/modules"
+          className={`flex flex-col items-center justify-center transition-all duration-200 active:scale-90 ${
+            location.pathname === '/modules' ? 'text-primary drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]' : 'text-on-surface-variant/60 hover:text-primary/80'
           }`}
         >
-          <span className="material-symbols-outlined text-xl">table_chart</span>
-          <span className="text-[10px] font-label-mono">Logs</span>
+          <span className="material-symbols-outlined text-xl">view_module</span>
+          <span className="font-label-sm text-[11px]">Modules</span>
         </Link>
 
-        <Link
-          to="/student-lookup"
-          className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg transition-colors ${
-            location.pathname === '/student-lookup' ? 'text-electric-blue font-bold' : 'text-on-surface-variant'
-          }`}
-        >
-          <span className="material-symbols-outlined text-xl">person_search</span>
-          <span className="text-[10px] font-label-mono">Student</span>
-        </Link>
+        {isAdmin ? (
+          <>
+            <Link
+              to="/logs"
+              className={`flex flex-col items-center justify-center transition-all duration-200 active:scale-90 ${
+                location.pathname === '/logs' ? 'text-primary drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]' : 'text-on-surface-variant/60 hover:text-primary/80'
+              }`}
+            >
+              <span className="material-symbols-outlined text-xl">history_edu</span>
+              <span className="font-label-sm text-[11px]">Logs</span>
+            </Link>
 
-        <Link
-          to={isAdmin ? '/admin' : '/login'}
-          className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg transition-colors ${
-            location.pathname === '/admin' ? 'text-emerald-glow font-bold' : 'text-on-surface-variant'
-          }`}
-        >
-          <span className="material-symbols-outlined text-xl">{isAdmin ? 'admin_panel_settings' : 'lock'}</span>
-          <span className="text-[10px] font-label-mono">{isAdmin ? 'Admin' : 'Login'}</span>
-        </Link>
+            <button
+              onClick={handleLeaveAdmin}
+              className="flex flex-col items-center justify-center text-error transition-all duration-200 active:scale-90 cursor-pointer"
+              title="Leave Admin Mode"
+            >
+              <span className="material-symbols-outlined text-xl">logout</span>
+              <span className="font-label-sm text-[11px]">Leave Admin</span>
+            </button>
+          </>
+        ) : (
+          <Link
+            to="/login"
+            className="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-primary/80 transition-all duration-200 active:scale-90"
+          >
+            <span className="material-symbols-outlined text-xl">login</span>
+            <span className="font-label-sm text-[11px]">Login</span>
+          </Link>
+        )}
       </nav>
 
       {/* Main Container */}
-      <main className="md:ml-[280px] pt-16 md:pt-16 pb-24 md:pb-10 min-h-screen p-3 sm:p-5 md:p-[40px] max-w-[1440px] mx-auto">
+      <main className="lg:ml-[260px] pt-16 pb-28 lg:pb-12 min-h-screen px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto">
         {children}
       </main>
     </>

@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import { sriLankaHolidays2026, getHolidayForDate } from '../data/sriLankaHolidaysData';
 
 function SriLankanCalendarWidget({ selectedDate, onSelectDate }) {
-  // Initialized to July 2026 (Semester 3 start month)
   const [viewYear, setViewYear] = useState(2026);
-  const [viewMonth, setViewMonth] = useState(6); // 0-indexed: 6 = July
+  const [viewMonth, setViewMonth] = useState(6);
 
   const monthNames = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -29,11 +28,9 @@ function SriLankanCalendarWidget({ selectedDate, onSelectDate }) {
     }
   };
 
-  // Generate calendar days for the current viewMonth & viewYear
-  const firstDayOfMonth = new Date(viewYear, viewMonth, 1).getDay(); // 0 = Sun
+  const firstDayOfMonth = new Date(viewYear, viewMonth, 1).getDay();
   const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
 
-  // Shift start to Monday (0 = Mon, 6 = Sun)
   const startOffset = (firstDayOfMonth + 6) % 7;
 
   const daysArray = [];
@@ -44,21 +41,22 @@ function SriLankanCalendarWidget({ selectedDate, onSelectDate }) {
     daysArray.push(d);
   }
 
-  // Get upcoming Sri Lankan holidays for list display
   const upcomingHolidays = sriLankaHolidays2026.filter(h => h.date >= '2026-07-27');
 
   return (
-    <div className="glass-panel rounded-xl p-5 flex flex-col gap-4">
-      <div className="flex justify-between items-center pb-3 border-b border-glass-stroke">
+    <div className="glass-card rounded-xl p-stack-md flex flex-col gap-4 overflow-hidden relative">
+      <div className="absolute top-[-20%] right-[-10%] w-32 h-32 bg-tertiary/10 blur-[40px] rounded-full"></div>
+      
+      <div className="flex justify-between items-center pb-3 border-b border-white/5 relative z-10">
         <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-coral-vibe">calendar_month</span>
-          <h3 className="font-headline-md text-base font-bold text-on-surface">
+          <span className="material-symbols-outlined text-tertiary">brightness_3</span>
+          <h3 className="font-label-bold text-label-bold text-on-surface uppercase tracking-widest text-xs">
             Calendar
           </h3>
         </div>
 
         {/* Month Switcher Controls */}
-        <div className="flex items-center gap-1 bg-surface-container-lowest px-2 py-1 rounded-lg border border-glass-stroke">
+        <div className="flex items-center gap-1 bg-surface-container-low px-2 py-1 rounded-lg border border-white/5">
           <button
             onClick={handlePrevMonth}
             className="text-on-surface-variant hover:text-on-surface p-0.5 cursor-pointer"
@@ -66,7 +64,7 @@ function SriLankanCalendarWidget({ selectedDate, onSelectDate }) {
           >
             <span className="material-symbols-outlined text-sm">chevron_left</span>
           </button>
-          <span className="font-label-mono text-xs font-bold text-electric-blue min-w-[90px] text-center">
+          <span className="font-label-mono text-xs font-bold text-primary min-w-[90px] text-center">
             {monthNames[viewMonth]} {viewYear}
           </span>
           <button
@@ -80,18 +78,18 @@ function SriLankanCalendarWidget({ selectedDate, onSelectDate }) {
       </div>
 
       {/* Grid Days Header */}
-      <div className="grid grid-cols-7 gap-1 text-center font-label-mono text-[11px] text-on-surface-variant uppercase font-semibold">
+      <div className="grid grid-cols-7 gap-1 text-center font-label-mono text-[11px] text-on-surface-variant uppercase font-bold relative z-10">
         <span>Mon</span>
         <span>Tue</span>
         <span>Wed</span>
         <span>Thu</span>
         <span>Fri</span>
-        <span className="text-coral-vibe font-bold">Sat</span>
-        <span className="text-coral-vibe font-bold">Sun</span>
+        <span className="text-tertiary">Sat</span>
+        <span className="text-tertiary">Sun</span>
       </div>
 
       {/* Grid Days Matrix */}
-      <div className="grid grid-cols-7 gap-1.5 text-center font-label-mono text-xs">
+      <div className="grid grid-cols-7 gap-1.5 text-center font-label-mono text-xs relative z-10">
         {daysArray.map((day, idx) => {
           if (!day) {
             return <div key={idx} className="h-9"></div>;
@@ -106,23 +104,23 @@ function SriLankanCalendarWidget({ selectedDate, onSelectDate }) {
           const isToday = dateStr === todayDateStr;
           const isPast = dateStr < todayDateStr;
 
-          let dayStyle = 'bg-surface-container/40 border-glass-stroke text-on-surface hover:bg-surface-container-high';
+          let dayStyle = 'bg-surface-container/40 border-white/5 text-on-surface hover:bg-surface-container';
 
           if (isSelected) {
-            dayStyle = 'bg-electric-blue text-slate-900 font-bold border-electric-blue shadow-[0_0_12px_rgba(0,212,255,0.6)]';
+            dayStyle = 'bg-primary text-on-primary font-bold border-primary shadow-[0_0_12px_rgba(56,189,248,0.6)]';
           } else if (isToday) {
-            dayStyle = 'bg-emerald-glow/20 border-emerald-glow text-emerald-glow font-bold ring-2 ring-emerald-glow/60 shadow-[0_0_12px_rgba(52,211,153,0.5)]';
+            dayStyle = 'bg-secondary/20 border-secondary text-secondary font-bold ring-1 ring-secondary/60 shadow-[0_0_10px_rgba(78,222,163,0.4)]';
           } else if (holiday) {
-            dayStyle = 'bg-coral-vibe/15 border-coral-vibe/50 text-coral-vibe font-bold';
+            dayStyle = 'poya-badge font-bold';
           } else if (isPast) {
-            dayStyle = 'bg-surface-container-lowest/30 border-glass-stroke/40 text-on-surface-variant/40';
+            dayStyle = 'bg-surface-container-low/30 border-white/5 text-on-surface-variant/40';
           }
 
           return (
             <button
               key={idx}
-              onClick={() => onSelectDate(dateStr)}
-              title={holiday ? `${holiday.name} (${holiday.type})` : isPast ? `${dateStr} (Finished Day)` : dateStr}
+              onClick={() => onSelectDate && onSelectDate(dateStr)}
+              title={holiday ? `${holiday.name} (${holiday.type})` : isPast ? `${dateStr} (Past Day)` : dateStr}
               className={`h-9 rounded-lg flex flex-col items-center justify-center relative transition-all cursor-pointer border ${dayStyle}`}
             >
               <span className={isPast && !isSelected && !isToday ? 'line-through opacity-50 font-normal' : ''}>{day}</span>
@@ -137,26 +135,26 @@ function SriLankanCalendarWidget({ selectedDate, onSelectDate }) {
       </div>
 
       {/* Sri Lanka Holidays List Feed */}
-      <div className="mt-2 pt-3 border-t border-glass-stroke flex flex-col gap-2">
-        <span className="text-[11px] font-label-mono uppercase text-on-surface-variant font-semibold flex items-center gap-1">
-          <span className="material-symbols-outlined text-xs text-coral-vibe">event</span>
+      <div className="mt-2 pt-3 border-t border-white/5 flex flex-col gap-2 relative z-10">
+        <span className="text-[11px] font-label-bold uppercase text-on-surface-variant flex items-center gap-1">
+          <span className="material-symbols-outlined text-xs text-tertiary">event</span>
           Upcoming Holidays
         </span>
         <div className="flex flex-col gap-1.5 max-h-32 overflow-y-auto pr-1">
           {upcomingHolidays.map((h, i) => (
             <button
               key={i}
-              onClick={() => onSelectDate(h.date)}
-              className="flex items-center justify-between bg-surface-container-lowest p-2 rounded-lg border border-glass-stroke hover:border-coral-vibe/40 text-left transition-colors cursor-pointer"
+              onClick={() => onSelectDate && onSelectDate(h.date)}
+              className="flex items-center justify-between bg-surface-container-low p-2 rounded-xl border border-white/5 hover:border-tertiary/40 text-left transition-colors cursor-pointer"
             >
               <div className="flex items-center gap-2">
                 <span className="text-sm">{h.icon}</span>
                 <div>
-                  <h4 className="font-body-md font-bold text-on-surface text-xs">{h.name}</h4>
+                  <h4 className="font-headline-md font-bold text-on-surface text-xs">{h.name}</h4>
                   <span className="text-[10px] text-on-surface-variant font-label-mono">{h.type}</span>
                 </div>
               </div>
-              <span className="font-label-mono text-xs text-coral-vibe font-semibold">
+              <span className="font-label-mono text-xs text-tertiary font-bold">
                 {h.date.split('-')[2]}/{h.date.split('-')[1]}
               </span>
             </button>
