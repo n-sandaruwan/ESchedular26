@@ -106,7 +106,6 @@ function LabTrackerPage() {
       return d.toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric',
-        year: 'numeric',
       });
     } catch (e) {
       return dateStr;
@@ -220,8 +219,7 @@ function LabTrackerPage() {
       const d = new Date(parts[0], parts[1] - 1, parts[2]);
       return d.toLocaleDateString('en-US', {
         weekday: 'long',
-        year: 'numeric',
-        month: 'long',
+        month: 'short',
         day: 'numeric',
       });
     } catch (e) {
@@ -733,7 +731,7 @@ function LabTrackerPage() {
         <div className="space-y-4">
           <div className="bg-surface-container/60 backdrop-blur-xl border border-primary/30 rounded-2xl p-4 shadow-[0_0_20px_rgba(56,189,248,0.12)] max-w-md mx-auto space-y-2 text-center">
             <label className="text-xs font-label-bold uppercase text-primary tracking-wider block">
-              Select Electrical Group:
+              Select EE Group:
             </label>
             <select
               value={selectedGroupLookupCode}
@@ -742,7 +740,7 @@ function LabTrackerPage() {
             >
               {LAB_GROUPS.map((g) => (
                 <option key={g.code} value={g.code} className="bg-surface text-on-surface font-mono">
-                  {g.code} ({g.name})
+                  {g.code}
                 </option>
               ))}
             </select>
@@ -755,7 +753,7 @@ function LabTrackerPage() {
                   {selectedGroupLookupCode}
                 </div>
                 <div>
-                  <h3 className="font-bold text-on-surface text-base sm:text-lg">Electrical Group {selectedGroupLookupCode}</h3>
+                  <h3 className="font-bold text-on-surface text-base sm:text-lg">Group {selectedGroupLookupCode}</h3>
                   <p className="text-xs text-on-surface-variant font-mono">
                     {groupLookupMembers.length} Registered Student Members
                   </p>
@@ -1057,7 +1055,7 @@ function LabTrackerPage() {
                     >
                       {LAB_GROUPS.map((g) => (
                         <option key={g.code} value={g.code} className="bg-surface text-on-surface font-mono py-2">
-                          {g.code} — {g.name}
+                          {g.code}
                         </option>
                       ))}
                     </select>
