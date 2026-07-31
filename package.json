@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "predeploy": "npm run build",
+    "build": "vite build && node -e \"require('fs').copyFileSync('dist/index.html', 'dist/404.html')\"",
+    "predeploy": "npm run build && node -e \"require('fs').cpSync('dist', 'docs', {recursive: true})\"",
     "deploy": "gh-pages -d dist",
     "lint": "oxlint",
     "preview": "vite preview"
