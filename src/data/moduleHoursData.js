@@ -145,9 +145,9 @@ export const initialModuleHours = [
     weeklyHours: 3,
     venue: 'AUD',
     credits: 3,
-    coordinator: 'Dr. Praneeth Wijesinghe',
-    email: 'praneeth@is.ruh.ac.lk',
-    teachers: ['Dr. Praneeth Wijesinghe'],
+    coordinator: 'Eng. Ms. H. A. Danusi Saumyadi',
+    email: '',
+    teachers: ['Eng. Ms. H. A. Danusi Saumyadi', 'Dr. Praneeth Wijesinghe'],
     gradingScheme: defaultGradingScheme
   }
 ];

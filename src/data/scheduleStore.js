@@ -1,6 +1,8 @@
 import { weeklyTimetable } from './timetableData';
 import { getStoredModuleHours, saveStoredModuleHours } from './moduleHoursData';
 import { getStoredDailyLogs, saveStoredDailyLogs, addAuditLog } from './dailyLogsData';
+import { pushOverrideToCloud, pushNoticeToCloud } from './firebaseSync';
+import { pushRecordToGoogleSheetWebhook } from './googleSheetsSync';
 
 // Initial Schedule Overrides (Cancellations, Reschedules, Swaps per date)
 export const initialOverrides = [
@@ -17,6 +19,9 @@ export const getStoredOverrides = () => {
 
 export const saveStoredOverrides = (overrides) => {
   localStorage.setItem('mis_schedule_overrides', JSON.stringify(overrides));
+  if (Array.isArray(overrides)) {
+    overrides.forEach(o => pushOverrideToCloud(o));
+  }
 };
 
 // Initial Notices Feed
@@ -38,6 +43,8 @@ export const addNotice = (title, content, type = 'Alert', date = new Date().toIS
   const newNotice = { id: Date.now(), title, content, type, date };
   const updated = [newNotice, ...current];
   localStorage.setItem('mis_notices', JSON.stringify(updated));
+  pushNoticeToCloud(newNotice);
+  pushRecordToGoogleSheetWebhook({ type: 'Notice Broadcast', title, content, date, status: type });
   return updated;
 };
 

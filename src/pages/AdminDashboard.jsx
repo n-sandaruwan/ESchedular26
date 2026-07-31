@@ -2,6 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { getStoredModuleHours, saveStoredModuleHours } from '../data/moduleHoursData';
 import { getStoredDailyLogs, saveStoredDailyLogs, addAuditLog } from '../data/dailyLogsData';
 import { getModulesForDate, modifyScheduleSlot, addNotice } from '../data/scheduleStore';
+import {
+  getStoredSheetCsvUrl,
+  saveStoredSheetCsvUrl,
+  getStoredSheetWebhookUrl,
+  saveStoredSheetWebhookUrl,
+  fetchScheduleFromGoogleSheet,
+  GOOGLE_APPS_SCRIPT_TEMPLATE
+} from '../data/googleSheetsSync';
 
 function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('reschedule');
@@ -29,6 +37,44 @@ function AdminDashboard() {
 
   const [statusMsg, setStatusMsg] = useState('');
   const [conflictWarning, setConflictWarning] = useState('');
+
+  // Confirmation Modal State
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    btnText: 'Confirm',
+    btnStyle: 'btn-electric',
+    onConfirm: null
+  });
+
+  // Google Sheets & Drive Integration State
+  const [sheetCsvUrl, setSheetCsvUrl] = useState(getStoredSheetCsvUrl());
+  const [sheetWebhookUrl, setSheetWebhookUrl] = useState(getStoredSheetWebhookUrl());
+  const [isDriveSyncing, setIsDriveSyncing] = useState(false);
+  const [showScriptModal, setShowScriptModal] = useState(false);
+
+  const handleSaveDriveConfig = async (e) => {
+    e.preventDefault();
+    saveStoredSheetCsvUrl(sheetCsvUrl);
+    saveStoredSheetWebhookUrl(sheetWebhookUrl);
+
+    if (sheetCsvUrl) {
+      setIsDriveSyncing(true);
+      try {
+        const res = await fetchScheduleFromGoogleSheet(sheetCsvUrl);
+        setStatusMsg(`✅ Successfully synced ${res.count} schedule records live from your Google Drive Sheet!`);
+        addAuditLog('Google Drive Sync', `Admin triggered live sync from Google Sheet (${res.count} records).`);
+      } catch (err) {
+        setConflictWarning(`Failed to fetch from Google Sheet: ${err.message}. Make sure the sheet is published as CSV (File -> Share -> Publish to web -> CSV).`);
+      } finally {
+        setIsDriveSyncing(false);
+      }
+    } else {
+      setStatusMsg('✅ Google Drive settings saved successfully!');
+    }
+    setTimeout(() => setStatusMsg(''), 5000);
+  };
 
   useEffect(() => {
     const list = getModulesForDate(logDate);
@@ -90,12 +136,8 @@ function AdminDashboard() {
     setLogNote('');
   };
 
-  const handleRescheduleSubmit = (e) => {
-    e.preventDefault();
-    setConflictWarning('');
-
-    if (!reschedTargetModule || !reschedStartTime || !reschedEndTime) return;
-
+  // Execution Helpers after Confirmation Modal
+  const executeReschedule = () => {
     const formattedTimeSlot = `${reschedStartTime} - ${reschedEndTime}`;
 
     if (reschedVenue === 'NCC' && formattedTimeSlot.includes('08:30')) {
@@ -114,12 +156,25 @@ function AdminDashboard() {
     setStatusMsg(`Rescheduled ${reschedTargetModule} to ${reschedTargetDate} (${formattedTimeSlot} @ ${reschedVenue})! Master schedule updated.`);
     setTimeout(() => setStatusMsg(''), 4000);
     setReschedRemark('');
+    setConfirmModal({ isOpen: false, title: '', message: '', onConfirm: null });
   };
 
-  const handleCancellationSubmit = (e) => {
+  const handleRescheduleSubmit = (e) => {
     e.preventDefault();
-    if (!selectedCancelModule) return;
+    setConflictWarning('');
+    if (!reschedTargetModule || !reschedStartTime || !reschedEndTime) return;
 
+    setConfirmModal({
+      isOpen: true,
+      title: 'Confirm Reschedule Action',
+      message: `Are you sure you want to RESCHEDULE ${reschedTargetModule} on ${reschedTargetDate} to ${reschedStartTime} - ${reschedEndTime} (${reschedVenue})? This update will be published instantly.`,
+      btnText: 'Confirm Reschedule',
+      btnStyle: 'btn-electric',
+      onConfirm: executeReschedule
+    });
+  };
+
+  const executeCancellation = () => {
     modifyScheduleSlot({
       date: cancelDate,
       module: selectedCancelModule,
@@ -130,16 +185,45 @@ function AdminDashboard() {
     setStatusMsg(`Canceled ${selectedCancelModule} for ${cancelDate}! Notice & dashboard alert updated.`);
     setTimeout(() => setStatusMsg(''), 4000);
     setCancelRemark('');
+    setConfirmModal({ isOpen: false, title: '', message: '', onConfirm: null });
   };
 
-  const handleNoticeSubmit = (e) => {
+  const handleCancellationSubmit = (e) => {
     e.preventDefault();
+    if (!selectedCancelModule) return;
+
+    setConfirmModal({
+      isOpen: true,
+      title: 'Confirm Lecture Cancellation',
+      message: `Are you sure you want to CANCEL ${selectedCancelModule} scheduled on ${cancelDate}? This will notify all enrolled students.`,
+      btnText: 'Confirm Cancellation',
+      btnStyle: 'bg-error text-on-error hover:bg-error/90',
+      onConfirm: executeCancellation
+    });
+  };
+
+  const executeNoticeBroadcast = () => {
     addNotice(noticeTitle, noticeContent);
     addAuditLog('Notice Broadcast', `Posted announcement: "${noticeTitle}".`);
     setStatusMsg(`Notice broadcasted successfully to all dashboards!`);
     setTimeout(() => setStatusMsg(''), 4000);
     setNoticeTitle('');
     setNoticeContent('');
+    setConfirmModal({ isOpen: false, title: '', message: '', onConfirm: null });
+  };
+
+  const handleNoticeSubmit = (e) => {
+    e.preventDefault();
+    if (!noticeTitle || !noticeContent) return;
+
+    setConfirmModal({
+      isOpen: true,
+      title: 'Confirm Notice Broadcast',
+      message: `Are you sure you want to BROADCAST "${noticeTitle}" to all student dashboards?`,
+      btnText: 'Confirm Broadcast',
+      btnStyle: 'btn-electric',
+      onConfirm: executeNoticeBroadcast
+    });
   };
 
   const handleExitAdmin = () => {
@@ -309,6 +393,19 @@ function AdminDashboard() {
           >
             <span className="material-symbols-outlined text-lg">campaign</span>
             <span className="text-xs font-label-bold">Broadcast Notice</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('drive')}
+            className={`p-3 rounded-xl border flex flex-col sm:flex-row items-center justify-center gap-2 cursor-pointer transition-all ${
+              activeTab === 'drive'
+                ? 'bg-secondary/15 border-secondary text-secondary font-bold'
+                : 'bg-surface-container/50 border-white/5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
+            }`}
+          >
+            <span className="material-symbols-outlined text-lg">table_chart</span>
+            <span className="text-xs font-label-bold">Google Sheets Sync</span>
           </button>
         </div>
 
@@ -514,7 +611,112 @@ function AdminDashboard() {
             </button>
           </form>
         )}
+
+        {/* TAB 4: Google Sheets & Drive Integration Panel */}
+        {activeTab === 'drive' && (
+          <form onSubmit={handleSaveDriveConfig} className="glass-card p-stack-md rounded-xl flex flex-col gap-4 border-t-4 border-t-secondary">
+            <div>
+              <h4 className="font-headline-md text-base font-bold text-on-surface flex items-center gap-2">
+                <span className="material-symbols-outlined text-secondary">table_chart</span> Google Sheets & Drive Automatic Live Sync
+              </h4>
+              <p className="text-xs text-on-surface-variant mt-0.5">
+                Connect your Google Sheet in Google Drive for automatic two-way live schedule updates and attendance logging.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label className="text-[11px] font-label-bold uppercase text-on-surface-variant">
+                1. Published Google Sheet CSV URL (Fetch Live Timetable from Drive)
+              </label>
+              <input
+                className={inputClasses}
+                placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?output=csv"
+                value={sheetCsvUrl}
+                onChange={e => setSheetCsvUrl(e.target.value)}
+              />
+              <span className="text-[10px] text-on-surface-variant/70">
+                To get this URL: In Google Sheets, go to <b>File ➔ Share ➔ Publish to web</b>, select <b>Comma-separated values (.csv)</b>, and copy the link.
+              </span>
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label className="text-[11px] font-label-bold uppercase text-on-surface-variant">
+                2. Google Apps Script Webhook URL (Push Web App Updates to Drive Sheet)
+              </label>
+              <input
+                className={inputClasses}
+                placeholder="https://script.google.com/macros/s/.../exec"
+                value={sheetWebhookUrl}
+                onChange={e => setSheetWebhookUrl(e.target.value)}
+              />
+            </div>
+
+            <div className="flex items-center justify-between pt-2">
+              <button
+                type="button"
+                onClick={() => setShowScriptModal(!showScriptModal)}
+                className="text-xs text-secondary underline hover:opacity-80 cursor-pointer font-label-bold"
+              >
+                {showScriptModal ? 'Hide Google Apps Script Instructions' : '📋 Show Google Apps Script Template'}
+              </button>
+
+              <button
+                type="submit"
+                disabled={isDriveSyncing}
+                className="btn-electric px-6 py-2.5 rounded-xl text-xs font-label-bold flex items-center gap-2 cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-sm">sync</span>
+                <span>{isDriveSyncing ? 'Syncing...' : 'Save & Sync Drive Now'}</span>
+              </button>
+            </div>
+
+            {showScriptModal && (
+              <div className="p-4 bg-black/40 border border-white/10 rounded-xl space-y-2 text-xs">
+                <p className="font-bold text-on-surface">Instructions to set up Google Webhook in 1 minute:</p>
+                <ol className="list-decimal list-inside space-y-1 text-on-surface-variant text-[11px]">
+                  <li>Open your Google Sheet in Google Drive.</li>
+                  <li>Click <b>Extensions ➔ Apps Script</b>.</li>
+                  <li>Paste the following code and click <b>Deploy ➔ New Deployment</b> (type: <i>Web app</i>, Who has access: <i>Anyone</i>):</li>
+                </ol>
+                <textarea
+                  readOnly
+                  className="w-full h-36 bg-black p-3 font-mono text-[10px] text-secondary rounded border border-white/10"
+                  value={GOOGLE_APPS_SCRIPT_TEMPLATE}
+                />
+              </div>
+            )}
+          </form>
+        )}
       </div>
+
+      {/* Confirmation Modal Overlay */}
+      {confirmModal.isOpen && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-fadeIn">
+          <div className="bg-surface-container border border-primary/40 rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4 text-center border-t-4 border-t-primary">
+            <div className="w-12 h-12 rounded-full bg-primary/20 border border-primary/40 text-primary flex items-center justify-center mx-auto">
+              <span className="material-symbols-outlined text-2xl">help_outline</span>
+            </div>
+            <h3 className="font-extrabold text-on-surface text-lg">{confirmModal.title}</h3>
+            <p className="text-xs text-on-surface-variant leading-relaxed">{confirmModal.message}</p>
+            <div className="flex items-center justify-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setConfirmModal({ isOpen: false, title: '', message: '', onConfirm: null })}
+                className="px-5 py-2.5 rounded-xl border border-white/10 text-on-surface hover:bg-white/5 text-xs font-label-bold cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmModal.onConfirm}
+                className={`${confirmModal.btnStyle || 'btn-electric'} px-6 py-2.5 rounded-xl text-xs font-label-bold shadow-lg cursor-pointer`}
+              >
+                {confirmModal.btnText || 'Confirm'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

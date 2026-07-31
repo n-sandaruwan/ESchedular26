@@ -8,6 +8,7 @@ import ModulePage from './pages/ModulePage';
 import TimetablePage from './pages/TimetablePage';
 import DailyLogPage from './pages/DailyLogPage';
 import AuditLogPage from './pages/AuditLogPage';
+import LabTrackerPage from './pages/LabTrackerPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import DashboardLayout from './components/DashboardLayout';
 import './index.css';
@@ -24,6 +25,7 @@ function App() {
         <Route path="/modules" element={<DashboardLayout><ModuleTrackerPage /></DashboardLayout>} />
         <Route path="/modules/:moduleId" element={<DashboardLayout><ModulePage /></DashboardLayout>} />
         <Route path="/module/:moduleId" element={<DashboardLayout><ModulePage /></DashboardLayout>} />
+        <Route path="/lab-tracker" element={<DashboardLayout><LabTrackerPage /></DashboardLayout>} />
         <Route path="/logs" element={<DashboardLayout><DailyLogPage /></DashboardLayout>} />
         <Route path="/audit" element={<DashboardLayout><AuditLogPage /></DashboardLayout>} />
         

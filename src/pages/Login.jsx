@@ -25,6 +25,17 @@ function Login() {
       return;
     }
 
+    // Lab Admin Authentication -> Lab Admin Access (Can mark lab attendance)
+    if (
+      (cleanInput === 'labadmin' || cleanInput === 'labadmin@mis.com' || cleanInput === 'lab') &&
+      (password === 'labadmin' || password === 'lab123' || password === 'admin')
+    ) {
+      localStorage.setItem('mis_role', 'lab_admin');
+      localStorage.setItem('mis_user', 'Lab Administrator');
+      navigate('/lab-tracker');
+      return;
+    }
+
     // Student Authentication -> Student Dashboard
     if (cleanInput) {
       localStorage.setItem('mis_role', 'student');
@@ -42,6 +53,12 @@ function Login() {
     navigate('/');
   };
 
+  const handleLabAdminLogin = () => {
+    localStorage.setItem('mis_role', 'lab_admin');
+    localStorage.setItem('mis_user', 'Lab Administrator');
+    navigate('/lab-tracker');
+  };
+
   return (
     <div className="relative min-h-screen flex items-center justify-center p-4 bg-background overflow-hidden">
       <InteractiveShaderBackground />
@@ -55,7 +72,7 @@ function Login() {
             <span className="material-symbols-outlined text-2xl">lock</span>
           </div>
           <h1 className="font-headline-md text-2xl font-bold text-on-surface">ESchedular26 | Academic MIS</h1>
-          <p className="text-xs text-on-surface-variant mt-1">Authenticate to access Admin Portal or Student Dashboard.</p>
+          <p className="text-xs text-on-surface-variant mt-1">Authenticate to access Admin Portal, Lab Admin, or Student View.</p>
         </div>
 
         {error && (
@@ -74,7 +91,7 @@ function Login() {
               required
               value={email}
               onChange={e => setEmail(e.target.value)}
-              placeholder="admin@mis.com or admin"
+              placeholder="admin, labadmin, or student email"
             />
           </div>
 
@@ -100,22 +117,33 @@ function Login() {
 
         <div className="relative flex py-1 items-center">
           <div className="flex-grow border-t border-white/10"></div>
-          <span className="flex-shrink mx-3 text-[11px] font-label-bold text-on-surface-variant uppercase">OR</span>
+          <span className="flex-shrink mx-3 text-[11px] font-label-bold text-on-surface-variant uppercase">QUICK MODES</span>
           <div className="flex-grow border-t border-white/10"></div>
         </div>
 
-        {/* Guest Student Button */}
-        <button
-          type="button"
-          onClick={handleGuestStudentLogin}
-          className="bg-surface-container border border-white/10 text-on-surface hover:bg-white/5 py-2.5 rounded-lg text-xs font-label-bold cursor-pointer flex items-center justify-center gap-2 transition-colors"
-        >
-          <span className="material-symbols-outlined text-sm text-primary">school</span> Continue in Basic Mode
-        </button>
+        {/* Quick Mode Buttons */}
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={handleLabAdminLogin}
+            className="bg-secondary/10 border border-secondary/30 text-secondary hover:bg-secondary/20 py-2.5 rounded-lg text-xs font-label-bold cursor-pointer flex items-center justify-center gap-1.5 transition-colors"
+          >
+            <span className="material-symbols-outlined text-sm">biotech</span> Lab Admin Mode
+          </button>
+
+          <button
+            type="button"
+            onClick={handleGuestStudentLogin}
+            className="bg-surface-container border border-white/10 text-on-surface hover:bg-white/5 py-2.5 rounded-lg text-xs font-label-bold cursor-pointer flex items-center justify-center gap-1.5 transition-colors"
+          >
+            <span className="material-symbols-outlined text-sm text-primary">school</span> Basic Mode
+          </button>
+        </div>
 
         {/* Presets Hint Card */}
-        <div className="p-3 rounded-xl bg-surface-container-low border border-white/5 text-xs text-center font-label-bold">
-          Admin Credentials: <b className="text-primary">admin</b> / <b className="text-primary">admin</b>
+        <div className="p-3 rounded-xl bg-surface-container-low border border-white/5 text-xs text-center font-label-bold space-y-1 text-on-surface-variant">
+          <div>Admin: <b className="text-primary font-mono">admin</b> / <b className="text-primary font-mono">admin</b></div>
+          <div>Lab Admin: <b className="text-secondary font-mono">labadmin</b> / <b className="text-secondary font-mono">labadmin</b></div>
         </div>
 
       </div>

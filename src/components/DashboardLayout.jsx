@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import InteractiveShaderBackground from './InteractiveShaderBackground';
+import { isFirebaseConfigured } from '../firebase';
 
 function DashboardLayout({ children }) {
   const location = useLocation();
@@ -9,11 +10,14 @@ function DashboardLayout({ children }) {
   
   const role = localStorage.getItem('mis_role') || 'student';
   const isAdmin = role === 'admin';
+  const isLabAdmin = role === 'lab_admin';
+  const isCloudSynced = isFirebaseConfigured();
 
   const allNavItems = [
     { name: 'Home Dashboard', icon: 'home', path: '/' },
     { name: 'Weekly Schedule', icon: 'calendar_month', path: '/timetable' },
     { name: 'Module Tracker', icon: 'view_module', path: '/modules' },
+    { name: 'Lab Tracker', icon: 'biotech', path: '/lab-tracker' },
     { name: 'Daily Lecture Logs', icon: 'history_edu', path: '/logs', adminOnly: true },
     { name: 'Audit Trail', icon: 'history', path: '/audit', adminOnly: true },
     { name: 'Admin Portal', icon: 'admin_panel_settings', path: '/admin', adminOnly: true }
@@ -55,7 +59,12 @@ function DashboardLayout({ children }) {
               </h1>
               {isAdmin && (
                 <span className="text-[10px] font-label-bold px-2 py-0.5 rounded-full border uppercase bg-secondary/10 text-secondary border-secondary/30">
-                  Admin
+                  Full Admin
+                </span>
+              )}
+              {isLabAdmin && (
+                <span className="text-[10px] font-label-bold px-2 py-0.5 rounded-full border uppercase bg-tertiary/10 text-tertiary border-tertiary/30">
+                  Lab Admin
                 </span>
               )}
             </Link>
@@ -63,20 +72,30 @@ function DashboardLayout({ children }) {
 
           {/* Right Controls */}
           <div className="flex items-center gap-3 md:gap-4">
-            {isAdmin ? (
+            {/* Cloud Sync Status Indicator */}
+            {isCloudSynced ? (
+              <span className="hidden sm:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-secondary/10 border border-secondary/30 text-secondary text-[11px] font-label-bold" title="Connected to Firebase Realtime Cloud Database. Changes sync live across all batch mates.">
+                <span className="w-2 h-2 rounded-full bg-secondary animate-pulse"></span> Cloud Synced
+              </span>
+            ) : (
+              <span className="hidden sm:flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[11px] font-label-bold" title="Operating in local mode. Add Firebase keys to src/firebase.js for instant multi-device batch sync.">
+                <span className="w-2 h-2 rounded-full bg-amber-400"></span> Local Mode
+              </span>
+            )}
+            {isAdmin || isLabAdmin ? (
               <button
                 onClick={handleLeaveAdmin}
                 className="hidden sm:flex items-center gap-1.5 bg-error/10 border border-error/30 hover:bg-error/20 px-3 py-1 rounded-full text-xs font-label-bold text-error transition-colors cursor-pointer"
-                title="Exit Admin Mode and return to Basic View"
+                title="Exit Admin/Lab Admin Mode and return to Basic View"
               >
-                <span className="material-symbols-outlined text-sm">logout</span> Leave Admin Mode
+                <span className="material-symbols-outlined text-sm">logout</span> Leave {isLabAdmin ? 'Lab Admin' : 'Admin'}
               </button>
             ) : (
               <Link
                 to="/login"
                 className="hidden sm:flex items-center gap-1.5 btn-electric px-3 py-1 rounded-full text-xs font-label-bold"
               >
-                <span className="material-symbols-outlined text-sm">login</span> Admin Login
+                <span className="material-symbols-outlined text-sm">login</span> Login / Modes
               </Link>
             )}
 
@@ -254,6 +273,16 @@ function DashboardLayout({ children }) {
         >
           <span className="material-symbols-outlined text-xl">view_module</span>
           <span className="font-label-sm text-[11px]">Modules</span>
+        </Link>
+
+        <Link
+          to="/lab-tracker"
+          className={`flex flex-col items-center justify-center transition-all duration-200 active:scale-90 ${
+            location.pathname === '/lab-tracker' ? 'text-primary drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]' : 'text-on-surface-variant/60 hover:text-primary/80'
+          }`}
+        >
+          <span className="material-symbols-outlined text-xl">biotech</span>
+          <span className="font-label-sm text-[11px]">Labs</span>
         </Link>
 
         {isAdmin ? (
