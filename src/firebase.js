@@ -9,8 +9,8 @@ const firebaseConfig = {
   projectId: "eschedular26",
   storageBucket: "eschedular26.firebasestorage.app",
   messagingSenderId: "283044413530",
-  appId: "1:283044413530:web:73cae194f338d088471863",
-  measurementId: "G-FFTRHJKGTS"
+  appId: "1:283044413530:web:2d54a69d4ea9d57b471863",
+  measurementId: "G-3H7520G0K7"
 };
 
 // Helper: Check if Firebase Config has been initialized with user's real keys
