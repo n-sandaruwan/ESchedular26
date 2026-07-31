@@ -4,12 +4,13 @@ import { getFirestore } from "firebase/firestore";
 
 // Paste your Firebase Web App credentials from https://console.firebase.google.com/
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyBzfNA8V2voziY1f3qgWB0pSRyRxM4Qhvo",
+  authDomain: "eschedular26.firebaseapp.com",
+  projectId: "eschedular26",
+  storageBucket: "eschedular26.firebasestorage.app",
+  messagingSenderId: "283044413530",
+  appId: "1:283044413530:web:73cae194f338d088471863",
+  measurementId: "G-FFTRHJKGTS"
 };
 
 // Helper: Check if Firebase Config has been initialized with user's real keys
