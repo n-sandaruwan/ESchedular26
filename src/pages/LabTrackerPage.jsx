@@ -1017,39 +1017,128 @@ function LabTrackerPage() {
             </div>
           )}
 
-          <div className="bg-surface-container/60 border border-white/10 rounded-2xl p-4 sm:p-5 shadow-xl space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-white/10 pb-3">
-              <div>
-                <h2 className="text-base font-bold text-on-surface flex items-center gap-2">
-                  <span className="material-symbols-outlined text-secondary text-lg">how_to_reg</span>
-                  <span>Lab Leader Attendance Portal</span>
-                </h2>
-                <p className="text-xs text-on-surface-variant">Select group code (EE01–EE12) and date to mark lab attendance.</p>
+            {/* Large Prominent Control Card for EE Group & Date Selection */}
+            <div className="bg-black/40 border border-primary/30 rounded-2xl p-4 sm:p-5 space-y-4 shadow-xl">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-secondary/20 border border-secondary/40 flex items-center justify-center text-secondary shrink-0">
+                    <span className="material-symbols-outlined text-xl">how_to_reg</span>
+                  </div>
+                  <div>
+                    <h2 className="text-base sm:text-lg font-extrabold text-on-surface">Lab Leader Attendance Portal</h2>
+                    <p className="text-xs text-on-surface-variant">Select group code (EE01–EE12) and session date below.</p>
+                  </div>
+                </div>
               </div>
 
-              <div className="flex flex-wrap items-center gap-2">
-                <div>
-                  <label className="text-[10px] text-on-surface-variant font-label-bold block mb-0.5">Date:</label>
-                  <input
-                    type="date"
-                    value={selectedDate}
-                    onChange={(e) => setSelectedDate(e.target.value)}
-                    className="px-2.5 py-1 bg-black/50 border border-white/20 rounded-xl text-on-surface text-xs font-mono"
-                  />
-                </div>
-                <div>
-                  <label className="text-[10px] text-on-surface-variant font-label-bold block mb-0.5">EE Group:</label>
-                  <select
-                    value={selectedGroupCode}
-                    onChange={(e) => setSelectedGroupCode(e.target.value)}
-                    className="px-2.5 py-1 bg-black/50 border border-white/20 rounded-xl text-on-surface text-xs font-bold font-mono"
-                  >
+              {/* 2-Column Large Interactive Selectors */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                {/* 1. EE Group Selector */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-label-bold uppercase text-primary tracking-wider flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-sm">groups</span>
+                    <span>1. Select EE Lab Group:</span>
+                  </label>
+
+                  {/* Large Styled Select Dropdown */}
+                  <div className="relative">
+                    <select
+                      value={selectedGroupCode}
+                      onChange={(e) => setSelectedGroupCode(e.target.value)}
+                      className="w-full h-12 px-4 py-2.5 bg-black/80 border-2 border-primary/40 hover:border-primary focus:border-primary rounded-2xl text-on-surface text-sm sm:text-base font-mono font-black focus:outline-none focus:ring-2 focus:ring-primary shadow-lg cursor-pointer appearance-none pr-10 transition-all"
+                    >
+                      {LAB_GROUPS.map((g) => (
+                        <option key={g.code} value={g.code} className="bg-surface text-on-surface font-mono py-2">
+                          {g.code} — {g.name}
+                        </option>
+                      ))}
+                    </select>
+                    <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-primary pointer-events-none text-xl">
+                      unfold_more
+                    </span>
+                  </div>
+
+                  {/* Horizontal Scroll Quick-Select Pills */}
+                  <div className="flex items-center gap-1.5 overflow-x-auto pb-1 pt-1 no-scrollbar">
                     {LAB_GROUPS.map((g) => (
-                      <option key={g.code} value={g.code} className="bg-surface text-on-surface">
-                        {g.code} ({g.name})
-                      </option>
+                      <button
+                        key={g.code}
+                        type="button"
+                        onClick={() => setSelectedGroupCode(g.code)}
+                        className={`px-3 py-1 rounded-xl text-xs font-mono font-extrabold shrink-0 transition-all cursor-pointer border ${
+                          selectedGroupCode === g.code
+                            ? 'bg-primary text-on-primary border-primary shadow-md shadow-primary/30 scale-105'
+                            : 'bg-white/5 text-on-surface-variant/80 border-white/10 hover:border-primary/40 hover:text-primary'
+                        }`}
+                      >
+                        {g.code}
+                      </button>
                     ))}
-                  </select>
+                  </div>
+                </div>
+
+                {/* 2. Session Date Selector with Stepper */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-label-bold uppercase text-secondary tracking-wider flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-sm">calendar_month</span>
+                    <span>2. Select Session Date:</span>
+                  </label>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handlePreviousDay}
+                      className="w-12 h-12 flex items-center justify-center bg-black/80 border-2 border-white/15 hover:border-secondary hover:text-secondary rounded-2xl text-on-surface active:scale-95 transition-all cursor-pointer shrink-0 shadow-md"
+                      title="Previous Day"
+                    >
+                      <span className="material-symbols-outlined text-xl">chevron_left</span>
+                    </button>
+
+                    {/* Big Interactive Date Card Input */}
+                    <div className="relative flex-1 h-12 bg-black/80 border-2 border-secondary/40 hover:border-secondary rounded-2xl flex items-center justify-between px-3.5 cursor-pointer shadow-lg transition-all group">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <span className="material-symbols-outlined text-secondary text-lg shrink-0">event</span>
+                        <span className="text-xs sm:text-sm font-extrabold font-mono text-on-surface truncate">
+                          {getFormattedPillDate(selectedDate)}
+                        </span>
+                      </div>
+
+                      <span className="text-[10px] font-mono font-black uppercase text-secondary bg-secondary/10 border border-secondary/30 px-2 py-0.5 rounded-lg shrink-0">
+                        {getDayNameFromDateString(selectedDate)}
+                      </span>
+
+                      <input
+                        type="date"
+                        value={selectedDate}
+                        onChange={(e) => setSelectedDate(e.target.value)}
+                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
+                        title="Click to pick any date from calendar"
+                      />
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleNextDay}
+                      className="w-12 h-12 flex items-center justify-center bg-black/80 border-2 border-white/15 hover:border-secondary hover:text-secondary rounded-2xl text-on-surface active:scale-95 transition-all cursor-pointer shrink-0 shadow-md"
+                      title="Next Day"
+                    >
+                      <span className="material-symbols-outlined text-xl">chevron_right</span>
+                    </button>
+                  </div>
+
+                  {/* Return to Today pill if shifted */}
+                  {selectedDate !== '2026-08-05' && (
+                    <div className="pt-0.5">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedDate('2026-08-05')}
+                        className="text-[11px] font-mono font-bold text-secondary hover:underline flex items-center gap-1"
+                      >
+                        <span className="material-symbols-outlined text-xs">today</span>
+                        <span>Jump to Today (Aug 5, 2026)</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -1292,7 +1381,6 @@ function LabTrackerPage() {
                 <p className="font-bold text-on-surface text-sm">No labs scheduled for Group {selectedGroupCode} on {selectedDate}.</p>
               </div>
             )}
-          </div>
         </div>
       )}
 
