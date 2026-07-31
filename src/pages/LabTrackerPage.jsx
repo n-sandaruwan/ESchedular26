@@ -1063,58 +1063,160 @@ function LabTrackerPage() {
 
             {currentLeaderSchedule ? (
               <form onSubmit={handleSaveAttendance} className="space-y-4">
-                <div className="bg-black/30 border border-white/10 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div>
-                    <span className="text-[10px] text-secondary font-bold uppercase block">{currentLeaderSchedule.week} Session for {selectedGroupCode}</span>
-                    <h3 className="font-bold text-on-surface text-sm">{currentLeaderSchedule.lab_name}</h3>
-                    <p className="text-xs text-on-surface-variant">{currentLeaderSchedule.venue} • {currentLeaderSchedule.time}</p>
-                  </div>
-                  {canMarkAttendance && (
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <button
-                        type="button"
-                        onClick={() => handleToggleAll(true)}
-                        className="px-2.5 py-1 rounded-lg bg-secondary/15 hover:bg-secondary/25 text-secondary border border-secondary/30 text-xs font-label-bold transition-colors cursor-pointer"
-                      >
-                        Select All Present
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleToggleAll(false)}
-                        className="px-2.5 py-1 rounded-lg bg-error/15 hover:bg-error/25 text-error border border-error/30 text-xs font-label-bold transition-colors cursor-pointer"
-                      >
-                        Select All Absent
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleToggleAll(null)}
-                        className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-on-surface-variant text-xs font-label-bold border border-white/10 transition-colors cursor-pointer"
-                      >
-                        Clear Selection
-                      </button>
+                {/* Session Header Card & Quick Action Steppers */}
+                <div className="bg-black/40 border border-white/10 rounded-2xl p-4 space-y-3 shadow-lg">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/5 pb-3">
+                    <div>
+                      <span className="text-[10px] text-secondary font-bold uppercase tracking-wider block mb-0.5">{currentLeaderSchedule.week} Session • {selectedGroupCode}</span>
+                      <h3 className="font-extrabold text-on-surface text-base">{currentLeaderSchedule.lab_name}</h3>
+                      <p className="text-xs text-on-surface-variant font-mono mt-0.5">📍 {currentLeaderSchedule.venue} • 🕒 {currentLeaderSchedule.time}</p>
                     </div>
-                  )}
+
+                    {canMarkAttendance && (
+                      <div className="grid grid-cols-3 sm:flex items-center gap-1.5 sm:gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleToggleAll(true)}
+                          className="px-2.5 py-1.5 rounded-xl bg-secondary/15 hover:bg-secondary/25 text-secondary border border-secondary/40 text-[11px] font-label-bold transition-all cursor-pointer text-center flex items-center justify-center gap-1 shadow-sm"
+                        >
+                          <span>✓ All Present</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleToggleAll(false)}
+                          className="px-2.5 py-1.5 rounded-xl bg-error/15 hover:bg-error/25 text-error border border-error/40 text-[11px] font-label-bold transition-all cursor-pointer text-center flex items-center justify-center gap-1 shadow-sm"
+                        >
+                          <span>✗ All Absent</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleToggleAll(null)}
+                          className="px-2 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-on-surface-variant text-[11px] font-label-bold border border-white/10 transition-all cursor-pointer text-center flex items-center justify-center gap-1"
+                        >
+                          <span>Clear</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Attendance Summary Counter Bar */}
+                  <div className="flex items-center justify-between text-xs font-mono pt-1">
+                    <span className="text-on-surface-variant">Roster: <strong className="text-on-surface">{groupStudents.length} Students</strong></span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-secondary font-bold">Present: {Object.values(leaderAttendance).filter(v => v === true).length}</span>
+                      <span className="text-error font-bold">Absent: {Object.values(leaderAttendance).filter(v => v === false).length}</span>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="overflow-x-auto">
+                {/* MOBILE VIEW: Ultra-Clean Card List */}
+                <div className="block sm:hidden space-y-2.5">
+                  {groupStudents.map((student) => {
+                    const status = leaderAttendance[student.reg_no];
+                    return (
+                      <div 
+                        key={student.reg_no} 
+                        className={`p-3.5 rounded-2xl border transition-all shadow-md backdrop-blur-md ${
+                          status === true 
+                            ? 'bg-secondary/10 border-secondary/40 shadow-[0_0_12px_rgba(78,222,163,0.15)]' 
+                            : status === false 
+                            ? 'bg-error/10 border-error/40' 
+                            : 'bg-black/40 border-white/10'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-2 mb-2.5">
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 border ${
+                              status === true 
+                                ? 'bg-secondary/20 text-secondary border-secondary/40' 
+                                : status === false 
+                                ? 'bg-error/20 text-error border-error/40' 
+                                : 'bg-white/10 text-on-surface border-white/10'
+                            }`}>
+                              {student.name[0]}
+                            </div>
+                            <div className="min-w-0">
+                              <h4 className="font-bold text-on-surface text-sm truncate">{student.name}</h4>
+                              <span className="text-[11px] text-on-surface-variant font-mono block">{student.reg_no}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {canMarkAttendance ? (
+                          <div className="grid grid-cols-2 gap-2 pt-1 border-t border-white/5">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setLeaderAttendance((prev) => ({
+                                  ...prev,
+                                  [student.reg_no]: prev[student.reg_no] === true ? null : true,
+                                }))
+                              }
+                              className={`py-2 px-3 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all cursor-pointer border ${
+                                status === true
+                                  ? 'bg-secondary text-on-secondary border-secondary shadow-lg shadow-secondary/30 scale-[1.02]'
+                                  : 'bg-white/5 text-on-surface-variant border-white/10 hover:bg-secondary/20 hover:text-secondary'
+                              }`}
+                            >
+                              <span className="text-sm">✓</span>
+                              <span>Present</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setLeaderAttendance((prev) => ({
+                                  ...prev,
+                                  [student.reg_no]: prev[student.reg_no] === false ? null : false,
+                                }))
+                              }
+                              className={`py-2 px-3 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all cursor-pointer border ${
+                                status === false
+                                  ? 'bg-error text-on-error border-error shadow-lg shadow-error/30 scale-[1.02]'
+                                  : 'bg-white/5 text-on-surface-variant border-white/10 hover:bg-error/20 hover:text-error'
+                              }`}
+                            >
+                              <span className="text-sm">✗</span>
+                              <span>Absent</span>
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="pt-2 border-t border-white/5 text-right">
+                            <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-xl text-xs font-bold border ${
+                              status === true
+                                ? 'bg-secondary/20 text-secondary border-secondary/40'
+                                : status === false
+                                ? 'bg-error/20 text-error border-error/40'
+                                : 'bg-white/5 text-on-surface-variant/60 border-white/10'
+                            }`}>
+                              {status === true ? '✓ Present' : status === false ? '✗ Absent' : 'Not Marked'}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* DESKTOP VIEW: Sleek Table */}
+                <div className="hidden sm:block overflow-x-auto border border-white/10 rounded-2xl">
                   <table className="w-full text-left text-sm text-on-surface-variant">
-                    <thead className="bg-black/40 text-on-surface uppercase text-[10px] font-label-bold border-b border-white/10">
+                    <thead className="bg-black/50 text-on-surface uppercase text-[10px] font-label-bold border-b border-white/10">
                       <tr>
-                        <th className="py-2.5 px-3">Reg No</th>
-                        <th className="py-2.5 px-3">Student Name</th>
-                        <th className="py-2.5 px-3 text-center">Status Toggle</th>
+                        <th className="py-3 px-4">Reg No</th>
+                        <th className="py-3 px-4">Student Name</th>
+                        <th className="py-3 px-4 text-center">Status Toggle</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-white/5 text-xs">
+                    <tbody className="divide-y divide-white/5 text-xs bg-black/20">
                       {groupStudents.map((student) => {
                         const status = leaderAttendance[student.reg_no];
                         return (
                           <tr key={student.reg_no} className="hover:bg-white/5 transition-colors">
-                            <td className="py-2.5 px-3 font-mono font-medium text-on-surface">{student.reg_no}</td>
-                            <td className="py-2.5 px-3 font-semibold text-on-surface">{student.name}</td>
-                            <td className="py-2.5 px-3 text-center">
+                            <td className="py-3 px-4 font-mono font-bold text-on-surface">{student.reg_no}</td>
+                            <td className="py-3 px-4 font-bold text-on-surface">{student.name}</td>
+                            <td className="py-3 px-4 text-center">
                               {canMarkAttendance ? (
-                                <div className="inline-flex items-center gap-1.5 justify-center">
+                                <div className="inline-flex items-center gap-2 justify-center">
                                   <button
                                     type="button"
                                     onClick={() =>
@@ -1123,10 +1225,10 @@ function LabTrackerPage() {
                                         [student.reg_no]: prev[student.reg_no] === true ? null : true,
                                       }))
                                     }
-                                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer border ${
+                                    className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer border ${
                                       status === true
-                                        ? 'bg-secondary/20 text-secondary border-secondary/50 shadow-sm ring-1 ring-secondary/30'
-                                        : 'bg-white/5 text-on-surface-variant/70 border-white/10 hover:bg-secondary/10 hover:text-secondary hover:border-secondary/30'
+                                        ? 'bg-secondary text-on-secondary border-secondary shadow-md shadow-secondary/20'
+                                        : 'bg-white/5 text-on-surface-variant/70 border-white/10 hover:bg-secondary/15 hover:text-secondary'
                                     }`}
                                   >
                                     ✓ Present
@@ -1139,17 +1241,17 @@ function LabTrackerPage() {
                                         [student.reg_no]: prev[student.reg_no] === false ? null : false,
                                       }))
                                     }
-                                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer border ${
+                                    className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer border ${
                                       status === false
-                                        ? 'bg-error/20 text-error border-error/50 shadow-sm ring-1 ring-error/30'
-                                        : 'bg-white/5 text-on-surface-variant/70 border-white/10 hover:bg-error/10 hover:text-error hover:border-error/30'
+                                        ? 'bg-error text-on-error border-error shadow-md shadow-error/20'
+                                        : 'bg-white/5 text-on-surface-variant/70 border-white/10 hover:bg-error/15 hover:text-error'
                                     }`}
                                   >
                                     ✗ Absent
                                   </button>
                                 </div>
                               ) : (
-                                <span className={`px-3 py-1 rounded-full text-xs font-bold border ${
+                                <span className={`px-3 py-1 rounded-xl text-xs font-bold border ${
                                   status === true
                                     ? 'bg-secondary/20 text-secondary border-secondary/40'
                                     : status === false
@@ -1167,13 +1269,13 @@ function LabTrackerPage() {
                   </table>
                 </div>
 
-                <div className="flex justify-end pt-2 border-t border-white/10">
+                <div className="flex justify-end pt-3 border-t border-white/10">
                   {canMarkAttendance ? (
                     <button
                       type="submit"
-                      className="btn-electric px-5 py-2 rounded-xl text-xs font-label-bold flex items-center gap-2 cursor-pointer"
+                      className="btn-electric w-full sm:w-auto px-6 py-3 rounded-2xl text-xs font-label-bold flex items-center justify-center gap-2 shadow-xl cursor-pointer text-center"
                     >
-                      <span className="material-symbols-outlined text-sm">save</span>
+                      <span className="material-symbols-outlined text-base">save</span>
                       <span>Save Attendance Records</span>
                     </button>
                   ) : (
