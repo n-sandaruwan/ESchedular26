@@ -24,9 +24,17 @@ function LabTrackerPage() {
   // Group Lookup state
   const [selectedGroupLookupCode, setSelectedGroupLookupCode] = useState('EE01');
 
+  const getLocalTodayDateStr = () => {
+    const d = new Date();
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  };
+
   // Daily Schedule state
-  const todayStr = new Date().toISOString().split('T')[0];
-  const [selectedDate, setSelectedDate] = useState('2026-08-05'); // Default to Week 2 start date
+  const todayStr = getLocalTodayDateStr();
+  const [selectedDate, setSelectedDate] = useState(getLocalTodayDateStr());
 
   // Local Storage attendance sync
   const [storedAttendance, setStoredAttendance] = useState({});
@@ -840,9 +848,9 @@ function LabTrackerPage() {
             </h2>
 
             <div className="flex flex-col sm:flex-row items-center gap-3 pt-1">
-              {selectedDate !== '2026-08-05' && (
+              {selectedDate !== todayStr && (
                 <button
-                  onClick={() => setSelectedDate('2026-08-05')}
+                  onClick={() => setSelectedDate(todayStr)}
                   className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-primary text-on-primary font-label-bold text-xs shadow-lg shadow-primary/30 hover:opacity-90 transition-all cursor-pointer animate-pulse shrink-0"
                   title="Return to Today"
                 >
@@ -862,7 +870,7 @@ function LabTrackerPage() {
 
                 <div className="relative group flex flex-col items-center px-4 py-1 text-center cursor-pointer min-w-[170px]">
                   <span className="text-xs font-mono uppercase tracking-widest text-primary font-black">
-                    {selectedDate === '2026-08-05' ? 'TODAY' : getDayNameFromDateString(selectedDate)}
+                    {selectedDate === todayStr ? 'TODAY' : getDayNameFromDateString(selectedDate)}
                   </span>
                   <span className="text-sm sm:text-base font-extrabold font-mono text-on-surface flex items-center gap-1.5 mt-0.5">
                     <span>{getFormattedPillDate(selectedDate)}</span>
@@ -1127,15 +1135,15 @@ function LabTrackerPage() {
                   </div>
 
                   {/* Return to Today pill if shifted */}
-                  {selectedDate !== '2026-08-05' && (
+                  {selectedDate !== todayStr && (
                     <div className="pt-0.5">
                       <button
                         type="button"
-                        onClick={() => setSelectedDate('2026-08-05')}
+                        onClick={() => setSelectedDate(todayStr)}
                         className="text-[11px] font-mono font-bold text-secondary hover:underline flex items-center gap-1"
                       >
                         <span className="material-symbols-outlined text-xs">today</span>
-                        <span>Jump to Today (Aug 5, 2026)</span>
+                        <span>Jump to Today ({getFormattedPillDate(todayStr)})</span>
                       </button>
                     </div>
                   )}

@@ -14,9 +14,15 @@ import SriLankanCalendarWidget from '../components/SriLankanCalendarWidget';
 
 function StudentDashboard() {
   const navigate = useNavigate();
-  const [notices, setNotices] = useState([]);
+  const getLocalTodayDateStr = (d = new Date()) => {
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  };
+
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const [selectedDate, setSelectedDate] = useState(getLocalTodayDateStr());
   const [moduleHours, setModuleHours] = useState([]);
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [adminActionMsg, setAdminActionMsg] = useState('');
@@ -24,7 +30,7 @@ function StudentDashboard() {
   const role = localStorage.getItem('mis_role');
   const isAdmin = role === 'admin';
 
-  const todayDateStr = currentTime.toISOString().split('T')[0];
+  const todayDateStr = getLocalTodayDateStr(currentTime);
   const selectedDayName = getDayNameFromDate(selectedDate);
   const selectedHoliday = getHolidayForDate(selectedDate);
   const isViewingToday = selectedDate === todayDateStr;
