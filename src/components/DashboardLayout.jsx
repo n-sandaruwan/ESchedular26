@@ -103,10 +103,6 @@ function DashboardLayout({ children }) {
               </Link>
             )}
 
-            <button className="material-symbols-outlined text-primary hover:opacity-80 transition-opacity cursor-pointer text-xl sm:text-2xl">
-              notifications
-            </button>
-
             {/* Avatar */}
             <div 
               onClick={() => navigate(isAdmin ? '/admin' : '/login')}
