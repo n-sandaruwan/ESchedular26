@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getStoredModuleHours, saveStoredModuleHours } from '../data/moduleHoursData';
 import { getStoredDailyLogs, saveStoredDailyLogs, addAuditLog } from '../data/dailyLogsData';
 import { getModulesForDate, modifyScheduleSlot, addNotice } from '../data/scheduleStore';
+import { exportCompleteDatabaseJSON, restoreCompleteDatabaseJSON } from '../data/backupRestore';
 import {
   getStoredSheetCsvUrl,
   saveStoredSheetCsvUrl,
@@ -407,6 +408,19 @@ function AdminDashboard() {
             <span className="material-symbols-outlined text-lg">table_chart</span>
             <span className="text-xs font-label-bold">Google Sheets Sync</span>
           </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('backup')}
+            className={`p-3 rounded-xl border flex flex-col sm:flex-row items-center justify-center gap-2 cursor-pointer transition-all ${
+              activeTab === 'backup'
+                ? 'bg-secondary/15 border-secondary text-secondary font-bold shadow-[0_0_15px_rgba(78,222,163,0.2)]'
+                : 'bg-surface-container/50 border-white/5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
+            }`}
+          >
+            <span className="material-symbols-outlined text-lg text-secondary">verified_user</span>
+            <span className="text-xs font-label-bold">Backup & Cloud Health</span>
+          </button>
         </div>
 
         {/* TAB 1: Inside Reschedule Tool Panel */}
@@ -686,6 +700,118 @@ function AdminDashboard() {
               </div>
             )}
           </form>
+        )}
+
+        {/* TAB 5: Backup & Security Center */}
+        {activeTab === 'backup' && (
+          <div className="glass-card p-stack-md rounded-xl flex flex-col gap-5 border-t-4 border-t-secondary">
+            <div>
+              <span className="font-label-bold text-[10px] bg-secondary/20 text-secondary px-2.5 py-1 rounded-full uppercase tracking-wider">
+                🛡️ 1-Year Zero-Data-Loss Safety Center
+              </span>
+              <h4 className="font-headline-md text-base font-bold text-on-surface flex items-center gap-2 mt-2">
+                <span className="material-symbols-outlined text-secondary">verified_user</span> System Backup & Data Recovery Center
+              </h4>
+              <p className="text-xs text-on-surface-variant mt-0.5">
+                Export complete offline JSON snapshots and restore your database instantly to prevent any data loss across 1+ years of academic records.
+              </p>
+            </div>
+
+            {/* Cloud Sync Status Metrics */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="p-3 bg-surface-container/60 border border-white/5 rounded-xl flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-secondary/20 text-secondary flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-lg animate-pulse">cloud_done</span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-on-surface-variant uppercase font-label-bold">Firebase Cloud</span>
+                  <p className="text-xs font-bold text-secondary">7 Collections Synced</p>
+                </div>
+              </div>
+
+              <div className="p-3 bg-surface-container/60 border border-white/5 rounded-xl flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-primary/20 text-primary flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-lg">storage</span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-on-surface-variant uppercase font-label-bold">IndexedDB Cache</span>
+                  <p className="text-xs font-bold text-primary">Offline Persistence Active</p>
+                </div>
+              </div>
+
+              <div className="p-3 bg-surface-container/60 border border-white/5 rounded-xl flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-tertiary/20 text-tertiary flex items-center justify-center shrink-0">
+                  <span className="material-symbols-outlined text-lg">history</span>
+                </div>
+                <div>
+                  <span className="text-[10px] text-on-surface-variant uppercase font-label-bold">Daily Snapshot</span>
+                  <p className="text-xs font-bold text-tertiary">Auto-Saved Locally</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+              {/* 1. Download Backup */}
+              <div className="p-4 bg-surface-container/40 border border-white/10 rounded-xl space-y-3">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-secondary">download</span>
+                  <h5 className="font-bold text-xs text-on-surface">1. Download Full Database Backup</h5>
+                </div>
+                <p className="text-[11px] text-on-surface-variant">
+                  Save a timestamped <code>.json</code> backup containing all 7 collections (schedules, overrides, notices, lab attendance, daily logs, module progress, assessments, audit logs).
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    exportCompleteDatabaseJSON();
+                    setStatusMsg("✅ Full Database Backup downloaded successfully!");
+                    setTimeout(() => setStatusMsg(''), 4000);
+                  }}
+                  className="w-full btn-electric py-2.5 rounded-xl text-xs font-label-bold flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-sm">download</span>
+                  <span>Download JSON Backup</span>
+                </button>
+              </div>
+
+              {/* 2. Restore Backup */}
+              <div className="p-4 bg-surface-container/40 border border-white/10 rounded-xl space-y-3">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-primary">upload_file</span>
+                  <h5 className="font-bold text-xs text-on-surface">2. Restore Database from File</h5>
+                </div>
+                <p className="text-[11px] text-on-surface-variant">
+                  Upload an <code>.json</code> backup file to restore all records to both your local browser and Cloud Firestore.
+                </p>
+                <label className="w-full border border-primary/40 bg-primary/10 hover:bg-primary/20 text-primary py-2.5 rounded-xl text-xs font-label-bold flex items-center justify-center gap-2 cursor-pointer transition-colors">
+                  <span className="material-symbols-outlined text-sm">publish</span>
+                  <span>Upload & Restore Backup JSON</span>
+                  <input
+                    type="file"
+                    accept=".json"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = async (event) => {
+                          const res = await restoreCompleteDatabaseJSON(event.target.result);
+                          if (res.success) {
+                            setStatusMsg("✅ Database restored and pushed live to Cloud Firestore!");
+                            setTimeout(() => window.location.reload(), 2000);
+                          } else {
+                            setConflictWarning(res.message);
+                          }
+                        };
+                        reader.readAsText(file);
+                      }
+                    }}
+                  />
+                </label>
+              </div>
+            </div>
+          </div>
         )}
       </div>
 

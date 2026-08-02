@@ -53,8 +53,11 @@ export const getStoredAssessments = () => {
   return initialAssessments;
 };
 
+import { pushAssessmentsToCloud } from './firebaseSync';
+
 export const saveStoredAssessments = (assessmentsArray) => {
   localStorage.setItem('mis_module_assessments', JSON.stringify(assessmentsArray));
+  pushAssessmentsToCloud(assessmentsArray);
 };
 
 export const toggleAssessmentStatus = (id, newStatus) => {

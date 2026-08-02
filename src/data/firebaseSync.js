@@ -7,6 +7,9 @@ const listeners = {
   notices: [],
   lab_attendance: [],
   audit_logs: [],
+  daily_logs: [],
+  module_hours: [],
+  assessments: []
 };
 
 export const subscribeToCloudEvent = (event, callback) => {
@@ -45,7 +48,7 @@ export const initRealtimeCloudSync = () => {
         notifySubscribers('overrides', cloudData);
       }
     }, (err) => {
-      console.warn("Firestore overrides subscription notice (using local data):", err);
+      console.warn("Firestore overrides subscription notice:", err);
     });
   } catch (err) {
     console.error("Firestore overrides subscription error:", err);
@@ -60,13 +63,12 @@ export const initRealtimeCloudSync = () => {
         cloudNotices.push({ id: docSnap.id, ...docSnap.data() });
       });
       if (cloudNotices.length > 0) {
-        // Sort newest first
         cloudNotices.sort((a, b) => b.id - a.id);
         localStorage.setItem('mis_notices', JSON.stringify(cloudNotices));
         notifySubscribers('notices', cloudNotices);
       }
     }, (err) => {
-      console.warn("Firestore notices subscription notice (using local data):", err);
+      console.warn("Firestore notices subscription notice:", err);
     });
   } catch (err) {
     console.error("Firestore notices subscription error:", err);
@@ -85,10 +87,88 @@ export const initRealtimeCloudSync = () => {
         notifySubscribers('lab_attendance', attendanceMap);
       }
     }, (err) => {
-      console.warn("Firestore lab attendance subscription notice (using local data):", err);
+      console.warn("Firestore lab attendance subscription notice:", err);
     });
   } catch (err) {
     console.error("Firestore lab attendance subscription error:", err);
+  }
+
+  // 4. Listen for Daily Evening Lecture Logs
+  try {
+    const dailyLogsRef = collection(db, 'daily_logs');
+    onSnapshot(dailyLogsRef, (snapshot) => {
+      const logsData = [];
+      snapshot.forEach((docSnap) => {
+        logsData.push({ id: docSnap.id, ...docSnap.data() });
+      });
+      if (logsData.length > 0) {
+        logsData.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+        localStorage.setItem('mis_daily_logs', JSON.stringify(logsData));
+        notifySubscribers('daily_logs', logsData);
+      }
+    }, (err) => {
+      console.warn("Firestore daily_logs subscription notice:", err);
+    });
+  } catch (err) {
+    console.error("Firestore daily_logs subscription error:", err);
+  }
+
+  // 5. Listen for Module Hours & Course Progress
+  try {
+    const moduleHoursRef = collection(db, 'module_hours');
+    onSnapshot(moduleHoursRef, (snapshot) => {
+      const hoursData = [];
+      snapshot.forEach((docSnap) => {
+        hoursData.push({ code: docSnap.id, ...docSnap.data() });
+      });
+      if (hoursData.length > 0) {
+        localStorage.setItem('mis_module_hours', JSON.stringify(hoursData));
+        notifySubscribers('module_hours', hoursData);
+      }
+    }, (err) => {
+      console.warn("Firestore module_hours subscription notice:", err);
+    });
+  } catch (err) {
+    console.error("Firestore module_hours subscription error:", err);
+  }
+
+  // 6. Listen for Course Assessments
+  try {
+    const assessmentsRef = collection(db, 'assessments');
+    onSnapshot(assessmentsRef, (snapshot) => {
+      const list = [];
+      snapshot.forEach((docSnap) => {
+        list.push({ id: docSnap.id, ...docSnap.data() });
+      });
+      if (list.length > 0) {
+        localStorage.setItem('mis_module_assessments', JSON.stringify(list));
+        notifySubscribers('assessments', list);
+      }
+    }, (err) => {
+      console.warn("Firestore assessments subscription notice:", err);
+    });
+  } catch (err) {
+    console.error("Firestore assessments subscription error:", err);
+  }
+
+  // 7. Listen for Audit Logs
+  try {
+    const auditLogsRef = collection(db, 'audit_logs');
+    onSnapshot(auditLogsRef, (snapshot) => {
+      const auditList = [];
+      snapshot.forEach((docSnap) => {
+        auditList.push({ id: docSnap.id, ...docSnap.data() });
+      });
+      if (auditList.length > 0) {
+        auditList.sort((a, b) => b.id - a.id);
+        localStorage.setItem('mis_audit_logs', JSON.stringify(auditList));
+        notifySubscribers('audit_logs', auditList);
+      }
+    }, (err) => {
+      console.warn("Firestore audit_logs subscription notice:", err);
+    });
+  } catch (err) {
+    console.error("Firestore audit_logs subscription error:", err);
   }
 };
 
@@ -138,7 +218,6 @@ export const pushNoticeToCloud = async (notice) => {
 export const pushLabAttendanceToCloud = async (dateStr, labName, records) => {
   if (!isFirebaseConfigured() || !db) return;
   try {
-    // Sanitize doc id
     const docId = `${dateStr}_${labName.replace(/[^a-zA-Z0-9_-]/g, '_')}`;
     const payload = sanitizeFirestoreData({
       date: dateStr,
@@ -150,5 +229,60 @@ export const pushLabAttendanceToCloud = async (dateStr, labName, records) => {
     console.log(`✅ Lab Attendance synced to cloud: ${docId}`);
   } catch (err) {
     console.error("Failed to push lab attendance to cloud:", err);
+  }
+};
+
+// Save Daily Evening Logs to Cloud
+export const pushDailyLogsToCloud = async (logs) => {
+  if (!isFirebaseConfigured() || !db || !Array.isArray(logs)) return;
+  try {
+    for (const log of logs) {
+      const docId = String(log.id || `${log.date}_${log.module}`);
+      await setDoc(doc(db, 'daily_logs', docId), sanitizeFirestoreData(log));
+    }
+    console.log("✅ Daily logs synced to cloud");
+  } catch (err) {
+    console.error("Failed to push daily logs to cloud:", err);
+  }
+};
+
+// Save Module Hours to Cloud
+export const pushModuleHoursToCloud = async (hoursArray) => {
+  if (!isFirebaseConfigured() || !db || !Array.isArray(hoursArray)) return;
+  try {
+    for (const mod of hoursArray) {
+      const docId = String(mod.code);
+      await setDoc(doc(db, 'module_hours', docId), sanitizeFirestoreData(mod));
+    }
+    console.log("✅ Module hours synced to cloud");
+  } catch (err) {
+    console.error("Failed to push module hours to cloud:", err);
+  }
+};
+
+// Save Assessments to Cloud
+export const pushAssessmentsToCloud = async (assessments) => {
+  if (!isFirebaseConfigured() || !db || !Array.isArray(assessments)) return;
+  try {
+    for (const item of assessments) {
+      const docId = String(item.id);
+      await setDoc(doc(db, 'assessments', docId), sanitizeFirestoreData(item));
+    }
+    console.log("✅ Assessments synced to cloud");
+  } catch (err) {
+    console.error("Failed to push assessments to cloud:", err);
+  }
+};
+
+// Save Audit Logs to Cloud
+export const pushAuditLogsToCloud = async (logs) => {
+  if (!isFirebaseConfigured() || !db || !Array.isArray(logs)) return;
+  try {
+    for (const log of logs) {
+      const docId = String(log.id || Date.now());
+      await setDoc(doc(db, 'audit_logs', docId), sanitizeFirestoreData(log));
+    }
+  } catch (err) {
+    console.error("Failed to push audit logs to cloud:", err);
   }
 };

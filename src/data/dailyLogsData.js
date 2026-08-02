@@ -27,6 +27,8 @@ export const studentRegistry = [
   { regNo: 'EG/2023/120', name: 'R. P. Jayawardena', labGroup: 'Group C1', practicalSlot: 'Wed 08:30 - 11:30 (Measurement Lab)' }
 ];
 
+import { pushDailyLogsToCloud, pushAuditLogsToCloud } from './firebaseSync';
+
 // Local Storage Wrappers
 export const getStoredDailyLogs = () => {
   const local = localStorage.getItem('mis_daily_logs');
@@ -38,6 +40,7 @@ export const getStoredDailyLogs = () => {
 
 export const saveStoredDailyLogs = (logs) => {
   localStorage.setItem('mis_daily_logs', JSON.stringify(logs));
+  pushDailyLogsToCloud(logs);
 };
 
 export const getStoredAuditLogs = () => {
@@ -59,5 +62,6 @@ export const addAuditLog = (action, details, user = 'Admin') => {
   };
   const updated = [newEntry, ...current];
   localStorage.setItem('mis_audit_logs', JSON.stringify(updated));
+  pushAuditLogsToCloud(updated);
   return updated;
 };
