@@ -44,6 +44,8 @@ export const initRealtimeCloudSync = () => {
         localStorage.setItem('mis_schedule_overrides', JSON.stringify(cloudData));
         notifySubscribers('overrides', cloudData);
       }
+    }, (err) => {
+      console.warn("Firestore overrides subscription notice (using local data):", err);
     });
   } catch (err) {
     console.error("Firestore overrides subscription error:", err);
@@ -63,6 +65,8 @@ export const initRealtimeCloudSync = () => {
         localStorage.setItem('mis_notices', JSON.stringify(cloudNotices));
         notifySubscribers('notices', cloudNotices);
       }
+    }, (err) => {
+      console.warn("Firestore notices subscription notice (using local data):", err);
     });
   } catch (err) {
     console.error("Firestore notices subscription error:", err);
@@ -80,6 +84,8 @@ export const initRealtimeCloudSync = () => {
         localStorage.setItem('eschedular26_lab_attendance', JSON.stringify(attendanceMap));
         notifySubscribers('lab_attendance', attendanceMap);
       }
+    }, (err) => {
+      console.warn("Firestore lab attendance subscription notice (using local data):", err);
     });
   } catch (err) {
     console.error("Firestore lab attendance subscription error:", err);
