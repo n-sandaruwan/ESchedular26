@@ -24,6 +24,7 @@ function StudentDashboard() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(getLocalTodayDateStr());
   const [moduleHours, setModuleHours] = useState([]);
+  const [notices, setNotices] = useState([]);
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [adminActionMsg, setAdminActionMsg] = useState('');
 
