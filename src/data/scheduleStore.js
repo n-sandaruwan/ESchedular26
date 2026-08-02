@@ -179,7 +179,7 @@ export const getModulesForDate = (dateStr) => {
 };
 
 // Function: Reschedule / Cancel / Swap a Lecture (Admin Action)
-export const modifyScheduleSlot = ({ date, module, status, newTime, newVenue, reason, swapModule }) => {
+export const modifyScheduleSlot = ({ date, module, status, newTime = '', newVenue = '', reason = '', swapModule = '' }) => {
   const currentOverrides = getStoredOverrides();
 
   const newOverride = {
@@ -187,14 +187,15 @@ export const modifyScheduleSlot = ({ date, module, status, newTime, newVenue, re
     date,
     module,
     status,
-    time: newTime,
-    venue: newVenue,
-    reason,
-    swapModule
+    time: newTime || '',
+    venue: newVenue || '',
+    reason: reason || '',
+    swapModule: swapModule || ''
   };
 
   const updatedOverrides = [newOverride, ...currentOverrides.filter(o => !(o.date === date && o.module === module))];
   saveStoredOverrides(updatedOverrides);
+  pushOverrideToCloud(newOverride);
 
   // Auto Broadcast Notice
   let noticeTitle = '';

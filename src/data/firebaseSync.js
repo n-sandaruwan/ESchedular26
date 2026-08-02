@@ -92,13 +92,30 @@ export const initRealtimeCloudSync = () => {
   }
 };
 
+// Helper to remove any undefined fields before sending to Firestore (Firestore rejects undefined values)
+const sanitizeFirestoreData = (data) => {
+  if (!data || typeof data !== 'object') return data;
+  const clean = {};
+  Object.keys(data).forEach((key) => {
+    if (data[key] !== undefined && data[key] !== null) {
+      if (typeof data[key] === 'object' && !Array.isArray(data[key])) {
+        clean[key] = sanitizeFirestoreData(data[key]);
+      } else {
+        clean[key] = data[key];
+      }
+    }
+  });
+  return clean;
+};
+
 // Save a Schedule Override (Cancellation/Reschedule/Swap) to Cloud
 export const pushOverrideToCloud = async (override) => {
   if (!isFirebaseConfigured() || !db) return;
   try {
     const docId = String(override.id || `${override.date}_${override.module}`);
-    await setDoc(doc(db, 'schedule_overrides', docId), override);
-    console.log(`✅ Override synced to cloud: ${docId}`);
+    const cleanPayload = sanitizeFirestoreData(override);
+    await setDoc(doc(db, 'schedule_overrides', docId), cleanPayload);
+    console.log(`✅ Override synced to cloud: ${docId}`, cleanPayload);
   } catch (err) {
     console.error("Failed to push override to cloud:", err);
   }
@@ -109,8 +126,9 @@ export const pushNoticeToCloud = async (notice) => {
   if (!isFirebaseConfigured() || !db) return;
   try {
     const docId = String(notice.id || Date.now());
-    await setDoc(doc(db, 'notices', docId), notice);
-    console.log(`✅ Notice synced to cloud: ${docId}`);
+    const cleanPayload = sanitizeFirestoreData(notice);
+    await setDoc(doc(db, 'notices', docId), cleanPayload);
+    console.log(`✅ Notice synced to cloud: ${docId}`, cleanPayload);
   } catch (err) {
     console.error("Failed to push notice to cloud:", err);
   }
@@ -122,12 +140,12 @@ export const pushLabAttendanceToCloud = async (dateStr, labName, records) => {
   try {
     // Sanitize doc id
     const docId = `${dateStr}_${labName.replace(/[^a-zA-Z0-9_-]/g, '_')}`;
-    const payload = {
+    const payload = sanitizeFirestoreData({
       date: dateStr,
       lab_name: labName,
       records: records,
       updated_at: new Date().toISOString(),
-    };
+    });
     await setDoc(doc(db, 'lab_attendance', docId), payload);
     console.log(`✅ Lab Attendance synced to cloud: ${docId}`);
   } catch (err) {

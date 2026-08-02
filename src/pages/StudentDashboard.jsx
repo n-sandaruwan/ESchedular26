@@ -10,6 +10,7 @@ import {
 } from '../data/scheduleStore';
 import { getHolidayForDate } from '../data/sriLankaHolidaysData';
 import { getStoredDailyLogs, saveStoredDailyLogs, addAuditLog } from '../data/dailyLogsData';
+import { subscribeToCloudEvent } from '../data/firebaseSync';
 import SriLankanCalendarWidget from '../components/SriLankanCalendarWidget';
 
 function StudentDashboard() {
@@ -39,6 +40,14 @@ function StudentDashboard() {
   useEffect(() => {
     setModuleHours(getStoredModuleHours());
     setNotices(getStoredNotices());
+
+    subscribeToCloudEvent('overrides', () => {
+      setCurrentTime(new Date());
+    });
+
+    subscribeToCloudEvent('notices', (newNotices) => {
+      setNotices(newNotices);
+    });
 
     const interval = setInterval(() => {
       setCurrentTime(new Date());
