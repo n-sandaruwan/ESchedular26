@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getStoredDailyLogs } from '../data/dailyLogsData';
+import { getSriLankaDateStr } from '../utils/dateUtils';
 
 function DailyLogPage() {
   const [logs, setLogs] = useState([]);
@@ -40,7 +41,7 @@ function DailyLogPage() {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `Department_MIS_Lecture_Logs_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `Department_MIS_Lecture_Logs_${getSriLankaDateStr()}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

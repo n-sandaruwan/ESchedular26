@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { getSriLankaDateStr } from '../utils/dateUtils';
 import { sriLankaHolidays2026, getHolidayForDate } from '../data/sriLankaHolidaysData';
 
 function SriLankanCalendarWidget({ selectedDate, onSelectDate }) {
@@ -100,7 +101,7 @@ function SriLankanCalendarWidget({ selectedDate, onSelectDate }) {
           const dateStr = `${viewYear}-${mmStr}-${ddStr}`;
           const isSelected = selectedDate === dateStr;
           const holiday = getHolidayForDate(dateStr);
-          const todayDateStr = new Date().toISOString().split('T')[0];
+          const todayDateStr = getSriLankaDateStr();
           const isToday = dateStr === todayDateStr;
           const isPast = dateStr < todayDateStr;
 
