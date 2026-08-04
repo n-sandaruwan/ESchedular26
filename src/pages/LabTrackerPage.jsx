@@ -16,7 +16,7 @@ function LabTrackerPage() {
   const isLabAdmin = role === 'lab_admin';
   const canMarkAttendance = isAdmin || isLabAdmin;
 
-  const [activeTab, setActiveTab] = useState('search'); // 'search' | 'group' | 'daily' | 'leader' | 'admin'
+  const [activeTab, setActiveTab] = useState('daily'); // 'daily' | 'search' | 'group' | 'leader' | 'admin'
   const [searchDigits, setSearchDigits] = useState('');
   const [searchedStudent, setSearchedStudent] = useState(null);
   const [studentSchedule, setStudentSchedule] = useState([]);
@@ -509,6 +509,18 @@ function LabTrackerPage() {
         {/* Responsive Navigation Tile Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
           <button
+            onClick={() => setActiveTab('daily')}
+            className={`p-3 rounded-xl border flex flex-col items-center justify-center gap-1.5 transition-all cursor-pointer ${
+              activeTab === 'daily'
+                ? 'bg-primary/20 border-primary text-primary font-bold shadow-lg shadow-primary/10'
+                : 'bg-black/30 border-white/5 text-on-surface-variant hover:text-on-surface hover:bg-white/5'
+            }`}
+          >
+            <span className="material-symbols-outlined text-xl">calendar_today</span>
+            <span className="text-xs font-label-bold text-center">Daily Schedule</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab('search')}
             className={`p-3 rounded-xl border flex flex-col items-center justify-center gap-1.5 transition-all cursor-pointer ${
               activeTab === 'search'
@@ -530,18 +542,6 @@ function LabTrackerPage() {
           >
             <span className="material-symbols-outlined text-xl">groups</span>
             <span className="text-xs font-label-bold text-center">Group Lookup</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('daily')}
-            className={`p-3 rounded-xl border flex flex-col items-center justify-center gap-1.5 transition-all cursor-pointer ${
-              activeTab === 'daily'
-                ? 'bg-primary/20 border-primary text-primary font-bold shadow-lg shadow-primary/10'
-                : 'bg-black/30 border-white/5 text-on-surface-variant hover:text-on-surface hover:bg-white/5'
-            }`}
-          >
-            <span className="material-symbols-outlined text-xl">calendar_today</span>
-            <span className="text-xs font-label-bold text-center">Daily Schedule</span>
           </button>
 
           <button
