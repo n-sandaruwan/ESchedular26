@@ -152,7 +152,7 @@ function Login() {
             to="/"
             className="text-xs text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center gap-1 font-label-bold"
           >
-            <span className="material-symbols-outlined text-sm">arrow_back</span> Return to Basic Student Mode
+            <span className="material-symbols-outlined text-sm">arrow_back</span> Return to Basic Mode
           </Link>
         </div>
 

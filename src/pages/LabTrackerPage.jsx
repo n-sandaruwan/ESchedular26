@@ -1004,18 +1004,16 @@ function LabTrackerPage() {
             <div className="p-3.5 bg-amber-500/10 border border-amber-500/30 rounded-xl text-amber-300 text-xs font-bold flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-base text-amber-400">lock</span>
-                <span>Basic Student Mode: Attendance marking is view-only. Log in as <strong>Lab Admin Mode</strong> to mark attendance.</span>
+                <span>Basic Mode: Attendance marking is view-only. Log in as <strong>Lab Admin Mode</strong> to mark attendance.</span>
               </div>
               <button
                 type="button"
                 onClick={() => {
-                  localStorage.setItem('mis_role', 'lab_admin');
-                  localStorage.setItem('mis_user', 'Lab Administrator');
-                  window.location.reload();
+                  window.location.hash = '#/login';
                 }}
-                className="px-3 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-200 text-xs font-label-bold transition-colors cursor-pointer self-start sm:self-auto shrink-0"
+                className="px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/40 rounded-lg text-xs font-mono font-bold transition-all shrink-0 cursor-pointer"
               >
-                Switch to Lab Admin Mode
+                Sign In as Lab Admin
               </button>
             </div>
           )}
