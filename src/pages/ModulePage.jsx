@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { getStoredModuleHours, saveStoredModuleHours } from '../data/moduleHoursData';
 import { weeklyTimetable } from '../data/timetableData';
 import { getStoredAssessments, toggleAssessmentStatus } from '../data/assessmentData';
+import { getStoredOverrides } from '../data/scheduleStore';
 import { getSriLankaDateObj } from '../utils/dateUtils';
 
 function ModulePage() {
@@ -10,6 +11,7 @@ function ModulePage() {
   const [modules, setModules] = useState([]);
   const [selectedModule, setSelectedModule] = useState(null);
   const [assessments, setAssessments] = useState([]);
+  const [canceledSessions, setCanceledSessions] = useState([]);
 
   useEffect(() => {
     const list = getStoredModuleHours();
@@ -17,6 +19,12 @@ function ModulePage() {
     const match = list.find(m => m.code === moduleId) || list[0];
     setSelectedModule(match);
     setAssessments(getStoredAssessments());
+    
+    const overrides = getStoredOverrides();
+    const canceled = overrides
+      .filter(o => o.module === (match?.code || moduleId) && o.status === 'Canceled')
+      .sort((a, b) => new Date(a.date) - new Date(b.date));
+    setCanceledSessions(canceled);
   }, [moduleId]);
 
   const role = localStorage.getItem('mis_role');
@@ -457,6 +465,49 @@ function ModulePage() {
           </div>
         )}
       </div>
+
+      {/* Canceled Sessions Panel */}
+      {canceledSessions.length > 0 && (
+        <div className="glass-card rounded-2xl p-4 space-y-3 border-error/20 bg-error/5">
+          <div className="flex justify-between items-center pb-2.5 border-b border-error/10">
+            <div>
+              <h3 className="font-headline-md text-base font-bold text-error flex items-center gap-2">
+                <span className="material-symbols-outlined text-error text-base">event_busy</span>
+                Canceled Sessions
+              </h3>
+              <p className="text-xs text-error/80 mt-0.5">Recorded cancellations for this module</p>
+            </div>
+            <span className="font-label-bold text-xs text-error bg-error/10 px-2.5 py-0.5 rounded-full border border-error/20">
+              {canceledSessions.length} Canceled
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            {canceledSessions.map((session, index) => (
+              <div
+                key={index}
+                className="bg-surface-container/80 border border-error/10 hover:border-error/30 rounded-xl p-3.5 flex flex-col justify-between gap-2 transition-all"
+              >
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-error text-sm">event_busy</span>
+                    <h4 className="font-headline-md font-bold text-on-surface text-sm">{session.date}</h4>
+                  </div>
+                  <span className="font-label-bold text-xs px-2.5 py-0.5 rounded-full bg-error/10 text-error border border-error/20">
+                    Canceled
+                  </span>
+                </div>
+
+                {session.reason && (
+                  <div className="pt-2 border-t border-white/5 text-xs">
+                    <p className="text-on-surface-variant italic">"{session.reason}"</p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

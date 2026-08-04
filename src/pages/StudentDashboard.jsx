@@ -37,6 +37,11 @@ function StudentDashboard() {
     btnStyle: 'bg-primary text-on-primary',
     onConfirm: null
   });
+  const [verifyModal, setVerifyModal] = useState({
+    isOpen: false,
+    slot: null,
+    hours: 1
+  });
 
   const role = localStorage.getItem('mis_role');
   const isAdmin = role === 'admin';
@@ -529,22 +534,38 @@ function StudentDashboard() {
 
                         {/* Reason / Remarks if Canceled or Rescheduled */}
                         {slot.reason && (
-                          <p className="mt-3 text-xs text-error italic bg-error/5 p-2 rounded-lg border border-error/10">
+                  <p className="mt-3 text-xs text-error italic bg-error/5 p-2 rounded-lg border border-error/10">
                             Note: {slot.reason}
                           </p>
                         )}
 
                         {/* Inline Admin Controls (Only visible to Admin) */}
-                        {isAdmin && (
+                        {isAdmin && !isHoliday && !isDone && !isCanceled && !isSwapped && (
                           <div className="mt-3 pt-3 border-t border-white/5 flex flex-wrap items-center justify-end gap-2">
                             <span className="text-[10px] font-label-bold text-on-surface-variant mr-auto">Admin Controls:</span>
-                            <button
-                              onClick={() => handleQuickLogHours(slot.module, 2)}
-                              className="px-2.5 py-1 rounded bg-secondary/10 text-secondary border border-secondary/20 text-xs font-label-bold hover:bg-secondary/20 cursor-pointer"
-                              title="Log 2 hours for this class into Daily Logs"
-                            >
-                              + Log 2h to Logs
-                            </button>
+                            {isUnverified ? (
+                              <button
+                                onClick={() => {
+                                  const calcHours = (slot.endMin - slot.startMin) / 60;
+                                  setVerifyModal({
+                                    isOpen: true,
+                                    slot: slot,
+                                    hours: calcHours > 0 ? calcHours : 1
+                                  });
+                                }}
+                                className="px-2.5 py-1 rounded bg-orange-500/10 text-orange-500 border border-orange-500/20 text-xs font-label-bold hover:bg-orange-500/20 cursor-pointer"
+                              >
+                                + Verify & Log
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => handleQuickLogHours(slot.module, 2)}
+                                className="px-2.5 py-1 rounded bg-secondary/10 text-secondary border border-secondary/20 text-xs font-label-bold hover:bg-secondary/20 cursor-pointer"
+                                title="Log 2 hours for this class into Daily Logs"
+                              >
+                                + Log 2h to Logs
+                              </button>
+                            )}
                             <button
                               onClick={() => handleQuickReschedule(slot.module)}
                               className="px-2.5 py-1 rounded bg-primary/10 text-primary border border-primary/20 text-xs font-label-bold hover:bg-primary/20 cursor-pointer"
@@ -688,6 +709,57 @@ function StudentDashboard() {
                 className={`w-full sm:w-auto px-6 py-3 rounded-xl text-sm font-label-bold transition-all shadow-lg cursor-pointer ${confirmModal.btnStyle || 'bg-primary text-on-primary hover:bg-primary/90'}`}
               >
                 {confirmModal.btnText || 'Confirm'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Verify & Log Modal */}
+      {verifyModal.isOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[9999] animate-fade-in">
+          <div className="bg-surface-container border border-white/10 rounded-2xl p-8 max-w-md w-full shadow-2xl space-y-6 text-center transform scale-100 transition-transform">
+            
+            <div className="w-16 h-16 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-500 flex items-center justify-center mx-auto shadow-[0_0_20px_rgba(249,115,22,0.2)]">
+              <span className="material-symbols-outlined text-3xl">pending_actions</span>
+            </div>
+            
+            <div>
+              <h3 className="font-headline-md font-bold text-on-surface text-xl mb-2">Verify Lecture</h3>
+              <p className="text-sm text-on-surface-variant leading-relaxed">
+                Confirm the duration to log for <b className="text-primary">{verifyModal.slot?.module}</b> on {selectedDate}.
+              </p>
+            </div>
+
+            <div className="text-left bg-surface-container-low p-4 rounded-xl border border-white/5 space-y-2 text-sm">
+               <label className="text-on-surface-variant font-label-bold text-xs uppercase">Duration (Hours)</label>
+               <input
+                 type="number"
+                 value={verifyModal.hours}
+                 onChange={(e) => setVerifyModal({...verifyModal, hours: Number(e.target.value)})}
+                 step="0.5"
+                 min="0.5"
+                 className="w-full bg-surface-container border border-white/10 rounded-lg p-3 text-on-surface focus:border-primary focus:outline-none"
+               />
+            </div>
+            
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 border-t border-white/5">
+              <button
+                type="button"
+                onClick={() => setVerifyModal({ isOpen: false, slot: null, hours: 0 })}
+                className="w-full sm:w-auto px-6 py-3 rounded-xl border border-white/10 text-on-surface hover:bg-white/5 hover:text-white transition-all text-sm font-label-bold cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                   handleQuickLogHours(verifyModal.slot.module, verifyModal.hours);
+                   setVerifyModal({ isOpen: false, slot: null, hours: 0 });
+                }}
+                className="w-full sm:w-auto px-6 py-3 rounded-xl text-sm font-label-bold transition-all shadow-lg cursor-pointer bg-primary text-on-primary hover:bg-primary/90"
+              >
+                Confirm & Log
               </button>
             </div>
           </div>
