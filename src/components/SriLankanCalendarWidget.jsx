@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { getSriLankaDateStr } from '../utils/dateUtils';
+import React, { useState, useMemo } from 'react';
+import { getSriLankaDateStr, getSriLankaDateObj } from '../utils/dateUtils';
 import { sriLankaHolidays2026, getHolidayForDate } from '../data/sriLankaHolidaysData';
 
 function SriLankanCalendarWidget({ selectedDate, onSelectDate }) {
-  const [viewYear, setViewYear] = useState(2026);
-  const [viewMonth, setViewMonth] = useState(6);
+  const currentDate = useMemo(() => getSriLankaDateObj(), []);
+  const [viewYear, setViewYear] = useState(currentDate.getFullYear());
+  const [viewMonth, setViewMonth] = useState(currentDate.getMonth());
 
   const monthNames = [
     'January', 'February', 'March', 'April', 'May', 'June',
