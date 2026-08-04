@@ -1,3 +1,5 @@
+import { pushModuleHoursToCloud } from './firebaseSync';
+
 const defaultGradingScheme = [
   {
     category: 'Continuous Assessments',
@@ -178,8 +180,6 @@ export const getStoredModuleHours = () => {
   }
   return initialModuleHours;
 };
-
-import { pushModuleHoursToCloud } from './firebaseSync';
 
 export const saveStoredModuleHours = (hoursArray) => {
   localStorage.setItem('mis_module_hours', JSON.stringify(hoursArray));

@@ -85,8 +85,8 @@ export const parseTimeRangeToMinutes = (timeStr) => {
     if (isPM && h < 12) h += 12;
     if (isAM && h === 12) h = 0;
 
-    // Heuristic: If 1 <= h <= 6 without explicit AM/PM, treat as afternoon PM
-    if (!isPM && !isAM && h >= 1 && h <= 6) {
+    // Heuristic: If 1 <= h <= 7 without explicit AM/PM, treat as afternoon/evening PM
+    if (!isPM && !isAM && h >= 1 && h <= 7) {
       h += 12;
     }
 

@@ -160,11 +160,8 @@ function LabTrackerPage() {
     const key = `${sch.date}_${sch.lab_name}`;
     const attendanceEntry = storedAttendance[key];
 
-    if (attendanceEntry && attendanceEntry.records && attendanceEntry.records[studentRegNo] === true) {
-      return true;
-    }
-    if (sch.date < todayStr) {
-      return true;
+    if (attendanceEntry && attendanceEntry.records && attendanceEntry.records[studentRegNo] !== undefined) {
+      return attendanceEntry.records[studentRegNo] === true;
     }
     return false;
   };

@@ -1,3 +1,5 @@
+import { pushLabAttendanceToCloud } from './firebaseSync';
+
 // EE01 to EE12 Group Codes Mapping
 export const LAB_GROUPS = [
   { id: 1, code: 'EE01', name: 'Electrical Group 01' },
@@ -193,8 +195,6 @@ export const INITIAL_SCHEDULE = [
 ];
 
 const LOCAL_STORAGE_KEY = 'eschedular26_lab_attendance';
-
-import { pushLabAttendanceToCloud } from './firebaseSync';
 
 export function getStoredAttendance() {
   try {
