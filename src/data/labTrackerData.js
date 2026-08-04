@@ -207,6 +207,13 @@ export function getStoredAttendance() {
   }
 }
 
+// Reset/Clear all attendance records
+export function clearAllStoredAttendance() {
+  localStorage.removeItem(LOCAL_STORAGE_KEY);
+  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify({}));
+  return {};
+}
+
 // Helper to save attendance records for a date and lab name
 export function saveStoredAttendance(dateStr, labName, attendanceMap) {
   const current = getStoredAttendance();

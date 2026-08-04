@@ -5,6 +5,7 @@ import {
   INITIAL_SCHEDULE,
   getStoredAttendance,
   saveStoredAttendance,
+  clearAllStoredAttendance,
   exportAttendanceCSV,
 } from '../data/labTrackerData';
 import { getSriLankaDateObj, getSriLankaDateStr } from '../utils/dateUtils';
@@ -1030,6 +1031,26 @@ function LabTrackerPage() {
                     <p className="text-xs text-on-surface-variant">Select group code (EE01–EE12) and session date below.</p>
                   </div>
                 </div>
+
+                {canMarkAttendance && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (window.confirm('Are you sure you want to RESET all lab attendance records? This will clear test entries.')) {
+                        clearAllStoredAttendance();
+                        setStoredAttendance({});
+                        setLeaderAttendance({});
+                        setSaveSuccess('All lab attendance records have been reset successfully!');
+                        setTimeout(() => setSaveSuccess(''), 4000);
+                      }
+                    }}
+                    className="px-3 py-1.5 rounded-xl bg-error/10 hover:bg-error/20 border border-error/30 text-error text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
+                    title="Reset all test attendance records"
+                  >
+                    <span className="material-symbols-outlined text-sm">restart_alt</span>
+                    <span>Reset All Attendance</span>
+                  </button>
+                )}
               </div>
 
               {/* 2-Column Large Interactive Selectors */}
