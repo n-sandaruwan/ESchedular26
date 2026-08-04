@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { weeklyTimetable } from '../data/timetableData';
+import { getSriLankaDateObj } from '../utils/dateUtils';
 
 function TimetablePage() {
   const days = [
@@ -11,7 +12,7 @@ function TimetablePage() {
   ];
 
   const getTodayDayName = () => {
-    const d = new Date().getDay();
+    const d = getSriLankaDateObj().getDay();
     const dayMap = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const current = dayMap[d];
     return ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].includes(current) ? current : 'Monday';
@@ -46,7 +47,7 @@ function TimetablePage() {
   const afternoonSlots = daySlots.filter(s => (s.startMin || 0) >= 720);
 
   const renderSlotCard = (slot, index) => {
-    const now = new Date();
+    const now = getSriLankaDateObj();
     const nowMin = now.getHours() * 60 + now.getMinutes();
     const isToday = getTodayDayName() === activeDay;
     const startMin = slot.startMin || 510;

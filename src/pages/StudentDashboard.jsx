@@ -12,6 +12,7 @@ import { getHolidayForDate } from '../data/sriLankaHolidaysData';
 import { getStoredDailyLogs, saveStoredDailyLogs, addAuditLog } from '../data/dailyLogsData';
 import { subscribeToCloudEvent } from '../data/firebaseSync';
 import SriLankanCalendarWidget from '../components/SriLankanCalendarWidget';
+import { getSriLankaDateObj } from '../utils/dateUtils';
 
 function StudentDashboard() {
   const navigate = useNavigate();

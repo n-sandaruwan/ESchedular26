@@ -1,4 +1,5 @@
 import { pushLabAttendanceToCloud } from './firebaseSync';
+import { getSriLankaDateStr, getSriLankaTimestampStr } from '../utils/dateUtils';
 
 // EE01 to EE12 Group Codes Mapping
 export const LAB_GROUPS = [
@@ -213,7 +214,7 @@ export function saveStoredAttendance(dateStr, labName, attendanceMap) {
   current[key] = {
     date: dateStr,
     lab_name: labName,
-    updated_at: new Date().toISOString(),
+    updated_at: getSriLankaTimestampStr(),
     records: attendanceMap, // { reg_no: true/false }
   };
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(current));
@@ -250,7 +251,7 @@ export function exportAttendanceCSV() {
     // If no records stored yet, export all 75 students with default status
     INITIAL_STUDENTS.forEach((student) => {
       rows.push([
-        new Date().toISOString().split('T')[0],
+        getSriLankaDateStr(),
         student.reg_no,
         `"${student.name}"`,
         student.group_code,
@@ -264,7 +265,7 @@ export function exportAttendanceCSV() {
   const encodedUri = encodeURI(csvContent);
   const link = document.createElement('a');
   link.setAttribute('href', encodedUri);
-  link.setAttribute('download', `EE_Lab_Attendance_Export_${new Date().toISOString().split('T')[0]}.csv`);
+  link.setAttribute('download', `EE_Lab_Attendance_Export_${getSriLankaDateStr()}.csv`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

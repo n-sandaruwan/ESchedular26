@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { getStoredModuleHours, saveStoredModuleHours } from '../data/moduleHoursData';
 import { weeklyTimetable } from '../data/timetableData';
 import { getStoredAssessments, toggleAssessmentStatus } from '../data/assessmentData';
+import { getSriLankaDateObj } from '../utils/dateUtils';
 
 function ModulePage() {
   const { moduleId } = useParams();
@@ -72,14 +73,14 @@ function ModulePage() {
   const getNextDateForDay = (dayName) => {
     const dayMap = { Sunday: 0, Monday: 1, Tuesday: 2, Wednesday: 3, Thursday: 4, Friday: 5, Saturday: 6 };
     const targetDay = dayMap[dayName];
-    const today = new Date();
+    const today = getSriLankaDateObj();
     const currentDay = today.getDay();
 
     let distance = targetDay - currentDay;
     if (distance < 0) distance += 7;
     if (distance === 0 && today.getHours() >= 18) distance = 7;
 
-    const nextDate = new Date();
+    const nextDate = getSriLankaDateObj();
     nextDate.setDate(today.getDate() + distance);
     return nextDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };

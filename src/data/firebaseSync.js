@@ -1,5 +1,6 @@
 import { db, isFirebaseConfigured } from '../firebase';
 import { doc, setDoc, onSnapshot, collection } from 'firebase/firestore';
+import { getSriLankaTimestampStr } from '../utils/dateUtils';
 
 // Callbacks registered by data stores to update UI on remote changes
 const listeners = {
@@ -223,7 +224,7 @@ export const pushLabAttendanceToCloud = async (dateStr, labName, records) => {
       date: dateStr,
       lab_name: labName,
       records: records,
-      updated_at: new Date().toISOString(),
+      updated_at: getSriLankaTimestampStr(),
     });
     await setDoc(doc(db, 'lab_attendance', docId), payload);
     console.log(`✅ Lab Attendance synced to cloud: ${docId}`);

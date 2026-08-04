@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getStoredModuleHours, saveStoredModuleHours } from '../data/moduleHoursData';
 import { getStoredDailyLogs, saveStoredDailyLogs, addAuditLog } from '../data/dailyLogsData';
 import { getModulesForDate, modifyScheduleSlot, addNotice } from '../data/scheduleStore';
+import { getSriLankaDateStr } from '../utils/dateUtils';
 import { exportCompleteDatabaseJSON, restoreCompleteDatabaseJSON } from '../data/backupRestore';
 import {
   getStoredSheetCsvUrl,
@@ -15,20 +16,20 @@ import {
 function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('reschedule');
 
-  const [logDate, setLogDate] = useState(new Date().toISOString().split('T')[0]);
+  const [logDate, setLogDate] = useState(getSriLankaDateStr());
   const [logModules, setLogModules] = useState([]);
   const [selectedLogModule, setSelectedLogModule] = useState('');
   const [conductedHours, setConductedHours] = useState('');
   const [logNote, setLogNote] = useState('');
 
   const [reschedTargetModule, setReschedTargetModule] = useState('');
-  const [reschedTargetDate, setReschedTargetDate] = useState(new Date().toISOString().split('T')[0]);
+  const [reschedTargetDate, setReschedTargetDate] = useState(getSriLankaDateStr());
   const [reschedStartTime, setReschedStartTime] = useState('08:30');
   const [reschedEndTime, setReschedEndTime] = useState('10:30');
   const [reschedVenue, setReschedVenue] = useState('LT1');
   const [reschedRemark, setReschedRemark] = useState('');
 
-  const [cancelDate, setCancelDate] = useState(new Date().toISOString().split('T')[0]);
+  const [cancelDate, setCancelDate] = useState(getSriLankaDateStr());
   const [cancelAvailableModules, setCancelAvailableModules] = useState([]);
   const [selectedCancelModule, setSelectedCancelModule] = useState('');
   const [cancelRemark, setCancelRemark] = useState('');

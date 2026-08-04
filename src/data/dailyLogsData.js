@@ -28,6 +28,7 @@ export const studentRegistry = [
 ];
 
 import { pushDailyLogsToCloud, pushAuditLogsToCloud } from './firebaseSync';
+import { getSriLankaTimestampStr } from '../utils/dateUtils';
 
 // Local Storage Wrappers
 export const getStoredDailyLogs = () => {
@@ -55,7 +56,7 @@ export const addAuditLog = (action, details, user = 'Admin') => {
   const current = getStoredAuditLogs();
   const newEntry = {
     id: Date.now(),
-    timestamp: new Date().toISOString().replace('T', ' ').substring(0, 16),
+    timestamp: getSriLankaTimestampStr().replace('T', ' ').substring(0, 16),
     user,
     action,
     details

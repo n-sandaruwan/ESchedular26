@@ -8,6 +8,7 @@ import {
   saveStoredAttendance,
   exportAttendanceCSV,
 } from '../data/labTrackerData';
+import { getSriLankaDateObj, getSriLankaDateStr } from '../utils/dateUtils';
 
 function LabTrackerPage() {
   const role = localStorage.getItem('mis_role') || 'student';
@@ -25,7 +26,7 @@ function LabTrackerPage() {
   const [selectedGroupLookupCode, setSelectedGroupLookupCode] = useState('EE01');
 
   const getLocalTodayDateStr = () => {
-    const d = new Date();
+    const d = getSriLankaDateObj();
     const yyyy = d.getFullYear();
     const mm = String(d.getMonth() + 1).padStart(2, '0');
     const dd = String(d.getDate()).padStart(2, '0');
@@ -332,7 +333,7 @@ function LabTrackerPage() {
 
   // 1. Calculate Unmarked / Forgotten Attendance Sessions (ONLY past dates OR today if not marked before midnight)
   const calculateUnmarkedSessions = () => {
-    const realTodayStr = new Date().toISOString().split('T')[0];
+    const realTodayStr = getSriLankaDateStr();
     const unmarkedMap = new Map();
 
     INITIAL_SCHEDULE.forEach((sch) => {

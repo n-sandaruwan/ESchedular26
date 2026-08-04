@@ -13,6 +13,7 @@ import {
   pushAssessmentsToCloud,
   pushAuditLogsToCloud
 } from './firebaseSync';
+import { getSriLankaDateStr, getSriLankaTimestampStr } from '../utils/dateUtils';
 
 // 1. Export 100% Complete Database to a JSON File
 export const exportCompleteDatabaseJSON = () => {
@@ -20,7 +21,7 @@ export const exportCompleteDatabaseJSON = () => {
     metadata: {
       appName: 'ESchedular26 MIS System',
       version: '2.0.0',
-      exportedAt: new Date().toISOString(),
+      exportedAt: getSriLankaTimestampStr(),
       timestamp: Date.now(),
       system: 'Faculty of Engineering Semester 3 MIS'
     },
@@ -37,7 +38,7 @@ export const exportCompleteDatabaseJSON = () => {
   const blob = new Blob([jsonString], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
-  const dateStr = new Date().toISOString().split('T')[0];
+  const dateStr = getSriLankaDateStr();
   link.href = url;
   link.setAttribute('download', `ESchedular26_Full_Database_Backup_${dateStr}.json`);
   document.body.appendChild(link);
@@ -110,7 +111,7 @@ export const restoreCompleteDatabaseJSON = async (jsonString) => {
 export const createEmergencyLocalSnapshot = () => {
   try {
     const snapshot = {
-      timestamp: new Date().toISOString(),
+      timestamp: getSriLankaTimestampStr(),
       schedule_overrides: getStoredOverrides(),
       notices: getStoredNotices(),
       lab_attendance: getStoredAttendance(),

@@ -3,6 +3,7 @@ import { getStoredModuleHours, saveStoredModuleHours } from './moduleHoursData';
 import { getStoredDailyLogs, saveStoredDailyLogs, addAuditLog } from './dailyLogsData';
 import { pushOverrideToCloud, pushNoticeToCloud } from './firebaseSync';
 import { pushRecordToGoogleSheetWebhook } from './googleSheetsSync';
+import { getSriLankaDateStr } from '../utils/dateUtils';
 
 // Initial Schedule Overrides (Cancellations, Reschedules, Swaps per date)
 export const initialOverrides = [
@@ -38,7 +39,7 @@ export const getStoredNotices = () => {
   return initialNotices;
 };
 
-export const addNotice = (title, content, type = 'Alert', date = new Date().toISOString().split('T')[0]) => {
+export const addNotice = (title, content, type = 'Alert', date = getSriLankaDateStr()) => {
   const current = getStoredNotices();
   const newNotice = { id: Date.now(), title, content, type, date };
   const updated = [newNotice, ...current];
