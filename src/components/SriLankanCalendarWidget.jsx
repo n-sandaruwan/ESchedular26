@@ -113,7 +113,11 @@ function SriLankanCalendarWidget({ selectedDate, onSelectDate }) {
           } else if (isToday) {
             dayStyle = 'bg-secondary/20 border-secondary text-secondary font-bold ring-1 ring-secondary/60 shadow-[0_0_10px_rgba(78,222,163,0.4)]';
           } else if (holiday) {
-            dayStyle = 'poya-badge font-bold';
+            if (holiday.isPoya) {
+              dayStyle = 'bg-yellow-500/20 border-yellow-500/50 text-yellow-400 font-bold ring-1 ring-yellow-500/30 shadow-[0_0_8px_rgba(234,179,8,0.3)]';
+            } else {
+              dayStyle = 'bg-pink-500/20 border-pink-500/50 text-pink-400 font-bold ring-1 ring-pink-500/30 shadow-[0_0_8px_rgba(236,72,153,0.3)]';
+            }
           } else if (isPast) {
             dayStyle = 'bg-surface-container-low/30 border-white/5 text-on-surface-variant/40';
           }

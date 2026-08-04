@@ -332,16 +332,16 @@ function StudentDashboard() {
 
             {/* Holiday Special Banner if Selected Date is a Sri Lankan Holiday */}
             {selectedHoliday && (
-              <div className="mb-stack-md p-4 rounded-xl bg-tertiary/10 border border-tertiary/30 flex items-center justify-between gap-3">
+              <div className="mb-stack-md p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">{selectedHoliday.icon}</span>
                   <div>
-                    <h4 className="font-headline-md text-sm text-tertiary font-bold">{selectedHoliday.name}</h4>
-                    <p className="text-xs text-on-surface-variant">{selectedHoliday.type} — Physical lectures postponed.</p>
+                    <h4 className="font-headline-md text-sm text-yellow-500 font-bold">{selectedHoliday.name}</h4>
+                    <p className="text-xs text-on-surface-variant">{selectedHoliday.type} — Physical lectures cancelled.</p>
                   </div>
                 </div>
-                <span className="poya-badge px-3 py-1 rounded-full text-xs font-label-bold">
-                  Department Holiday
+                <span className="bg-yellow-500/20 text-yellow-500 border border-yellow-500/30 px-3 py-1 rounded-full text-xs font-label-bold">
+                  Public Holiday
                 </span>
               </div>
             )}
@@ -390,7 +390,7 @@ function StudentDashboard() {
                           <div>
                             <div className="flex items-center gap-2 mb-1">
                               <span className={`font-label-bold text-xs uppercase tracking-wider ${
-                                isCanceled ? 'text-error line-through' : isOngoing ? 'text-primary' : 'text-on-surface-variant'
+                                (isCanceled || isHoliday) ? 'text-error line-through' : isOngoing ? 'text-primary' : 'text-on-surface-variant'
                               }`}>
                                 {slot.time}
                               </span>
@@ -409,7 +409,7 @@ function StudentDashboard() {
                             </div>
 
                             <h4 className={`font-headline-md text-headline-md text-on-surface leading-tight ${
-                              isCanceled ? 'line-through opacity-50' : ''
+                              (isCanceled || isHoliday) ? 'line-through opacity-50' : ''
                             }`}>
                               <Link to={`/modules/${slot.module}`} className="hover:text-primary transition-colors">
                                 {slot.module}: {slot.name}
@@ -446,7 +446,7 @@ function StudentDashboard() {
                               </span>
                             )}
                             {isHoliday && (
-                              <span className="poya-badge px-3 py-1 rounded-lg font-label-bold text-xs">
+                              <span className="bg-yellow-500/20 text-yellow-500 border border-yellow-500/30 px-3 py-1 rounded-lg font-label-bold text-xs">
                                 Holiday
                               </span>
                             )}
