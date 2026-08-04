@@ -220,7 +220,7 @@ function StudentDashboard() {
           <p className="text-on-surface-variant flex flex-wrap items-center gap-2 text-xs sm:text-sm font-body-md mt-1">
             <span className="flex items-center gap-1.5">
               <span className="material-symbols-outlined text-sm text-primary">school</span> 
-              Faculty of Engineering • Semester 3
+              26th Batch, Faculty of Engineering, UOR
             </span>
             <span className="text-outline-variant/60 hidden sm:inline">•</span>
             <span className="flex items-center gap-1.5 bg-primary/10 text-primary border border-primary/20 px-3 py-0.5 rounded-full text-xs font-label-mono shadow-[0_0_12px_rgba(56,189,248,0.2)]">
