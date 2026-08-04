@@ -168,18 +168,24 @@ function StudentDashboard() {
     const isPast = dateStr < todayDateStr;
     const isFuture = dateStr > todayDateStr;
 
+    // Fetch daily logs to verify if past lectures actually happened
+    const dailyLogs = getStoredDailyLogs();
+
     return rawSlots.map((slot) => {
       let liveStatus = slot.status || 'Scheduled';
       let progressPercent = 0;
       let minsRemaining = 0;
       let minsUntilStart = 0;
 
+      // Check if this slot has a log entry for the current date
+      const isLogged = dailyLogs.some(log => log.date === dateStr && log.module === slot.module);
+
       if (slot.status === 'Canceled' || slot.status === 'Rescheduled' || slot.status === 'Swapped') {
         liveStatus = slot.status;
       } else if (selectedHoliday) {
         liveStatus = 'Holiday';
       } else if (isPast) {
-        liveStatus = 'Done';
+        liveStatus = isLogged ? 'Done' : 'Awaiting Verification';
       } else if (isFuture) {
         liveStatus = 'Upcoming';
       } else if (isToday) {
@@ -187,7 +193,7 @@ function StudentDashboard() {
         const end = slot.endMin || 630;
 
         if (nowMin > end) {
-          liveStatus = 'Done';
+          liveStatus = isLogged ? 'Done' : 'Awaiting Verification';
         } else if (nowMin >= start && nowMin <= end) {
           liveStatus = 'Ongoing';
           const totalDuration = Math.max(1, end - start);
@@ -217,6 +223,7 @@ function StudentDashboard() {
     if (statusFilter === 'UPCOMING') return slot.liveStatus === 'Upcoming';
     if (statusFilter === 'DONE') return slot.liveStatus === 'Done';
     if (statusFilter === 'CANCELED') return slot.liveStatus === 'Canceled';
+    if (statusFilter === 'UNVERIFIED') return slot.liveStatus === 'Awaiting Verification';
     return true;
   });
 
@@ -343,6 +350,7 @@ function StudentDashboard() {
                   { label: 'Ongoing', key: 'ONGOING' },
                   { label: 'Upcoming', key: 'UPCOMING' },
                   { label: 'Completed', key: 'DONE' },
+                  { label: 'Awaiting Verification', key: 'UNVERIFIED' },
                   { label: 'Canceled', key: 'CANCELED' }
                 ].map(chip => (
                   <button
@@ -392,6 +400,7 @@ function StudentDashboard() {
                   const isOngoing = slot.liveStatus === 'Ongoing';
                   const isDone = slot.liveStatus === 'Done';
                   const isCanceled = slot.liveStatus === 'Canceled';
+                  const isUnverified = slot.liveStatus === 'Awaiting Verification';
                   const isSwapped = slot.liveStatus === 'Swapped' || slot.liveStatus === 'Rescheduled';
                   const isHoliday = slot.liveStatus === 'Holiday';
 
@@ -405,6 +414,8 @@ function StudentDashboard() {
                           ? 'bg-error'
                           : isDone
                           ? 'bg-secondary opacity-60'
+                          : isUnverified
+                          ? 'bg-orange-500'
                           : isSwapped
                           ? 'bg-tertiary'
                           : 'bg-on-surface-variant'
@@ -420,7 +431,7 @@ function StudentDashboard() {
                           <div>
                             <div className="flex items-center gap-2 mb-1">
                               <span className={`font-label-bold text-xs uppercase tracking-wider ${
-                                (isCanceled || isHoliday) ? 'text-error line-through' : isOngoing ? 'text-primary' : 'text-on-surface-variant'
+                                (isCanceled || isHoliday) ? 'text-error line-through' : isOngoing ? 'text-primary' : isUnverified ? 'text-orange-500' : 'text-on-surface-variant'
                               }`}>
                                 {slot.time}
                               </span>
@@ -458,6 +469,12 @@ function StudentDashboard() {
                             {isDone && (
                               <span className="bg-secondary/10 text-secondary border border-secondary/20 px-3 py-1 rounded-lg font-label-bold text-xs">
                                 ✓ Conducted
+                              </span>
+                            )}
+                            {isUnverified && (
+                              <span className="bg-orange-500/20 text-orange-500 border border-orange-500/30 px-3 py-1 rounded-lg font-label-bold text-xs flex items-center gap-1">
+                                <span className="material-symbols-outlined text-[14px]">pending_actions</span>
+                                Awaiting Verification
                               </span>
                             )}
                             {slot.liveStatus === 'Upcoming' && (

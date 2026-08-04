@@ -1,15 +1,40 @@
 import React, { useState, useEffect } from 'react';
-import { getStoredDailyLogs } from '../data/dailyLogsData';
+import { getStoredDailyLogs, saveStoredDailyLogs } from '../data/dailyLogsData';
+import { getStoredModuleHours, saveStoredModuleHours } from '../data/moduleHoursData';
 import { getSriLankaDateStr } from '../utils/dateUtils';
 
 function DailyLogPage() {
   const [logs, setLogs] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedModule, setSelectedModule] = useState('ALL');
+  const isAdmin = localStorage.getItem('mis_role') === 'admin';
 
   useEffect(() => {
     setLogs(getStoredDailyLogs());
   }, []);
+
+  const handleDeleteLog = (id) => {
+    if (!window.confirm('Are you sure you want to permanently delete this log entry? This will also subtract the logged hours from the module total.')) return;
+
+    const currentLogs = getStoredDailyLogs();
+    const logToDelete = currentLogs.find(l => l.id === id);
+    if (!logToDelete) return;
+
+    // 1. Remove from logs
+    const updatedLogs = currentLogs.filter(l => l.id !== id);
+    saveStoredDailyLogs(updatedLogs);
+    setLogs(updatedLogs);
+
+    // 2. Subtract hours from module
+    const currentHours = getStoredModuleHours();
+    const updatedHours = currentHours.map(m => {
+      if (m.code === logToDelete.module) {
+        return { ...m, conductedHours: Math.max(0, m.conductedHours - logToDelete.hours) };
+      }
+      return m;
+    });
+    saveStoredModuleHours(updatedHours);
+  };
 
   const filteredLogs = logs.filter((item) => {
     const matchesModule = selectedModule === 'ALL' || item.module === selectedModule;
@@ -120,12 +145,13 @@ function DailyLogPage() {
                 <th className="p-4">Topic / Coverage</th>
                 <th className="p-4">Venue</th>
                 <th className="p-4">Instructor</th>
+                {isAdmin && <th className="p-4 text-center">Action</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5 text-sm">
               {filteredLogs.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="p-8 text-center text-on-surface-variant">
+                  <td colSpan={isAdmin ? "7" : "6"} className="p-8 text-center text-on-surface-variant">
                     No matching lecture logs found for this filter.
                   </td>
                 </tr>
@@ -146,6 +172,17 @@ function DailyLogPage() {
                     <td className="p-4 font-body-md text-on-surface font-medium">{log.topic}</td>
                     <td className="p-4 text-xs text-on-surface-variant">{log.venue}</td>
                     <td className="p-4 text-xs text-on-surface-variant">{log.instructor}</td>
+                    {isAdmin && (
+                      <td className="p-4 text-center">
+                        <button
+                          onClick={() => handleDeleteLog(log.id)}
+                          className="bg-error/10 text-error hover:bg-error hover:text-white px-2 py-1 rounded-md text-xs font-label-bold border border-error/20 transition-colors"
+                          title="Delete this log"
+                        >
+                          <span className="material-symbols-outlined text-[16px] align-middle">delete</span>
+                        </button>
+                      </td>
+                    )}
                   </tr>
                 ))
               )}
