@@ -912,56 +912,56 @@ function LabTrackerPage() {
                     key={lab.lab_name}
                     className="bg-surface-container/60 border border-white/10 rounded-2xl p-4 sm:p-5 shadow-xl space-y-3 relative overflow-hidden backdrop-blur-xl hover:border-primary/40 transition-all"
                   >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-9 h-9 rounded-xl bg-primary/20 border border-primary/40 flex items-center justify-center text-primary shrink-0">
-                          <span className="material-symbols-outlined text-lg">science</span>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-3.5">
+                      <div className="flex items-start sm:items-center gap-3">
+                        <div className="w-11 h-11 rounded-xl bg-primary/20 border border-primary/40 flex items-center justify-center text-primary shrink-0 mt-0.5 sm:mt-0">
+                          <span className="material-symbols-outlined text-xl">science</span>
                         </div>
-                        <div>
-                          <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-primary/10 text-primary border border-primary/30 uppercase">
+                        <div className="space-y-1">
+                          <span className="px-2.5 py-0.5 rounded text-xs font-mono font-bold bg-primary/10 text-primary border border-primary/30 uppercase inline-block">
                             {lab.week}
                           </span>
-                          <h4 className="font-bold text-on-surface text-base sm:text-lg leading-snug mt-0.5">
+                          <h4 className="font-extrabold text-on-surface text-lg sm:text-xl leading-snug">
                             {lab.lab_name}
                           </h4>
                         </div>
                       </div>
 
-                      <div>
+                      <div className="shrink-0 self-start sm:self-center">
                         {isLabMarked ? (
-                          <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-secondary/20 text-secondary border border-secondary/40 font-mono shadow-[0_0_10px_rgba(78,222,163,0.3)] inline-flex items-center gap-1">
-                            <span className="material-symbols-outlined text-xs">check_circle</span>
+                          <span className="px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-extrabold bg-secondary/20 text-secondary border border-secondary/40 font-mono shadow-[0_0_10px_rgba(78,222,163,0.3)] inline-flex items-center gap-1.5">
+                            <span className="material-symbols-outlined text-sm">check_circle</span>
                             <span>Attendance Marked</span>
                           </span>
                         ) : (
-                          <span className="px-3 py-1 rounded-full text-xs font-medium bg-amber-500/10 text-amber-400 border border-amber-500/30 font-mono inline-flex items-center gap-1">
-                            <span className="material-symbols-outlined text-xs">schedule</span>
+                          <span className="px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-bold bg-amber-500/10 text-amber-400 border border-amber-500/30 font-mono inline-flex items-center gap-1.5">
+                            <span className="material-symbols-outlined text-sm">schedule</span>
                             <span>Attendance Pending</span>
                           </span>
                         )}
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-4 text-xs sm:text-sm text-on-surface-variant font-mono bg-black/30 p-2.5 rounded-xl border border-white/5">
-                      <span className="flex items-center gap-1.5">
-                        <span className="material-symbols-outlined text-sm text-primary">location_on</span>
+                    <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-sm sm:text-base text-on-surface-variant font-mono bg-black/40 p-3 sm:p-3.5 rounded-xl border border-white/10">
+                      <span className="flex items-center gap-2">
+                        <span className="material-symbols-outlined text-base sm:text-lg text-primary">location_on</span>
                         <span className="font-bold text-on-surface">Venue: {lab.venue}</span>
                       </span>
-                      <span className="flex items-center gap-1.5 text-primary font-bold">
-                        <span className="material-symbols-outlined text-sm">schedule</span>
+                      <span className="flex items-center gap-2 text-primary font-bold">
+                        <span className="material-symbols-outlined text-base sm:text-lg">schedule</span>
                         <span>Time: {lab.time}</span>
                       </span>
                     </div>
 
                     {/* Assigned Lab Groups with Glowing Emerald Highlight for Marked Groups */}
-                    <div className="space-y-1.5 pt-1">
-                      <span className="text-[11px] font-label-bold text-on-surface-variant uppercase tracking-wider block">
+                    <div className="space-y-2 pt-1.5">
+                      <span className="text-xs sm:text-sm font-extrabold text-on-surface-variant uppercase tracking-wider block">
                         Assigned EE Lab Groups on This Day ({isAllGroups ? 'All 12 Groups' : `${lab.groups.length} Groups`}):
                       </span>
 
-                      <div className="flex flex-wrap items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
                         {isAllGroups ? (
-                          <span className={`px-3 py-1 rounded-xl font-mono text-xs font-extrabold shadow-sm ${
+                          <span className={`px-3.5 py-1.5 rounded-xl font-mono text-xs sm:text-sm font-extrabold shadow-sm ${
                             isLabMarked
                               ? 'bg-secondary/25 text-secondary border border-secondary/50 shadow-[0_0_12px_rgba(78,222,163,0.4)] ring-1 ring-secondary/40'
                               : 'bg-primary/20 text-primary border border-primary/40'
@@ -976,14 +976,14 @@ function LabTrackerPage() {
                             return (
                               <span
                                 key={gCode}
-                                className={`px-3 py-1 rounded-xl font-mono text-xs font-extrabold flex items-center gap-1 transition-all shadow-md ${
+                                className={`px-3.5 py-1.5 rounded-xl font-mono text-xs sm:text-sm font-extrabold flex items-center gap-1.5 transition-all shadow-md ${
                                   isGroupMarked
                                     ? 'bg-secondary/25 text-secondary border border-secondary/50 shadow-[0_0_12px_rgba(78,222,163,0.4)] ring-1 ring-secondary/40'
                                     : 'bg-primary/10 text-primary border border-primary/30'
                                 }`}
                               >
                                 <span>{gCode}</span>
-                                {isGroupMarked && <span className="text-secondary font-bold text-[11px]">✓</span>}
+                                {isGroupMarked && <span className="text-secondary font-bold text-xs">✓</span>}
                               </span>
                             );
                           })
