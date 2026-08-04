@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
   LAB_GROUPS,
-  MODULE_LAB_COUNTS,
   INITIAL_STUDENTS,
   INITIAL_SCHEDULE,
   getStoredAttendance,
