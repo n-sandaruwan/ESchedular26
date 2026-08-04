@@ -29,6 +29,14 @@ function StudentDashboard() {
   const [notices, setNotices] = useState([]);
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [adminActionMsg, setAdminActionMsg] = useState('');
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    btnText: 'Confirm',
+    btnStyle: 'bg-primary text-on-primary',
+    onConfirm: null
+  });
 
   const role = localStorage.getItem('mis_role');
   const isAdmin = role === 'admin';
@@ -91,16 +99,38 @@ function StudentDashboard() {
   };
 
   const handleQuickCancelClass = (moduleCode) => {
-    if (window.confirm(`Are you sure you want to CANCEL the ${moduleCode} lecture on ${selectedDate}?`)) {
-      modifyScheduleSlot({
-        date: selectedDate,
-        module: moduleCode,
-        status: 'Canceled',
-        reason: 'Canceled via Quick Admin Action on Dashboard'
-      });
-      setAdminActionMsg(`Canceled ${moduleCode} on ${selectedDate}`);
-      setTimeout(() => setAdminActionMsg(''), 3500);
-    }
+    setConfirmModal({
+      isOpen: true,
+      title: 'Confirm Quick Cancellation',
+      message: `Are you sure you want to instantly CANCEL the ${moduleCode} lecture on ${selectedDate}?`,
+      btnText: 'Confirm Cancellation',
+      btnStyle: 'bg-error text-on-error hover:bg-error/90 border-error/50 shadow-[0_0_15px_rgba(244,63,94,0.3)]',
+      onConfirm: () => {
+        modifyScheduleSlot({
+          date: selectedDate,
+          module: moduleCode,
+          status: 'Canceled',
+          reason: 'Canceled via Quick Admin Action on Dashboard'
+        });
+        setAdminActionMsg(`Canceled ${moduleCode} on ${selectedDate}`);
+        setTimeout(() => setAdminActionMsg(''), 3500);
+        setConfirmModal({ isOpen: false, title: '', message: '', onConfirm: null });
+      }
+    });
+  };
+
+  const handleQuickReschedule = (moduleCode) => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Reschedule Lecture',
+      message: `Do you want to navigate to the Admin Control Panel to reschedule the ${moduleCode} lecture on ${selectedDate}?`,
+      btnText: 'Go to Reschedule Panel',
+      btnStyle: 'btn-electric',
+      onConfirm: () => {
+        setConfirmModal({ isOpen: false, title: '', message: '', onConfirm: null });
+        navigate('/admin');
+      }
+    });
   };
 
   const handleQuickLogHours = (moduleCode, hours = 2) => {
@@ -499,7 +529,7 @@ function StudentDashboard() {
                               + Log 2h to Logs
                             </button>
                             <button
-                              onClick={() => navigate('/admin')}
+                              onClick={() => handleQuickReschedule(slot.module)}
                               className="px-2.5 py-1 rounded bg-primary/10 text-primary border border-primary/20 text-xs font-label-bold hover:bg-primary/20 cursor-pointer"
                             >
                               Reschedule
@@ -610,6 +640,42 @@ function StudentDashboard() {
 
         </div>
       </div>
+
+      {/* Enhanced Custom Confirmation Modal for Student Dashboard */}
+      {confirmModal.isOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[9999] animate-fade-in">
+          <div className="bg-surface-container border border-white/10 rounded-2xl p-8 max-w-md w-full shadow-2xl space-y-6 text-center transform scale-100 transition-transform">
+            
+            <div className="w-16 h-16 rounded-full bg-primary/10 border border-primary/30 text-primary flex items-center justify-center mx-auto shadow-[0_0_20px_rgba(56,189,248,0.2)]">
+              <span className="material-symbols-outlined text-3xl">info</span>
+            </div>
+            
+            <div>
+              <h3 className="font-headline-md font-bold text-on-surface text-xl mb-2">{confirmModal.title}</h3>
+              <p className="text-sm text-on-surface-variant leading-relaxed">
+                {confirmModal.message}
+              </p>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 border-t border-white/5">
+              <button
+                type="button"
+                onClick={() => setConfirmModal({ isOpen: false, title: '', message: '', onConfirm: null })}
+                className="w-full sm:w-auto px-6 py-3 rounded-xl border border-white/10 text-on-surface hover:bg-white/5 hover:text-white transition-all text-sm font-label-bold cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmModal.onConfirm}
+                className={`w-full sm:w-auto px-6 py-3 rounded-xl text-sm font-label-bold transition-all shadow-lg cursor-pointer ${confirmModal.btnStyle || 'bg-primary text-on-primary hover:bg-primary/90'}`}
+              >
+                {confirmModal.btnText || 'Confirm'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

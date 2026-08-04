@@ -18,6 +18,7 @@ function DashboardLayout({ children }) {
     { name: 'Weekly Schedule', icon: 'calendar_month', path: '/timetable' },
     { name: 'Module Tracker', icon: 'view_module', path: '/modules' },
     { name: 'Lab Tracker', icon: 'biotech', path: '/lab-tracker' },
+    { name: 'Cancellations', icon: 'event_busy', path: '/cancellations' },
     { name: 'Daily Lecture Logs', icon: 'history_edu', path: '/logs', adminOnly: true },
     { name: 'Audit Trail', icon: 'history', path: '/audit', adminOnly: true },
     { name: 'Admin Portal', icon: 'admin_panel_settings', path: '/admin', adminOnly: true }
