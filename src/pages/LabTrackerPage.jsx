@@ -195,6 +195,8 @@ function LabTrackerPage() {
           week: sch.week,
           time: sch.time,
           venue: sch.venue,
+          status: sch.status || 'Scheduled',
+          reason: sch.reason || '',
           groups: [sch.group_code],
         });
       } else {
@@ -677,7 +679,12 @@ function LabTrackerPage() {
                             <span className="text-xs font-mono text-on-surface-variant font-semibold">
                               📅 {sch.date}
                             </span>
-                            {completed ? (
+                            {sch.status === 'Rescheduled' ? (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/40 font-mono">
+                                <span className="material-symbols-outlined text-xs">sync</span>
+                                <span>Rescheduled</span>
+                              </span>
+                            ) : completed ? (
                               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-secondary/20 text-secondary border border-secondary/40 font-mono">
                                 <span className="material-symbols-outlined text-xs">check_circle</span>
                                 <span>Done</span>
@@ -706,6 +713,13 @@ function LabTrackerPage() {
                             <span>{sch.time}</span>
                           </span>
                         </div>
+
+                        {sch.reason && (
+                          <div className="mt-2 p-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300 text-[11px] font-mono flex items-center gap-1.5">
+                            <span className="material-symbols-outlined text-xs text-amber-400">info</span>
+                            <span>Note: {sch.reason}</span>
+                          </div>
+                        )}
                       </div>
                     );
                   })}

@@ -135,7 +135,7 @@ const GROUPS_11_TO_12 = ['EE11', 'EE12'];
 const ALL_GROUPS = ['EE01', 'EE02', 'EE03', 'EE04', 'EE05', 'EE06', 'EE07', 'EE08', 'EE09', 'EE10', 'EE11', 'EE12'];
 
 // Helper to expand groups array into individual schedule objects
-function expandScheduleEntries(week, date, time, lab_name, venue, groups) {
+function expandScheduleEntries(week, date, time, lab_name, venue, groups, status = 'Scheduled', reason = '') {
   return groups.map((gCode) => {
     const groupObj = LAB_GROUPS.find((g) => g.code === gCode);
     return {
@@ -147,18 +147,21 @@ function expandScheduleEntries(week, date, time, lab_name, venue, groups) {
       venue,
       group_code: gCode,
       group_id: groupObj ? groupObj.id : 1,
+      status,
+      reason,
     };
   });
 }
 
 // Complete 13-Week Semester Lab Schedule
 export const INITIAL_SCHEDULE = [
-  // Week 2 & Week 3 Rescheduled Labs
+  // Week 2
   ...expandScheduleEntries('Week 2', '2026-08-05', '08:30 AM - 11:30 AM', 'EE3301 Analog Electronics (Lab 1: Diodes & Practical Applications)', 'Communication Laboratory', GROUPS_1_TO_10),
-  ...expandScheduleEntries('Week 3', '2026-08-13', '01:30 PM - 04:30 PM', 'EE3301 Analog Electronics (Lab 1: Diodes & Practical Applications)', 'Communication Laboratory', GROUPS_11_TO_12),
+  ...expandScheduleEntries('Week 2', '2026-08-07', '01:30 PM - 04:30 PM', 'EE3301 Analog Electronics (Lab 1: Diodes & Practical Applications)', 'Communication Laboratory', GROUPS_11_TO_12, 'Rescheduled', 'Rescheduled to Thursday, Aug 13th'),
 
   // Week 3
   ...expandScheduleEntries('Week 3', '2026-08-12', '08:30 AM - 11:30 AM', 'EE3306 Signals & Systems (Lab 1: Continuous-Time Signal Analysis)', 'Communication Laboratory', GROUPS_1_TO_8),
+  ...expandScheduleEntries('Week 3', '2026-08-13', '01:30 PM - 04:30 PM', 'EE3301 Analog Electronics (Lab 1: Diodes & Practical Applications)', 'Communication Laboratory', GROUPS_11_TO_12, 'Rescheduled', 'Rescheduled from Friday, Aug 7th'),
   ...expandScheduleEntries('Week 3', '2026-08-14', '01:30 PM - 04:30 PM', 'EE3306 Signals & Systems (Lab 1: Continuous-Time Signal Analysis)', 'Communication Laboratory', GROUPS_9_TO_12),
 
   // Week 4
