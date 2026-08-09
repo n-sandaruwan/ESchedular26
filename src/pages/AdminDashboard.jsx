@@ -172,7 +172,7 @@ function AdminDashboard() {
       message: `Are you sure you want to RESCHEDULE ${reschedTargetModule} on ${reschedTargetDate} to ${reschedStartTime} - ${reschedEndTime} (${reschedVenue})? This update will be published instantly.`,
       btnText: 'Confirm Reschedule',
       btnStyle: 'btn-electric',
-      onConfirm: executeReschedule
+      onConfirm: () => executeReschedule()
     });
   };
 
@@ -199,8 +199,8 @@ function AdminDashboard() {
       title: 'Confirm Lecture Cancellation',
       message: `Are you sure you want to CANCEL ${selectedCancelModule} scheduled on ${cancelDate}? This will notify all enrolled students.`,
       btnText: 'Confirm Cancellation',
-      btnStyle: 'bg-error text-on-error hover:bg-error/90',
-      onConfirm: executeCancellation
+      btnStyle: 'bg-error text-on-error hover:bg-error/90 border-error/50 shadow-[0_0_15px_rgba(244,63,94,0.3)]',
+      onConfirm: () => executeCancellation()
     });
   };
 
@@ -224,7 +224,7 @@ function AdminDashboard() {
       message: `Are you sure you want to BROADCAST "${noticeTitle}" to all student dashboards?`,
       btnText: 'Confirm Broadcast',
       btnStyle: 'btn-electric',
-      onConfirm: executeNoticeBroadcast
+      onConfirm: () => executeNoticeBroadcast()
     });
   };
 
@@ -816,27 +816,34 @@ function AdminDashboard() {
         )}
       </div>
 
-      {/* Confirmation Modal Overlay */}
+      {/* Enhanced Custom Confirmation Modal */}
       {confirmModal.isOpen && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-fadeIn">
-          <div className="bg-surface-container border border-primary/40 rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4 text-center border-t-4 border-t-primary">
-            <div className="w-12 h-12 rounded-full bg-primary/20 border border-primary/40 text-primary flex items-center justify-center mx-auto">
-              <span className="material-symbols-outlined text-2xl">help_outline</span>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[9999] animate-fade-in">
+          <div className="bg-surface-container border border-white/10 rounded-2xl p-8 max-w-md w-full shadow-2xl space-y-6 text-center transform scale-100 transition-transform">
+            
+            <div className="w-16 h-16 rounded-full bg-primary/10 border border-primary/30 text-primary flex items-center justify-center mx-auto shadow-[0_0_20px_rgba(56,189,248,0.2)]">
+              <span className="material-symbols-outlined text-3xl">info</span>
             </div>
-            <h3 className="font-extrabold text-on-surface text-lg">{confirmModal.title}</h3>
-            <p className="text-xs text-on-surface-variant leading-relaxed">{confirmModal.message}</p>
-            <div className="flex items-center justify-center gap-3 pt-2">
+            
+            <div>
+              <h3 className="font-headline-md font-bold text-on-surface text-xl mb-2">{confirmModal.title}</h3>
+              <p className="text-sm text-on-surface-variant leading-relaxed">
+                {confirmModal.message}
+              </p>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 border-t border-white/5">
               <button
                 type="button"
                 onClick={() => setConfirmModal({ isOpen: false, title: '', message: '', onConfirm: null })}
-                className="px-5 py-2.5 rounded-xl border border-white/10 text-on-surface hover:bg-white/5 text-xs font-label-bold cursor-pointer"
+                className="w-full sm:w-auto px-6 py-3 rounded-xl border border-white/10 text-on-surface hover:bg-white/5 hover:text-white transition-all text-sm font-label-bold cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={confirmModal.onConfirm}
-                className={`${confirmModal.btnStyle || 'btn-electric'} px-6 py-2.5 rounded-xl text-xs font-label-bold shadow-lg cursor-pointer`}
+                className={`w-full sm:w-auto px-6 py-3 rounded-xl text-sm font-label-bold transition-all shadow-lg cursor-pointer ${confirmModal.btnStyle || 'bg-primary text-on-primary hover:bg-primary/90'}`}
               >
                 {confirmModal.btnText || 'Confirm'}
               </button>

@@ -29,6 +29,19 @@ function StudentDashboard() {
   const [notices, setNotices] = useState([]);
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [adminActionMsg, setAdminActionMsg] = useState('');
+  const [confirmModal, setConfirmModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    btnText: 'Confirm',
+    btnStyle: 'bg-primary text-on-primary',
+    onConfirm: null
+  });
+  const [verifyModal, setVerifyModal] = useState({
+    isOpen: false,
+    slot: null,
+    hours: 1
+  });
 
   const role = localStorage.getItem('mis_role');
   const isAdmin = role === 'admin';
@@ -91,16 +104,38 @@ function StudentDashboard() {
   };
 
   const handleQuickCancelClass = (moduleCode) => {
-    if (window.confirm(`Are you sure you want to CANCEL the ${moduleCode} lecture on ${selectedDate}?`)) {
-      modifyScheduleSlot({
-        date: selectedDate,
-        module: moduleCode,
-        status: 'Canceled',
-        reason: 'Canceled via Quick Admin Action on Dashboard'
-      });
-      setAdminActionMsg(`Canceled ${moduleCode} on ${selectedDate}`);
-      setTimeout(() => setAdminActionMsg(''), 3500);
-    }
+    setConfirmModal({
+      isOpen: true,
+      title: 'Confirm Quick Cancellation',
+      message: `Are you sure you want to instantly CANCEL the ${moduleCode} lecture on ${selectedDate}?`,
+      btnText: 'Confirm Cancellation',
+      btnStyle: 'bg-error text-on-error hover:bg-error/90 border-error/50 shadow-[0_0_15px_rgba(244,63,94,0.3)]',
+      onConfirm: () => {
+        modifyScheduleSlot({
+          date: selectedDate,
+          module: moduleCode,
+          status: 'Canceled',
+          reason: 'Canceled via Quick Admin Action on Dashboard'
+        });
+        setAdminActionMsg(`Canceled ${moduleCode} on ${selectedDate}`);
+        setTimeout(() => setAdminActionMsg(''), 3500);
+        setConfirmModal({ isOpen: false, title: '', message: '', onConfirm: null });
+      }
+    });
+  };
+
+  const handleQuickReschedule = (moduleCode) => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Reschedule Lecture',
+      message: `Do you want to navigate to the Admin Control Panel to reschedule the ${moduleCode} lecture on ${selectedDate}?`,
+      btnText: 'Go to Reschedule Panel',
+      btnStyle: 'btn-electric',
+      onConfirm: () => {
+        setConfirmModal({ isOpen: false, title: '', message: '', onConfirm: null });
+        navigate('/admin');
+      }
+    });
   };
 
   const handleQuickLogHours = (moduleCode, hours = 2) => {
@@ -138,18 +173,24 @@ function StudentDashboard() {
     const isPast = dateStr < todayDateStr;
     const isFuture = dateStr > todayDateStr;
 
+    // Fetch daily logs to verify if past lectures actually happened
+    const dailyLogs = getStoredDailyLogs();
+
     return rawSlots.map((slot) => {
       let liveStatus = slot.status || 'Scheduled';
       let progressPercent = 0;
       let minsRemaining = 0;
       let minsUntilStart = 0;
 
+      // Check if this slot has a log entry for the current date
+      const isLogged = dailyLogs.some(log => log.date === dateStr && log.module === slot.module);
+
       if (slot.status === 'Canceled' || slot.status === 'Rescheduled' || slot.status === 'Swapped') {
         liveStatus = slot.status;
       } else if (selectedHoliday) {
         liveStatus = 'Holiday';
       } else if (isPast) {
-        liveStatus = 'Done';
+        liveStatus = isLogged ? 'Done' : 'Awaiting Verification';
       } else if (isFuture) {
         liveStatus = 'Upcoming';
       } else if (isToday) {
@@ -157,7 +198,7 @@ function StudentDashboard() {
         const end = slot.endMin || 630;
 
         if (nowMin > end) {
-          liveStatus = 'Done';
+          liveStatus = isLogged ? 'Done' : 'Awaiting Verification';
         } else if (nowMin >= start && nowMin <= end) {
           liveStatus = 'Ongoing';
           const totalDuration = Math.max(1, end - start);
@@ -187,6 +228,7 @@ function StudentDashboard() {
     if (statusFilter === 'UPCOMING') return slot.liveStatus === 'Upcoming';
     if (statusFilter === 'DONE') return slot.liveStatus === 'Done';
     if (statusFilter === 'CANCELED') return slot.liveStatus === 'Canceled';
+    if (statusFilter === 'UNVERIFIED') return slot.liveStatus === 'Awaiting Verification';
     return true;
   });
 
@@ -313,6 +355,7 @@ function StudentDashboard() {
                   { label: 'Ongoing', key: 'ONGOING' },
                   { label: 'Upcoming', key: 'UPCOMING' },
                   { label: 'Completed', key: 'DONE' },
+                  { label: 'Awaiting Verification', key: 'UNVERIFIED' },
                   { label: 'Canceled', key: 'CANCELED' }
                 ].map(chip => (
                   <button
@@ -332,16 +375,16 @@ function StudentDashboard() {
 
             {/* Holiday Special Banner if Selected Date is a Sri Lankan Holiday */}
             {selectedHoliday && (
-              <div className="mb-stack-md p-4 rounded-xl bg-tertiary/10 border border-tertiary/30 flex items-center justify-between gap-3">
+              <div className="mb-stack-md p-4 rounded-xl bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">{selectedHoliday.icon}</span>
                   <div>
-                    <h4 className="font-headline-md text-sm text-tertiary font-bold">{selectedHoliday.name}</h4>
-                    <p className="text-xs text-on-surface-variant">{selectedHoliday.type} — Physical lectures postponed.</p>
+                    <h4 className="font-headline-md text-sm text-yellow-500 font-bold">{selectedHoliday.name}</h4>
+                    <p className="text-xs text-on-surface-variant">{selectedHoliday.type} — Physical lectures cancelled.</p>
                   </div>
                 </div>
-                <span className="poya-badge px-3 py-1 rounded-full text-xs font-label-bold">
-                  Department Holiday
+                <span className="bg-yellow-500/20 text-yellow-500 border border-yellow-500/30 px-3 py-1 rounded-full text-xs font-label-bold">
+                  Public Holiday
                 </span>
               </div>
             )}
@@ -362,6 +405,7 @@ function StudentDashboard() {
                   const isOngoing = slot.liveStatus === 'Ongoing';
                   const isDone = slot.liveStatus === 'Done';
                   const isCanceled = slot.liveStatus === 'Canceled';
+                  const isUnverified = slot.liveStatus === 'Awaiting Verification';
                   const isSwapped = slot.liveStatus === 'Swapped' || slot.liveStatus === 'Rescheduled';
                   const isHoliday = slot.liveStatus === 'Holiday';
 
@@ -375,6 +419,8 @@ function StudentDashboard() {
                           ? 'bg-error'
                           : isDone
                           ? 'bg-secondary opacity-60'
+                          : isUnverified
+                          ? 'bg-orange-500'
                           : isSwapped
                           ? 'bg-tertiary'
                           : 'bg-on-surface-variant'
@@ -390,7 +436,7 @@ function StudentDashboard() {
                           <div>
                             <div className="flex items-center gap-2 mb-1">
                               <span className={`font-label-bold text-xs uppercase tracking-wider ${
-                                isCanceled ? 'text-error line-through' : isOngoing ? 'text-primary' : 'text-on-surface-variant'
+                                (isCanceled || isHoliday) ? 'text-error line-through' : isOngoing ? 'text-primary' : isUnverified ? 'text-orange-500' : 'text-on-surface-variant'
                               }`}>
                                 {slot.time}
                               </span>
@@ -409,7 +455,7 @@ function StudentDashboard() {
                             </div>
 
                             <h4 className={`font-headline-md text-headline-md text-on-surface leading-tight ${
-                              isCanceled ? 'line-through opacity-50' : ''
+                              (isCanceled || isHoliday) ? 'line-through opacity-50' : ''
                             }`}>
                               <Link to={`/modules/${slot.module}`} className="hover:text-primary transition-colors">
                                 {slot.module}: {slot.name}
@@ -430,6 +476,12 @@ function StudentDashboard() {
                                 ✓ Conducted
                               </span>
                             )}
+                            {isUnverified && (
+                              <span className="bg-orange-500/20 text-orange-500 border border-orange-500/30 px-3 py-1 rounded-lg font-label-bold text-xs flex items-center gap-1">
+                                <span className="material-symbols-outlined text-[14px]">pending_actions</span>
+                                Awaiting Verification
+                              </span>
+                            )}
                             {slot.liveStatus === 'Upcoming' && (
                               <span className="bg-surface-container-highest text-on-surface-variant px-3 py-1 rounded-lg font-label-bold text-xs">
                                 Upcoming
@@ -446,7 +498,7 @@ function StudentDashboard() {
                               </span>
                             )}
                             {isHoliday && (
-                              <span className="poya-badge px-3 py-1 rounded-lg font-label-bold text-xs">
+                              <span className="bg-yellow-500/20 text-yellow-500 border border-yellow-500/30 px-3 py-1 rounded-lg font-label-bold text-xs">
                                 Holiday
                               </span>
                             )}
@@ -482,24 +534,40 @@ function StudentDashboard() {
 
                         {/* Reason / Remarks if Canceled or Rescheduled */}
                         {slot.reason && (
-                          <p className="mt-3 text-xs text-error italic bg-error/5 p-2 rounded-lg border border-error/10">
+                  <p className="mt-3 text-xs text-error italic bg-error/5 p-2 rounded-lg border border-error/10">
                             Note: {slot.reason}
                           </p>
                         )}
 
                         {/* Inline Admin Controls (Only visible to Admin) */}
-                        {isAdmin && (
+                        {isAdmin && !isHoliday && !isDone && !isCanceled && !isSwapped && (
                           <div className="mt-3 pt-3 border-t border-white/5 flex flex-wrap items-center justify-end gap-2">
                             <span className="text-[10px] font-label-bold text-on-surface-variant mr-auto">Admin Controls:</span>
+                            {isUnverified ? (
+                              <button
+                                onClick={() => {
+                                  const calcHours = (slot.endMin - slot.startMin) / 60;
+                                  setVerifyModal({
+                                    isOpen: true,
+                                    slot: slot,
+                                    hours: calcHours > 0 ? calcHours : 1
+                                  });
+                                }}
+                                className="px-2.5 py-1 rounded bg-orange-500/10 text-orange-500 border border-orange-500/20 text-xs font-label-bold hover:bg-orange-500/20 cursor-pointer"
+                              >
+                                + Verify & Log
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => handleQuickLogHours(slot.module, 2)}
+                                className="px-2.5 py-1 rounded bg-secondary/10 text-secondary border border-secondary/20 text-xs font-label-bold hover:bg-secondary/20 cursor-pointer"
+                                title="Log 2 hours for this class into Daily Logs"
+                              >
+                                + Log 2h to Logs
+                              </button>
+                            )}
                             <button
-                              onClick={() => handleQuickLogHours(slot.module, 2)}
-                              className="px-2.5 py-1 rounded bg-secondary/10 text-secondary border border-secondary/20 text-xs font-label-bold hover:bg-secondary/20 cursor-pointer"
-                              title="Log 2 hours for this class into Daily Logs"
-                            >
-                              + Log 2h to Logs
-                            </button>
-                            <button
-                              onClick={() => navigate('/admin')}
+                              onClick={() => handleQuickReschedule(slot.module)}
                               className="px-2.5 py-1 rounded bg-primary/10 text-primary border border-primary/20 text-xs font-label-bold hover:bg-primary/20 cursor-pointer"
                             >
                               Reschedule
@@ -610,6 +678,93 @@ function StudentDashboard() {
 
         </div>
       </div>
+
+      {/* Enhanced Custom Confirmation Modal for Student Dashboard */}
+      {confirmModal.isOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[9999] animate-fade-in">
+          <div className="bg-surface-container border border-white/10 rounded-2xl p-8 max-w-md w-full shadow-2xl space-y-6 text-center transform scale-100 transition-transform">
+            
+            <div className="w-16 h-16 rounded-full bg-primary/10 border border-primary/30 text-primary flex items-center justify-center mx-auto shadow-[0_0_20px_rgba(56,189,248,0.2)]">
+              <span className="material-symbols-outlined text-3xl">info</span>
+            </div>
+            
+            <div>
+              <h3 className="font-headline-md font-bold text-on-surface text-xl mb-2">{confirmModal.title}</h3>
+              <p className="text-sm text-on-surface-variant leading-relaxed">
+                {confirmModal.message}
+              </p>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 border-t border-white/5">
+              <button
+                type="button"
+                onClick={() => setConfirmModal({ isOpen: false, title: '', message: '', onConfirm: null })}
+                className="w-full sm:w-auto px-6 py-3 rounded-xl border border-white/10 text-on-surface hover:bg-white/5 hover:text-white transition-all text-sm font-label-bold cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmModal.onConfirm}
+                className={`w-full sm:w-auto px-6 py-3 rounded-xl text-sm font-label-bold transition-all shadow-lg cursor-pointer ${confirmModal.btnStyle || 'bg-primary text-on-primary hover:bg-primary/90'}`}
+              >
+                {confirmModal.btnText || 'Confirm'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Verify & Log Modal */}
+      {verifyModal.isOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[9999] animate-fade-in">
+          <div className="bg-surface-container border border-white/10 rounded-2xl p-8 max-w-md w-full shadow-2xl space-y-6 text-center transform scale-100 transition-transform">
+            
+            <div className="w-16 h-16 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-500 flex items-center justify-center mx-auto shadow-[0_0_20px_rgba(249,115,22,0.2)]">
+              <span className="material-symbols-outlined text-3xl">pending_actions</span>
+            </div>
+            
+            <div>
+              <h3 className="font-headline-md font-bold text-on-surface text-xl mb-2">Verify Lecture</h3>
+              <p className="text-sm text-on-surface-variant leading-relaxed">
+                Confirm the duration to log for <b className="text-primary">{verifyModal.slot?.module}</b> on {selectedDate}.
+              </p>
+            </div>
+
+            <div className="text-left bg-surface-container-low p-4 rounded-xl border border-white/5 space-y-2 text-sm">
+               <label className="text-on-surface-variant font-label-bold text-xs uppercase">Duration (Hours)</label>
+               <input
+                 type="number"
+                 value={verifyModal.hours}
+                 onChange={(e) => setVerifyModal({...verifyModal, hours: Number(e.target.value)})}
+                 step="0.5"
+                 min="0.5"
+                 className="w-full bg-surface-container border border-white/10 rounded-lg p-3 text-on-surface focus:border-primary focus:outline-none"
+               />
+            </div>
+            
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 border-t border-white/5">
+              <button
+                type="button"
+                onClick={() => setVerifyModal({ isOpen: false, slot: null, hours: 0 })}
+                className="w-full sm:w-auto px-6 py-3 rounded-xl border border-white/10 text-on-surface hover:bg-white/5 hover:text-white transition-all text-sm font-label-bold cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                   handleQuickLogHours(verifyModal.slot.module, verifyModal.hours);
+                   setVerifyModal({ isOpen: false, slot: null, hours: 0 });
+                }}
+                className="w-full sm:w-auto px-6 py-3 rounded-xl text-sm font-label-bold transition-all shadow-lg cursor-pointer bg-primary text-on-primary hover:bg-primary/90"
+              >
+                Confirm & Log
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
