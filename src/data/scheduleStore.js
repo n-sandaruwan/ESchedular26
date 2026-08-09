@@ -14,7 +14,18 @@ export const initialOverrides = [
 export const getStoredOverrides = () => {
   const local = localStorage.getItem('mis_schedule_overrides');
   if (local) {
-    try { return JSON.parse(local); } catch (e) { return initialOverrides; }
+    try {
+      const parsed = JSON.parse(local);
+      if (Array.isArray(parsed)) {
+        const missing = initialOverrides.filter(i => !parsed.some(p => String(p.id) === String(i.id)));
+        if (missing.length > 0) {
+          const merged = [...parsed, ...missing];
+          localStorage.setItem('mis_schedule_overrides', JSON.stringify(merged));
+          return merged;
+        }
+        return parsed;
+      }
+    } catch (e) { return initialOverrides; }
   }
   return initialOverrides;
 };
@@ -36,7 +47,18 @@ export const initialNotices = [
 export const getStoredNotices = () => {
   const local = localStorage.getItem('mis_notices');
   if (local) {
-    try { return JSON.parse(local); } catch (e) { return initialNotices; }
+    try {
+      const parsed = JSON.parse(local);
+      if (Array.isArray(parsed)) {
+        const missing = initialNotices.filter(i => !parsed.some(p => String(p.id) === String(i.id)));
+        if (missing.length > 0) {
+          const merged = [...missing, ...parsed];
+          localStorage.setItem('mis_notices', JSON.stringify(merged));
+          return merged;
+        }
+        return parsed;
+      }
+    } catch (e) { return initialNotices; }
   }
   return initialNotices;
 };
