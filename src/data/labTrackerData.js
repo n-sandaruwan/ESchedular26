@@ -153,9 +153,9 @@ function expandScheduleEntries(week, date, time, lab_name, venue, groups) {
 
 // Complete 13-Week Semester Lab Schedule
 export const INITIAL_SCHEDULE = [
-  // Week 2
+  // Week 2 & Week 3 Rescheduled Labs
   ...expandScheduleEntries('Week 2', '2026-08-05', '08:30 AM - 11:30 AM', 'EE3301 Analog Electronics (Lab 1: Diodes & Practical Applications)', 'Communication Laboratory', GROUPS_1_TO_10),
-  ...expandScheduleEntries('Week 2', '2026-08-07', '01:30 PM - 04:30 PM', 'EE3301 Analog Electronics (Lab 1: Diodes & Practical Applications)', 'Communication Laboratory', GROUPS_11_TO_12),
+  ...expandScheduleEntries('Week 3', '2026-08-13', '01:30 PM - 04:30 PM', 'EE3301 Analog Electronics (Lab 1: Diodes & Practical Applications)', 'Communication Laboratory', GROUPS_11_TO_12),
 
   // Week 3
   ...expandScheduleEntries('Week 3', '2026-08-12', '08:30 AM - 11:30 AM', 'EE3306 Signals & Systems (Lab 1: Continuous-Time Signal Analysis)', 'Communication Laboratory', GROUPS_1_TO_8),
