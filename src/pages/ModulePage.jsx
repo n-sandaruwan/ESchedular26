@@ -216,7 +216,30 @@ function ModulePage() {
         </div>
       )}
 
-      {/* In-Class Assessments & Lab Sessions Tracker Panel */}
+      {/* Necessary Conditions to Pass the Module */}
+      {selectedModule.passingConditions && selectedModule.passingConditions.length > 0 && (
+        <div className="glass-card rounded-2xl p-4 sm:p-5 border-white/5 space-y-3.5">
+          <div className="flex items-center justify-between pb-3 border-b border-white/5">
+            <h3 className="font-headline-md text-base sm:text-lg font-bold text-on-surface flex items-center gap-2">
+              <span className="material-symbols-outlined text-amber-400 text-lg">verified</span> Necessary Conditions to Pass
+            </h3>
+            <span className="font-label-bold text-xs sm:text-sm text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20 font-label-mono">
+              Must Meet All
+            </span>
+          </div>
+
+          <div className="space-y-2">
+            {selectedModule.passingConditions.map((condition, idx) => (
+              <div key={idx} className="flex items-start gap-3 p-3 bg-surface-container/60 rounded-xl border border-white/5">
+                <div className="w-6 h-6 rounded-full bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0 mt-0.5">
+                  <span className="text-amber-400 font-label-bold text-[10px]">{idx + 1}</span>
+                </div>
+                <p className="text-xs sm:text-sm text-on-surface leading-relaxed font-medium">{condition}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       <div className="glass-card rounded-2xl p-4 sm:p-5 border-white/5 space-y-3.5">
         <div className="flex items-center justify-between pb-3 border-b border-white/5">
           <div>
