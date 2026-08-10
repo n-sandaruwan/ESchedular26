@@ -190,7 +190,9 @@ export const getStoredModuleHours = () => {
               conductedHours: match.conductedHours !== undefined ? match.conductedHours : init.conductedHours,
               targetHours: match.targetHours || init.targetHours,
               weeklyHours: match.weeklyHours || init.weeklyHours,
-              venue: match.venue || init.venue
+              venue: match.venue || init.venue,
+              gradingScheme: init.gradingScheme || match.gradingScheme,
+              passingConditions: init.passingConditions || match.passingConditions
             };
           }
           return init;

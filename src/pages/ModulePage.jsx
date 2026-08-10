@@ -35,13 +35,16 @@ function ModulePage() {
     return <div className="p-8 text-center text-on-surface-variant text-sm">Loading module data...</div>;
   }
 
-  const percentage = Math.min(100, Math.round((selectedModule.conductedHours / selectedModule.targetHours) * 100));
-  const remainingHours = Math.max(0, selectedModule.targetHours - selectedModule.conductedHours);
+  const targetHours = selectedModule.targetHours || 45;
+  const conductedHours = selectedModule.conductedHours || 0;
+  const weeklyHours = selectedModule.weeklyHours || 2;
+  const percentage = Math.min(100, Math.round((conductedHours / targetHours) * 100));
+  const remainingHours = Math.max(0, targetHours - conductedHours);
 
   const handleAddHour = (amount) => {
     const updated = modules.map(m => {
       if (m.code === selectedModule.code) {
-        const newConducted = Math.max(0, Math.min(m.targetHours, Math.round((m.conductedHours + amount) * 10) / 10));
+        const newConducted = Math.max(0, Math.min(m.targetHours || 45, Math.round(((m.conductedHours || 0) + amount) * 10) / 10));
         return { ...m, conductedHours: newConducted };
       }
       return m;
@@ -50,7 +53,7 @@ function ModulePage() {
     saveStoredModuleHours(updated);
     setSelectedModule({
       ...selectedModule,
-      conductedHours: Math.max(0, Math.min(selectedModule.targetHours, Math.round((selectedModule.conductedHours + amount) * 10) / 10))
+      conductedHours: Math.max(0, Math.min(targetHours, Math.round((conductedHours + amount) * 10) / 10))
     });
   };
 
@@ -81,7 +84,7 @@ function ModulePage() {
   };
 
   const currentCode = (selectedModule?.code || '').toUpperCase();
-  const allModuleAssessments = assessments.filter(a => (a.moduleCode || '').toUpperCase() === currentCode);
+  const allModuleAssessments = (assessments || []).filter(a => (a.moduleCode || '').toUpperCase() === currentCode);
   // Students only see Scheduled items; admins see everything
   const moduleAssessments = isAdmin
     ? allModuleAssessments
@@ -180,7 +183,7 @@ function ModulePage() {
           <div className="bg-surface-container/60 p-4 rounded-xl border border-white/5 space-y-1.5">
             <span className="text-xs sm:text-sm font-label-bold text-on-surface-variant uppercase tracking-wider">Teaching Team</span>
             <div className="space-y-1">
-              {selectedModule.teachers && selectedModule.teachers.length > 0 ? (
+              {Array.isArray(selectedModule.teachers) && selectedModule.teachers.length > 0 ? (
                 selectedModule.teachers.map((t, idx) => (
                   <p key={idx} className="font-body-md text-on-surface text-xs sm:text-sm font-medium">• {t}</p>
                 ))
@@ -192,14 +195,14 @@ function ModulePage() {
 
           <div className="bg-surface-container/60 p-4 rounded-xl border border-white/5 space-y-1.5">
             <span className="text-xs sm:text-sm font-label-bold text-on-surface-variant uppercase tracking-wider">Venue & Allocation</span>
-            <h4 className="font-headline-md font-bold text-on-surface text-base">Venue: {selectedModule.venue}</h4>
-            <p className="text-xs sm:text-sm text-on-surface-variant/80">Allocation: {selectedModule.weeklyHours} hrs / week</p>
+            <h4 className="font-headline-md font-bold text-on-surface text-base">Venue: {selectedModule.venue || 'TBA'}</h4>
+            <p className="text-xs sm:text-sm text-on-surface-variant/80">Allocation: {weeklyHours} hrs / week</p>
           </div>
         </div>
       </div>
 
       {/* Assessment & Marks Evaluation Scheme Card */}
-      {selectedModule.gradingScheme && (
+      {Array.isArray(selectedModule.gradingScheme) && selectedModule.gradingScheme.length > 0 && (
         <div className="glass-card rounded-2xl p-4 sm:p-5 border-white/5 space-y-3.5">
           <div className="flex items-center justify-between pb-3 border-b border-white/5">
             <h3 className="font-headline-md text-base sm:text-lg font-bold text-on-surface flex items-center gap-2">
@@ -224,7 +227,7 @@ function ModulePage() {
                 </div>
 
                 <div className="space-y-1.5 pt-1">
-                  {cat.components.map((comp, cIdx) => (
+                  {Array.isArray(cat.components) && cat.components.map((comp, cIdx) => (
                     <div key={cIdx} className="flex items-center justify-between text-xs sm:text-sm text-on-surface-variant">
                       <span className="flex items-center gap-1.5">
                         <span className="text-on-surface-variant/60">•</span>
@@ -243,7 +246,7 @@ function ModulePage() {
       )}
 
       {/* Necessary Conditions to Pass the Module */}
-      {selectedModule.passingConditions && selectedModule.passingConditions.length > 0 && (
+      {Array.isArray(selectedModule.passingConditions) && selectedModule.passingConditions.length > 0 && (
         <div className="glass-card rounded-2xl p-4 sm:p-5 border-white/5 space-y-3.5">
           <div className="flex items-center justify-between pb-3 border-b border-white/5">
             <h3 className="font-headline-md text-base sm:text-lg font-bold text-on-surface flex items-center gap-2">
@@ -491,7 +494,7 @@ function ModulePage() {
         <div className="glass-card p-3.5 rounded-xl flex items-center justify-between border-white/5">
           <div>
             <span className="text-xs font-label-bold uppercase text-on-surface-variant/80 tracking-wider">Conducted</span>
-            <h3 className="text-xl sm:text-2xl font-bold text-secondary mt-0.5">{selectedModule.conductedHours} hrs</h3>
+            <h3 className="text-xl sm:text-2xl font-bold text-secondary mt-0.5">{conductedHours} hrs</h3>
             <p className="text-xs text-on-surface-variant/70">Logged by faculty</p>
           </div>
           <div className="w-10 h-10 rounded-xl bg-secondary/10 border border-secondary/20 flex items-center justify-center text-secondary shrink-0">
@@ -503,7 +506,7 @@ function ModulePage() {
         <div className="glass-card p-3.5 rounded-xl flex items-center justify-between border-white/5">
           <div>
             <span className="text-xs font-label-bold uppercase text-on-surface-variant/80 tracking-wider">Target</span>
-            <h3 className="text-xl sm:text-2xl font-bold text-primary mt-0.5">{selectedModule.targetHours} hrs</h3>
+            <h3 className="text-xl sm:text-2xl font-bold text-primary mt-0.5">{targetHours} hrs</h3>
             <p className="text-xs text-on-surface-variant/70">Required total</p>
           </div>
           <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
@@ -527,8 +530,8 @@ function ModulePage() {
         <div className="glass-card p-3.5 rounded-xl flex items-center justify-between border-white/5">
           <div>
             <span className="text-xs font-label-bold uppercase text-on-surface-variant/80 tracking-wider">Weekly</span>
-            <h3 className="text-xl sm:text-2xl font-bold text-on-surface mt-0.5">{selectedModule.weeklyHours} hrs/wk</h3>
-            <p className="text-xs text-on-surface-variant/70 truncate">Venue: {selectedModule.venue}</p>
+            <h3 className="text-xl sm:text-2xl font-bold text-on-surface mt-0.5">{weeklyHours} hrs/wk</h3>
+            <p className="text-xs text-on-surface-variant/70 truncate">Venue: {selectedModule.venue || 'TBA'}</p>
           </div>
           <div className="w-10 h-10 rounded-xl bg-surface-container border border-white/5 flex items-center justify-center text-on-surface-variant shrink-0">
             <span className="material-symbols-outlined text-xl">calendar_view_week</span>
@@ -559,13 +562,13 @@ function ModulePage() {
           <div className="bg-surface-container/60 p-3.5 rounded-xl border border-white/5">
             <span className="text-xs font-label-bold text-on-surface-variant/80 uppercase tracking-wider">Estimated Weeks Left</span>
             <h4 className="font-headline-md font-bold text-on-surface text-base mt-0.5">
-              {selectedModule.weeklyHours > 0 ? Math.ceil(remainingHours / selectedModule.weeklyHours) : 0} Weeks
+              {weeklyHours > 0 ? Math.ceil(remainingHours / weeklyHours) : 0} Weeks
             </h4>
           </div>
 
           <div className="bg-surface-container/60 p-3.5 rounded-xl border border-white/5">
             <span className="text-xs font-label-bold text-on-surface-variant/80 uppercase tracking-wider">Primary Venue</span>
-            <h4 className="font-headline-md font-bold text-on-surface text-base mt-0.5">{selectedModule.venue}</h4>
+            <h4 className="font-headline-md font-bold text-on-surface text-base mt-0.5">{selectedModule.venue || 'TBA'}</h4>
           </div>
 
           <div className="bg-surface-container/60 p-3.5 rounded-xl border border-white/5">
