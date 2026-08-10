@@ -16,13 +16,14 @@ function ModulePage() {
   useEffect(() => {
     const list = getStoredModuleHours();
     setModules(list);
-    const match = list.find(m => m.code === moduleId) || list[0];
+    const targetCode = (moduleId || '').trim().toUpperCase();
+    const match = list.find(m => (m.code || '').toUpperCase() === targetCode) || list[0];
     setSelectedModule(match);
     setAssessments(getStoredAssessments());
     
     const overrides = getStoredOverrides();
     const canceled = overrides
-      .filter(o => o.module === (match?.code || moduleId) && o.status === 'Canceled')
+      .filter(o => (o.module || '').toUpperCase() === (match?.code || targetCode) && o.status === 'Canceled')
       .sort((a, b) => new Date(a.date) - new Date(b.date));
     setCanceledSessions(canceled);
   }, [moduleId]);
@@ -79,7 +80,8 @@ function ModulePage() {
     setDeleteConfirm({ isOpen: false, id: null, title: '' });
   };
 
-  const allModuleAssessments = assessments.filter(a => a.moduleCode === selectedModule.code);
+  const currentCode = (selectedModule?.code || '').toUpperCase();
+  const allModuleAssessments = assessments.filter(a => (a.moduleCode || '').toUpperCase() === currentCode);
   // Students only see Scheduled items; admins see everything
   const moduleAssessments = isAdmin
     ? allModuleAssessments
@@ -92,7 +94,7 @@ function ModulePage() {
     daysOrder.forEach(day => {
       const slots = weeklyTimetable[day] || [];
       slots.forEach(slot => {
-        if (slot.module === selectedModule.code) {
+        if ((slot.module || '').toUpperCase() === currentCode) {
           sessions.push({ day, ...slot });
         }
       });
