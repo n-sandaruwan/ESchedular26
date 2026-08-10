@@ -259,9 +259,9 @@ function ModulePage() {
         <div className="flex items-center justify-between pb-3 border-b border-white/5">
           <div>
             <h3 className="font-headline-md text-base sm:text-lg font-bold text-on-surface flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary text-lg">science</span> In-Class Assessments & Lab Sessions Tracker
+              <span className="material-symbols-outlined text-primary text-lg">science</span> Assessment & Lab Tracker
             </h3>
-            <p className="text-xs sm:text-sm text-on-surface-variant mt-0.5">Track upcoming quizzes, labs, dates, venues and completion status.</p>
+            <p className="text-xs sm:text-sm text-on-surface-variant mt-0.5">Overview of module assessment components and completion status.</p>
           </div>
           <span className="font-label-bold text-xs sm:text-sm text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20 shrink-0">
             {moduleAssessments.length} Items Tracked
@@ -270,84 +270,74 @@ function ModulePage() {
 
         {moduleAssessments.length === 0 ? (
           <div className="p-6 text-center text-on-surface-variant text-xs sm:text-sm">
-            No in-class assessments or lab sessions scheduled for this module yet.
+            No assessment components recorded for this module yet.
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="space-y-2.5">
             {moduleAssessments.map((item) => {
               const isCompleted = item.status === 'Completed';
-              const isScheduled = item.status === 'Scheduled';
 
               return (
                 <div
                   key={item.id}
-                  className={`p-4 rounded-xl border transition-all flex flex-col justify-between gap-3 ${
+                  className={`p-3.5 rounded-xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
                     isCompleted
-                      ? 'bg-secondary/5 border-secondary/20'
-                      : isScheduled
-                      ? 'bg-primary/5 border-primary/20'
-                      : 'bg-surface-container/60 border-white/5'
+                      ? 'bg-secondary/5 border-secondary/20 hover:border-secondary/40'
+                      : 'bg-surface-container/60 border-white/5 hover:border-white/15'
                   }`}
                 >
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="font-label-bold text-xs px-2.5 py-0.5 rounded-md bg-surface-container border border-white/10 text-on-surface-variant">
-                        {item.type} • {item.weight}
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs shrink-0 ${
+                      isCompleted ? 'bg-secondary/20 text-secondary border border-secondary/30' : 'bg-primary/20 text-primary border border-primary/30'
+                    }`}>
+                      <span className="material-symbols-outlined text-base">
+                        {isCompleted ? 'check_circle' : 'assignment'}
                       </span>
-
-                      {/* Status Badge */}
-                      <button
-                        onClick={() => handleStatusToggle(item.id, item.status)}
-                        className={`font-label-bold text-xs px-2.5 py-0.5 rounded-full border flex items-center gap-1 cursor-pointer transition-transform active:scale-95 ${
-                          isCompleted
-                            ? 'bg-secondary/15 text-secondary border-secondary/30 shadow-[0_0_8px_rgba(78,222,163,0.3)]'
-                            : isScheduled
-                            ? 'bg-primary/15 text-primary border-primary/30'
-                            : 'bg-tertiary/15 text-tertiary border-tertiary/30'
-                        }`}
-                        title="Click to toggle status"
-                      >
-                        <span className="material-symbols-outlined text-xs">
-                          {isCompleted ? 'check_circle' : isScheduled ? 'schedule' : 'hourglass_top'}
+                    </span>
+                    <div className="space-y-0.5 min-w-0">
+                      <h4 className="font-headline-md font-bold text-on-surface text-sm sm:text-base leading-snug truncate">
+                        {item.title}
+                      </h4>
+                      <div className="flex items-center gap-2 text-xs text-on-surface-variant">
+                        <span className="font-label-bold text-[11px] px-2 py-0.5 rounded-md bg-surface-container border border-white/10 text-on-surface-variant font-label-mono">
+                          Weight: {item.weight}
                         </span>
-                        <span>{item.status}</span>
-                      </button>
-                    </div>
-
-                    <h4 className="font-headline-md font-bold text-on-surface text-sm sm:text-base leading-snug">
-                      {item.title}
-                    </h4>
-
-                    <div className="space-y-1 text-xs sm:text-sm text-on-surface-variant pt-1">
-                      <div className="flex items-center gap-2">
-                        <span className="material-symbols-outlined text-sm text-primary">event</span>
-                        <span className="font-label-mono text-on-surface">{item.date} ({item.time})</span>
+                        <span className="text-on-surface-variant/60">•</span>
+                        <span>{item.type}</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className="material-symbols-outlined text-sm text-primary">location_on</span>
-                        <span>Venue: <b className="text-on-surface">{item.venue}</b></span>
-                      </div>
-                      {item.notes && (
-                        <p className="text-xs text-on-surface-variant/80 italic pt-1 border-t border-white/5">
-                          📌 {item.notes}
-                        </p>
-                      )}
                     </div>
                   </div>
 
-                  {/* Toggle Status Action */}
-                  <div className="pt-2 border-t border-white/5 flex items-center justify-between text-xs">
-                    <span className="text-on-surface-variant/70 text-[11px]">
-                      {isCompleted ? 'Completed & recorded' : 'Scheduled upcoming session'}
-                    </span>
-                    <button
-                      onClick={() => handleStatusToggle(item.id, item.status)}
-                      className={`text-xs font-label-bold underline cursor-pointer ${
-                        isCompleted ? 'text-on-surface-variant' : 'text-primary'
-                      }`}
-                    >
-                      {isCompleted ? 'Mark Pending' : 'Mark Completed ✓'}
-                    </button>
+                  <div className="shrink-0 flex items-center justify-end">
+                    {isAdmin ? (
+                      <button
+                        onClick={() => handleStatusToggle(item.id, item.status)}
+                        className={`font-label-bold text-xs px-3.5 py-1.5 rounded-xl border flex items-center gap-1.5 cursor-pointer transition-all active:scale-95 ${
+                          isCompleted
+                            ? 'bg-secondary/20 text-secondary border-secondary/40 shadow-[0_0_8px_rgba(78,222,163,0.25)] hover:bg-secondary/30'
+                            : 'bg-primary/20 text-primary border-primary/40 hover:bg-primary/30'
+                        }`}
+                        title="Click to toggle status (Admin Action)"
+                      >
+                        <span className="material-symbols-outlined text-xs">
+                          {isCompleted ? 'check_circle' : 'pending_actions'}
+                        </span>
+                        <span>{isCompleted ? 'Done ✓' : 'Mark Completed'}</span>
+                      </button>
+                    ) : (
+                      <span
+                        className={`font-label-bold text-xs px-3 py-1.5 rounded-xl border flex items-center gap-1.5 ${
+                          isCompleted
+                            ? 'bg-secondary/15 text-secondary border-secondary/30'
+                            : 'bg-surface-container-highest text-on-surface-variant border-white/10'
+                        }`}
+                      >
+                        <span className="material-symbols-outlined text-xs">
+                          {isCompleted ? 'check_circle' : 'schedule'}
+                        </span>
+                        <span>{isCompleted ? 'Done' : 'Pending'}</span>
+                      </span>
+                    )}
                   </div>
                 </div>
               );
