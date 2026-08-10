@@ -1,4 +1,66 @@
 export const initialAssessments = [
+  // EE3205 - Power and Energy Assessment Breakdown
+  {
+    id: 'ee3205-ict',
+    moduleCode: 'EE3205',
+    title: 'In-Class Tests',
+    type: 'Continuous Assessment',
+    date: 'To Be Announced',
+    time: '20% Total Weight',
+    venue: 'LT1',
+    weight: '20%',
+    status: 'Scheduled',
+    notes: 'In-class tests [20%] (CA Minimum Cutoff: 35%)'
+  },
+  {
+    id: 'ee3205-mp',
+    moduleCode: 'EE3205',
+    title: 'Mini Project',
+    type: 'Continuous Assessment',
+    date: 'To Be Announced',
+    time: '20% Total Weight',
+    venue: 'LT1 / Laboratory',
+    weight: '20%',
+    status: 'Scheduled',
+    notes: 'Mini project [20%] (CA Minimum Cutoff: 35%)'
+  },
+  {
+    id: 'ee3205-tha',
+    moduleCode: 'EE3205',
+    title: 'Take Home Assignment',
+    type: 'Continuous Assessment',
+    date: 'To Be Announced',
+    time: '5% Total Weight',
+    venue: 'Online / Class',
+    weight: '5%',
+    status: 'Scheduled',
+    notes: 'Take home assignment [5%]'
+  },
+  {
+    id: 'ee3205-fv',
+    moduleCode: 'EE3205',
+    title: 'Field Visit',
+    type: 'Continuous Assessment',
+    date: 'To Be Announced',
+    time: '5% Total Weight',
+    venue: 'Field Site',
+    weight: '5%',
+    status: 'Scheduled',
+    notes: 'Field Visit [5%]'
+  },
+  {
+    id: 'ee3205-ese',
+    moduleCode: 'EE3205',
+    title: 'End Semester Written Examination',
+    type: 'End Semester Exam',
+    date: 'To Be Announced',
+    time: '50% Total Weight',
+    venue: 'Main Examination Hall',
+    weight: '50%',
+    status: 'Scheduled',
+    notes: 'Written Examination [50%] (Minimum Cutoff: 35% / 17.5 Marks)'
+  },
+
   // IS3301 - Mathematics Assessment Breakdown provided by user
   {
     id: 'is3301-tha1',
@@ -44,6 +106,12 @@ export const getStoredAssessments = () => {
     try {
       const parsed = JSON.parse(local);
       if (Array.isArray(parsed) && parsed.length > 0) {
+        const missing = initialAssessments.filter(i => !parsed.some(p => p.id === i.id));
+        if (missing.length > 0) {
+          const merged = [...parsed, ...missing];
+          localStorage.setItem('mis_module_assessments', JSON.stringify(merged));
+          return merged;
+        }
         return parsed;
       }
     } catch (e) {

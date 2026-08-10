@@ -75,14 +75,46 @@ export const initialModuleHours = [
     code: 'EE3205',
     title: 'Power and Energy',
     conductedHours: 2,
-    targetHours: 30,
+    targetHours: 27,
     weeklyHours: 2,
     venue: 'LT1',
     credits: 2,
     coordinator: 'Ms. Tashma Silva',
     email: 'tashmas@eie.ruh.ac.lk',
     teachers: ['Ms. Tashma Silva'],
-    gradingScheme: defaultGradingScheme
+    gradingScheme: [
+      {
+        category: 'Continuous Assessments (CA)',
+        weight: '50%',
+        components: [
+          { name: 'In-class tests', weight: '20%' },
+          { name: 'Mini project', weight: '20%' },
+          { name: 'Take home assignment', weight: '5%' },
+          { name: 'Field Visit', weight: '5%' }
+        ]
+      },
+      {
+        category: 'End Semester Examination',
+        weight: '50%',
+        components: [
+          { name: 'Written Examination', weight: '50%' }
+        ]
+      }
+    ],
+    passConditions: [
+      {
+        title: 'Continuous Assessment Minimum',
+        criteria: 'Earn at least 35% (i.e. 17.5 / 50 marks) of Continuous Assessment marks',
+        minPercentage: '35%',
+        minMarks: '17.5 / 50 Marks'
+      },
+      {
+        title: 'End Semester Examination Minimum',
+        criteria: 'Achieve at least 35% (i.e. 17.5 / 50 marks) allocated for End Semester Examination',
+        minPercentage: '35%',
+        minMarks: '17.5 / 50 Marks'
+      }
+    ]
   },
   {
     code: 'EE3306',
@@ -166,9 +198,11 @@ export const getStoredModuleHours = () => {
             return {
               ...init,
               conductedHours: match.conductedHours !== undefined ? match.conductedHours : init.conductedHours,
-              targetHours: match.targetHours || init.targetHours,
+              targetHours: init.targetHours,
               weeklyHours: match.weeklyHours || init.weeklyHours,
-              venue: match.venue || init.venue
+              venue: match.venue || init.venue,
+              gradingScheme: init.gradingScheme,
+              passConditions: init.passConditions
             };
           }
           return init;

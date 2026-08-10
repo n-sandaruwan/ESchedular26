@@ -216,6 +216,44 @@ function ModulePage() {
         </div>
       )}
 
+      {/* Necessary Conditions to Pass the Module Card */}
+      {selectedModule.passConditions && selectedModule.passConditions.length > 0 && (
+        <div className="glass-card rounded-2xl p-4 sm:p-5 border-amber-500/25 bg-amber-500/5 space-y-3.5 shadow-xl">
+          <div className="flex items-center justify-between pb-3 border-b border-amber-500/20">
+            <h3 className="font-headline-md text-base sm:text-lg font-bold text-on-surface flex items-center gap-2">
+              <span className="material-symbols-outlined text-amber-400 text-xl">verified_user</span> Necessary Conditions to Pass Module
+            </h3>
+            <span className="font-label-bold text-xs sm:text-sm text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/30 font-label-mono">
+              Mandatory Cutoffs
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {selectedModule.passConditions.map((cond, idx) => (
+              <div key={idx} className="bg-surface-container/80 p-4 rounded-xl border border-amber-500/20 space-y-2 relative overflow-hidden">
+                <div className="absolute top-0 left-0 bottom-0 w-1 bg-amber-400"></div>
+                <div className="flex justify-between items-center">
+                  <span className="font-headline-md text-xs sm:text-sm font-bold text-amber-300 flex items-center gap-1.5">
+                    <span className="material-symbols-outlined text-sm">gavel</span>
+                    {cond.title}
+                  </span>
+                  <span className="font-label-bold text-xs text-amber-400 font-label-mono bg-amber-500/20 px-2.5 py-0.5 rounded-full border border-amber-500/30">
+                    Min {cond.minPercentage}
+                  </span>
+                </div>
+                <p className="text-xs sm:text-sm text-on-surface leading-snug font-medium">
+                  {cond.criteria}
+                </p>
+                <div className="pt-2 border-t border-white/5 flex items-center justify-between text-xs text-on-surface-variant">
+                  <span>Required Pass Mark:</span>
+                  <span className="font-mono font-bold text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">{cond.minMarks}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* In-Class Assessments & Lab Sessions Tracker Panel */}
       <div className="glass-card rounded-2xl p-4 sm:p-5 border-white/5 space-y-3.5">
         <div className="flex items-center justify-between pb-3 border-b border-white/5">
