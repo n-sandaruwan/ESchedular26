@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { getStoredModuleHours } from '../data/moduleHoursData';
 
 function ModuleTrackerPage() {
@@ -61,10 +61,10 @@ function ModuleTrackerPage() {
           </div>
         ) : (
           filteredModules.map((mod) => (
-            <div
+            <Link
               key={mod.code}
-              onClick={() => navigate(`/modules/${mod.code}`)}
-              className="glass-card rounded-xl p-4 border border-white/5 hover:border-primary/50 hover:bg-white/[0.04] transition-all cursor-pointer group flex items-center justify-between gap-3.5 shadow-sm"
+              to={`/modules/${mod.code}`}
+              className="glass-card rounded-xl p-4 border border-white/5 hover:border-primary/50 hover:bg-white/[0.04] transition-all cursor-pointer group flex items-center justify-between gap-3.5 shadow-sm block"
             >
               <div className="space-y-1.5 flex-1 min-w-0">
                 <div className="flex items-center gap-2">
@@ -85,7 +85,7 @@ function ModuleTrackerPage() {
                   arrow_forward
                 </span>
               </div>
-            </div>
+            </Link>
           ))
         )}
       </div>
