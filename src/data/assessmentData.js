@@ -1,3 +1,5 @@
+import { pushAssessmentsToCloud } from './firebaseSync';
+
 export const initialAssessments = [
   // IS3301 - Mathematics Assessment Breakdown provided by user
   {
@@ -37,8 +39,6 @@ export const initialAssessments = [
     notes: 'Written Examination [60%]'
   }
 ];
-
-import { pushAssessmentsToCloud } from './firebaseSync';
 
 export const getStoredAssessments = () => {
   const local = localStorage.getItem('mis_module_assessments');

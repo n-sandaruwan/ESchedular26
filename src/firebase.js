@@ -35,15 +35,15 @@ try {
   auth = getAuth(app);
   db = getFirestore(app);
 
-  enableIndexedDbPersistence(db).catch((err) => {
-    if (err.code === 'failed-precondition') {
-      console.warn('Multiple tabs open, persistence enabled in primary tab.');
-    } else if (err.code === 'unimplemented') {
-      console.warn('Browser does not support offline persistence.');
-    }
-  });
+  try {
+    enableIndexedDbPersistence(db).catch((err) => {
+      console.warn('Firestore persistence note:', err?.message || err);
+    });
+  } catch (pErr) {
+    console.warn('Firestore persistence unsupported:', pErr);
+  }
 } catch (error) {
-  console.warn("Firebase initialization waiting for configuration keys. Falling back to local storage.", error);
+  console.warn("Firebase initialization error:", error);
 }
 
 export { auth, db };
