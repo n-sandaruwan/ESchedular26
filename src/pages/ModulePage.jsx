@@ -254,85 +254,70 @@ function ModulePage() {
         </div>
       )}
 
-      {/* In-Class Assessments & Lab Sessions Tracker Panel */}
-      <div className="glass-card rounded-2xl p-4 sm:p-5 border-white/5 space-y-3.5">
-        <div className="flex items-center justify-between pb-3 border-b border-white/5">
-          <div>
-            <h3 className="font-headline-md text-base sm:text-lg font-bold text-on-surface flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary text-lg">science</span> Assessment & Lab Tracker
-            </h3>
-            <p className="text-xs sm:text-sm text-on-surface-variant mt-0.5">Overview of module assessment components and completion status.</p>
-          </div>
-          <span className="font-label-bold text-xs sm:text-sm text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20 shrink-0">
-            {moduleAssessments.length} Items Tracked
+      {/* Assessment & Lab Tracker Panel */}
+      <div className="glass-card rounded-2xl p-3.5 sm:p-4 border-white/5 space-y-2.5">
+        <div className="flex items-center justify-between pb-2 border-b border-white/5">
+          <h3 className="font-headline-md text-xs sm:text-sm font-bold text-on-surface flex items-center gap-1.5 uppercase tracking-wider">
+            <span className="material-symbols-outlined text-primary text-base">science</span> Assessment Tracker
+          </h3>
+          <span className="font-label-bold text-[11px] text-primary bg-primary/10 px-2.5 py-0.5 rounded-full border border-primary/20 shrink-0 font-label-mono">
+            {moduleAssessments.length} Items
           </span>
         </div>
 
         {moduleAssessments.length === 0 ? (
-          <div className="p-6 text-center text-on-surface-variant text-xs sm:text-sm">
-            No assessment components recorded for this module yet.
+          <div className="p-3 text-center text-on-surface-variant text-xs">
+            No assessment components recorded.
           </div>
         ) : (
-          <div className="space-y-2.5">
+          <div className="space-y-1.5">
             {moduleAssessments.map((item) => {
               const isCompleted = item.status === 'Completed';
 
               return (
                 <div
                   key={item.id}
-                  className={`p-3.5 rounded-xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                  className={`px-3 py-2 rounded-lg border transition-all flex items-center justify-between gap-2.5 ${
                     isCompleted
-                      ? 'bg-secondary/5 border-secondary/20 hover:border-secondary/40'
-                      : 'bg-surface-container/60 border-white/5 hover:border-white/15'
+                      ? 'bg-secondary/5 border-secondary/20 hover:border-secondary/35'
+                      : 'bg-surface-container/50 border-white/5 hover:border-white/10'
                   }`}
                 >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <span className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs shrink-0 ${
-                      isCompleted ? 'bg-secondary/20 text-secondary border border-secondary/30' : 'bg-primary/20 text-primary border border-primary/30'
-                    }`}>
-                      <span className="material-symbols-outlined text-base">
-                        {isCompleted ? 'check_circle' : 'assignment'}
-                      </span>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className={`w-2 h-2 rounded-full shrink-0 ${isCompleted ? 'bg-secondary shadow-[0_0_6px_rgba(78,222,163,0.5)]' : 'bg-primary/70'}`}></span>
+                    <span className="font-headline-md font-bold text-on-surface text-xs sm:text-sm truncate">
+                      {item.title}
                     </span>
-                    <div className="space-y-0.5 min-w-0">
-                      <h4 className="font-headline-md font-bold text-on-surface text-sm sm:text-base leading-snug truncate">
-                        {item.title}
-                      </h4>
-                      <div className="flex items-center gap-2 text-xs text-on-surface-variant">
-                        <span className="font-label-bold text-[11px] px-2 py-0.5 rounded-md bg-surface-container border border-white/10 text-on-surface-variant font-label-mono">
-                          Weight: {item.weight}
-                        </span>
-                        <span className="text-on-surface-variant/60">•</span>
-                        <span>{item.type}</span>
-                      </div>
-                    </div>
+                    <span className="font-label-bold text-[10px] px-1.5 py-0.5 rounded bg-surface-container border border-white/10 text-on-surface-variant/80 font-label-mono shrink-0">
+                      {item.weight}
+                    </span>
                   </div>
 
-                  <div className="shrink-0 flex items-center justify-end">
+                  <div className="shrink-0 flex items-center">
                     {isAdmin ? (
                       <button
                         onClick={() => handleStatusToggle(item.id, item.status)}
-                        className={`font-label-bold text-xs px-3.5 py-1.5 rounded-xl border flex items-center gap-1.5 cursor-pointer transition-all active:scale-95 ${
+                        className={`font-label-bold text-[11px] px-2.5 py-1 rounded-lg border flex items-center gap-1 cursor-pointer transition-all active:scale-95 ${
                           isCompleted
-                            ? 'bg-secondary/20 text-secondary border-secondary/40 shadow-[0_0_8px_rgba(78,222,163,0.25)] hover:bg-secondary/30'
+                            ? 'bg-secondary/20 text-secondary border-secondary/40 hover:bg-secondary/30'
                             : 'bg-primary/20 text-primary border-primary/40 hover:bg-primary/30'
                         }`}
-                        title="Click to toggle status (Admin Action)"
+                        title="Toggle completion (Admin)"
                       >
-                        <span className="material-symbols-outlined text-xs">
+                        <span className="material-symbols-outlined text-[13px]">
                           {isCompleted ? 'check_circle' : 'pending_actions'}
                         </span>
-                        <span>{isCompleted ? 'Done ✓' : 'Mark Completed'}</span>
+                        <span>{isCompleted ? 'Done ✓' : 'Mark Done'}</span>
                       </button>
                     ) : (
                       <span
-                        className={`font-label-bold text-xs px-3 py-1.5 rounded-xl border flex items-center gap-1.5 ${
+                        className={`font-label-bold text-[11px] px-2.5 py-0.5 rounded-md border flex items-center gap-1 ${
                           isCompleted
                             ? 'bg-secondary/15 text-secondary border-secondary/30'
-                            : 'bg-surface-container-highest text-on-surface-variant border-white/10'
+                            : 'bg-surface-container-highest/80 text-on-surface-variant/70 border-white/10'
                         }`}
                       >
-                        <span className="material-symbols-outlined text-xs">
+                        <span className="material-symbols-outlined text-[13px]">
                           {isCompleted ? 'check_circle' : 'schedule'}
                         </span>
                         <span>{isCompleted ? 'Done' : 'Pending'}</span>
