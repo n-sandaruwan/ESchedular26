@@ -75,36 +75,14 @@ export const initialModuleHours = [
     code: 'EE3205',
     title: 'Power and Energy',
     conductedHours: 2,
-    targetHours: 27,
+    targetHours: 30,
     weeklyHours: 2,
     venue: 'LT1',
     credits: 2,
     coordinator: 'Ms. Tashma Silva',
     email: 'tashmas@eie.ruh.ac.lk',
     teachers: ['Ms. Tashma Silva'],
-    gradingScheme: [
-      {
-        category: 'Continuous Assessments',
-        weight: '50%',
-        components: [
-          { name: 'In Class Tests', weight: '20%' },
-          { name: 'Mini Project', weight: '20%' },
-          { name: 'Take Home Assignment', weight: '5%' },
-          { name: 'Field Visit', weight: '5%' }
-        ]
-      },
-      {
-        category: 'End Semester Examination',
-        weight: '50%',
-        components: [
-          { name: 'Written Examination', weight: '50%' }
-        ]
-      }
-    ],
-    passingConditions: [
-      'Earn at least 35% (i.e. 17.5 marks) of marks for Continuous Assessments',
-      'Achieve at least 35% (i.e. 17.5 marks) of the marks allocated for the End Semester Examination'
-    ]
+    gradingScheme: defaultGradingScheme
   },
   {
     code: 'EE3306',
@@ -190,9 +168,7 @@ export const getStoredModuleHours = () => {
               conductedHours: match.conductedHours !== undefined ? match.conductedHours : init.conductedHours,
               targetHours: match.targetHours || init.targetHours,
               weeklyHours: match.weeklyHours || init.weeklyHours,
-              venue: match.venue || init.venue,
-              gradingScheme: init.gradingScheme || match.gradingScheme,
-              passingConditions: init.passingConditions || match.passingConditions
+              venue: match.venue || init.venue
             };
           }
           return init;

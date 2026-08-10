@@ -1,5 +1,3 @@
-import { pushAssessmentsToCloud } from './firebaseSync';
-
 export const initialAssessments = [
   // IS3301 - Mathematics Assessment Breakdown provided by user
   {
@@ -45,13 +43,7 @@ export const getStoredAssessments = () => {
   if (local) {
     try {
       const parsed = JSON.parse(local);
-      if (Array.isArray(parsed)) {
-        const missing = initialAssessments.filter(i => !parsed.some(p => String(p.id) === String(i.id)));
-        if (missing.length > 0) {
-          const merged = [...parsed, ...missing];
-          localStorage.setItem('mis_module_assessments', JSON.stringify(merged));
-          return merged;
-        }
+      if (Array.isArray(parsed) && parsed.length > 0) {
         return parsed;
       }
     } catch (e) {
@@ -60,6 +52,8 @@ export const getStoredAssessments = () => {
   }
   return initialAssessments;
 };
+
+import { pushAssessmentsToCloud } from './firebaseSync';
 
 export const saveStoredAssessments = (assessmentsArray) => {
   localStorage.setItem('mis_module_assessments', JSON.stringify(assessmentsArray));
@@ -74,32 +68,6 @@ export const toggleAssessmentStatus = (id, newStatus) => {
     }
     return item;
   });
-  saveStoredAssessments(updated);
-  return updated;
-};
-
-export const addAssessment = ({ moduleCode, title, type, date, time, venue, weight, notes }) => {
-  const current = getStoredAssessments();
-  const newItem = {
-    id: `${moduleCode.toLowerCase()}-${Date.now()}`,
-    moduleCode,
-    title,
-    type: type || 'Continuous Assessment',
-    date: date || 'To Be Announced',
-    time: time || '',
-    venue: venue || '',
-    weight: weight || '',
-    status: 'Scheduled',
-    notes: notes || ''
-  };
-  const updated = [newItem, ...current];
-  saveStoredAssessments(updated);
-  return updated;
-};
-
-export const removeAssessment = (id) => {
-  const current = getStoredAssessments();
-  const updated = current.filter(item => item.id !== id);
   saveStoredAssessments(updated);
   return updated;
 };

@@ -2,14 +2,12 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
-export default defineConfig(({ command }) => ({
+export default defineConfig({
   plugins: [react()],
-  base: command === 'serve' ? '/' : '/ESchedular26/',
+  base: './',
   server: {
-    host: true,
-    port: 5173,
     watch: {
       ignored: ['**/*.pdf']
     }
   }
-}))
+})

@@ -12,13 +12,11 @@ import LabTrackerPage from './pages/LabTrackerPage';
 import CancelledLecturesPage from './pages/CancelledLecturesPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import DashboardLayout from './components/DashboardLayout';
-import ErrorBoundary from './components/ErrorBoundary';
 import './index.css';
 
 function App() {
   return (
-    <ErrorBoundary>
-      <Router>
+    <Router>
       <Routes>
         <Route path="/login" element={<Login />} />
         
@@ -41,7 +39,6 @@ function App() {
         } />
       </Routes>
     </Router>
-  </ErrorBoundary>
   );
 }
 
