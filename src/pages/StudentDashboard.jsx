@@ -6,7 +6,9 @@ import {
   getStoredNotices, 
   getDayNameFromDate, 
   exportSemesterScheduleCSV,
-  modifyScheduleSlot
+  modifyScheduleSlot,
+  removeNotice,
+  updateNotice
 } from '../data/scheduleStore';
 import { getHolidayForDate } from '../data/sriLankaHolidaysData';
 import { getStoredDailyLogs, saveStoredDailyLogs, addAuditLog } from '../data/dailyLogsData';
@@ -43,6 +45,10 @@ function StudentDashboard() {
     slot: null,
     hours: 1
   });
+  const [selectedNotice, setSelectedNotice] = useState(null);
+  const [isEditingNotice, setIsEditingNotice] = useState(false);
+  const [editNoticeTitle, setEditNoticeTitle] = useState('');
+  const [editNoticeContent, setEditNoticeContent] = useState('');
 
   const role = localStorage.getItem('mis_role');
   const isAdmin = role === 'admin';
@@ -669,26 +675,34 @@ function StudentDashboard() {
 
             <div className="space-y-stack-md">
               {notices.map((notice) => (
-                <div key={notice.id} className="flex gap-stack-md p-2.5 hover:bg-white/5 rounded-xl transition-colors group border border-white/5">
+                <div
+                  key={notice.id}
+                  onClick={() => setSelectedNotice(notice)}
+                  className="flex gap-stack-md p-3 hover:bg-white/10 rounded-xl transition-all group border border-white/5 hover:border-primary/40 cursor-pointer shadow-sm hover:shadow-md relative overflow-hidden"
+                  title="Click to open full notice"
+                >
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                    notice.type === 'Holiday' ? 'bg-tertiary/20 text-tertiary' : notice.type === 'Canceled' ? 'bg-error/20 text-error' : 'bg-primary/20 text-primary'
+                    notice.type === 'Holiday' ? 'bg-tertiary/20 text-tertiary border border-tertiary/30' : notice.type === 'Canceled' || notice.type === 'Alert' ? 'bg-error/20 text-error border border-error/30' : 'bg-primary/20 text-primary border border-primary/30'
                   }`}>
                     <span className="material-symbols-outlined text-xl">
-                      {notice.type === 'Holiday' ? 'brightness_3' : notice.type === 'Canceled' ? 'event_busy' : 'campaign'}
+                      {notice.type === 'Holiday' ? 'brightness_3' : notice.type === 'Canceled' ? 'event_busy' : notice.type === 'Alert' ? 'warning' : 'campaign'}
                     </span>
                   </div>
-                  <div className="flex-1 min-w-0">
+                  <div className="flex-1 min-w-0 pr-1">
                     <div className="flex items-center justify-between gap-1 mb-1">
-                      <h5 className="font-headline-md text-on-surface leading-tight text-xs font-bold truncate">
+                      <h5 className="font-headline-md text-on-surface leading-tight text-xs font-bold truncate group-hover:text-primary transition-colors">
                         {notice.title}
                       </h5>
-                      <span className="text-[10px] text-on-surface-variant/60 whitespace-nowrap font-label-mono">
-                        {notice.date}
-                      </span>
                     </div>
-                    <p className="text-xs text-on-surface-variant line-clamp-2">
+                    <p className="text-xs text-on-surface-variant line-clamp-2 leading-snug">
                       {notice.content}
                     </p>
+                    <div className="flex items-center justify-between mt-2 pt-1 border-t border-white/5 text-[10px] text-on-surface-variant/70 font-label-mono">
+                      <span>{notice.date}</span>
+                      <span className="text-primary font-bold flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform">
+                        Read Full <span className="material-symbols-outlined text-xs">open_in_full</span>
+                      </span>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -781,6 +795,154 @@ function StudentDashboard() {
                 Confirm & Log
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Notice Details Popup Modal */}
+      {selectedNotice && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 z-[9999] animate-fade-in">
+          <div className="bg-surface-container border border-white/10 rounded-2xl p-6 sm:p-8 max-w-lg w-full shadow-2xl space-y-5 transform scale-100 transition-transform relative overflow-hidden">
+            
+            {/* Decorative Glow */}
+            <div className="absolute top-0 right-0 w-40 h-40 bg-primary/10 blur-[50px] rounded-full pointer-events-none"></div>
+
+            {/* Header */}
+            <div className="flex items-start justify-between gap-3 pb-3 border-b border-white/10 relative z-10">
+              <div className="flex items-center gap-3">
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${
+                  selectedNotice.type === 'Holiday' ? 'bg-tertiary/20 text-tertiary border border-tertiary/30' : selectedNotice.type === 'Canceled' || selectedNotice.type === 'Alert' ? 'bg-error/20 text-error border border-error/30' : 'bg-primary/20 text-primary border border-primary/30'
+                }`}>
+                  <span className="material-symbols-outlined text-2xl">
+                    {selectedNotice.type === 'Holiday' ? 'brightness_3' : selectedNotice.type === 'Canceled' ? 'event_busy' : selectedNotice.type === 'Alert' ? 'warning' : 'campaign'}
+                  </span>
+                </div>
+                <div>
+                  <span className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-label-bold uppercase tracking-wider mb-1 ${
+                    selectedNotice.type === 'Holiday' ? 'bg-tertiary/20 text-tertiary border border-tertiary/30' : selectedNotice.type === 'Canceled' || selectedNotice.type === 'Alert' ? 'bg-error/20 text-error border border-error/30' : 'bg-primary/20 text-primary border border-primary/30'
+                  }`}>
+                    {selectedNotice.type || 'Notice'}
+                  </span>
+                  <h3 className="font-headline-md font-bold text-on-surface text-lg leading-snug">
+                    {selectedNotice.title}
+                  </h3>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => { setSelectedNotice(null); setIsEditingNotice(false); }}
+                className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 text-on-surface-variant hover:text-on-surface flex items-center justify-center transition-all cursor-pointer shrink-0"
+                title="Close Modal"
+              >
+                <span className="material-symbols-outlined text-lg">close</span>
+              </button>
+            </div>
+
+            {/* Timestamp info */}
+            <div className="flex items-center justify-between text-xs text-on-surface-variant font-label-mono bg-surface-container-low/60 px-3.5 py-2 rounded-xl border border-white/5">
+              <span className="flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-sm text-primary">calendar_month</span>
+                Date: <b className="text-on-surface">{selectedNotice.date}</b>
+              </span>
+              <span className="flex items-center gap-1 text-secondary font-bold">
+                <span className="material-symbols-outlined text-xs">verified</span> Department MIS Broadcast
+              </span>
+            </div>
+
+            {/* Main Notice Content */}
+            {isEditingNotice ? (
+              <div className="space-y-3">
+                <div>
+                  <label className="text-[11px] font-label-bold uppercase text-on-surface-variant mb-1 block">Title</label>
+                  <input
+                    type="text"
+                    value={editNoticeTitle}
+                    onChange={(e) => setEditNoticeTitle(e.target.value)}
+                    className="w-full bg-surface-container-low border border-white/10 rounded-xl p-3 text-xs text-on-surface outline-none focus:border-primary"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-label-bold uppercase text-on-surface-variant mb-1 block">Content</label>
+                  <textarea
+                    value={editNoticeContent}
+                    onChange={(e) => setEditNoticeContent(e.target.value)}
+                    rows={5}
+                    className="w-full bg-surface-container-low border border-white/10 rounded-xl p-3 text-xs text-on-surface outline-none focus:border-primary resize-none"
+                  />
+                </div>
+                <div className="flex justify-end gap-2 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsEditingNotice(false)}
+                    className="px-4 py-2 rounded-xl border border-white/10 text-xs font-label-bold text-on-surface cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const updated = updateNotice(selectedNotice.id, editNoticeTitle, editNoticeContent);
+                      setNotices(updated);
+                      setSelectedNotice({ ...selectedNotice, title: editNoticeTitle, content: editNoticeContent });
+                      setIsEditingNotice(false);
+                    }}
+                    className="px-4 py-2 rounded-xl bg-primary text-on-primary text-xs font-label-bold cursor-pointer"
+                  >
+                    Save Changes
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-surface-container-low/70 p-4 rounded-xl border border-white/5 max-h-60 overflow-y-auto">
+                <p className="text-sm text-on-surface leading-relaxed whitespace-pre-line font-body-md">
+                  {selectedNotice.content}
+                </p>
+              </div>
+            )}
+
+            {/* Footer Controls */}
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-white/10">
+              {isAdmin && !isEditingNotice ? (
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEditNoticeTitle(selectedNotice.title);
+                      setEditNoticeContent(selectedNotice.content);
+                      setIsEditingNotice(true);
+                    }}
+                    className="px-3 py-2 rounded-xl bg-primary/10 text-primary border border-primary/30 hover:bg-primary/20 text-xs font-label-bold flex items-center gap-1 cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-sm">edit</span> Edit Notice
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (window.confirm('Delete this announcement?')) {
+                        const updated = removeNotice(selectedNotice.id);
+                        setNotices(updated);
+                        setSelectedNotice(null);
+                      }
+                    }}
+                    className="px-3 py-2 rounded-xl bg-error/10 text-error border border-error/30 hover:bg-error/20 text-xs font-label-bold flex items-center gap-1 cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-sm">delete</span> Delete
+                  </button>
+                </div>
+              ) : (
+                <div></div>
+              )}
+
+              <button
+                type="button"
+                onClick={() => { setSelectedNotice(null); setIsEditingNotice(false); }}
+                className="px-6 py-2.5 rounded-xl bg-primary text-on-primary hover:bg-primary/90 text-xs font-label-bold transition-all shadow-[0_0_12px_rgba(56,189,248,0.4)] cursor-pointer ml-auto"
+              >
+                Close
+              </button>
+            </div>
+
           </div>
         </div>
       )}
