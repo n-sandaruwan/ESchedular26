@@ -1,5 +1,7 @@
 // src/utils/dateUtils.js
 
+export const SEMESTER_START_DATE = '2026-07-27';
+
 // Get current date string in YYYY-MM-DD format for Sri Lanka timezone
 export const getSriLankaDateStr = (dateObj = new Date()) => {
   return new Intl.DateTimeFormat('en-CA', {
@@ -8,6 +10,12 @@ export const getSriLankaDateStr = (dateObj = new Date()) => {
     month: '2-digit',
     day: '2-digit'
   }).format(dateObj);
+};
+
+// Get current date string, clamped to not be before SEMESTER_START_DATE
+export const getValidSemesterDateStr = (dateObj = new Date()) => {
+  const dateStr = getSriLankaDateStr(dateObj);
+  return dateStr < SEMESTER_START_DATE ? SEMESTER_START_DATE : dateStr;
 };
 
 // Get current ISO-like string for Sri Lanka timezone (YYYY-MM-DDTHH:mm:ss)
@@ -42,3 +50,4 @@ export const getSriLankaDayOfWeek = (dateObj = new Date()) => {
 export const getSriLankaDateObj = () => {
   return new Date(getSriLankaTimestampStr());
 };
+

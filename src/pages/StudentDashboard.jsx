@@ -12,7 +12,7 @@ import { getHolidayForDate } from '../data/sriLankaHolidaysData';
 import { getStoredDailyLogs, saveStoredDailyLogs, addAuditLog } from '../data/dailyLogsData';
 import { subscribeToCloudEvent } from '../data/firebaseSync';
 import SriLankanCalendarWidget from '../components/SriLankanCalendarWidget';
-import { getSriLankaDateObj } from '../utils/dateUtils';
+import { getSriLankaDateObj, SEMESTER_START_DATE, getValidSemesterDateStr } from '../utils/dateUtils';
 
 function StudentDashboard() {
   const navigate = useNavigate();
@@ -20,7 +20,8 @@ function StudentDashboard() {
     const yyyy = d.getFullYear();
     const mm = String(d.getMonth() + 1).padStart(2, '0');
     const dd = String(d.getDate()).padStart(2, '0');
-    return `${yyyy}-${mm}-${dd}`;
+    const dateStr = `${yyyy}-${mm}-${dd}`;
+    return dateStr < SEMESTER_START_DATE ? SEMESTER_START_DATE : dateStr;
   };
 
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -96,7 +97,9 @@ function StudentDashboard() {
     const yyyy = d.getFullYear();
     const mm = String(d.getMonth() + 1).padStart(2, '0');
     const dd = String(d.getDate()).padStart(2, '0');
-    setSelectedDate(`${yyyy}-${mm}-${dd}`);
+    const nextDate = `${yyyy}-${mm}-${dd}`;
+    if (nextDate < SEMESTER_START_DATE) return;
+    setSelectedDate(nextDate);
   };
 
   const handleGoToToday = () => {
@@ -291,8 +294,11 @@ function StudentDashboard() {
           <div className="flex items-center justify-between bg-surface-container-low rounded-xl p-1 border border-white/5 shadow-sm max-w-xs w-full sm:w-auto">
             <button
               onClick={() => handleStepDate(-1)}
-              className="w-touch-target h-touch-target flex items-center justify-center text-on-surface-variant hover:bg-white/5 rounded-lg active:scale-95 transition-all cursor-pointer"
-              title="Previous Day"
+              disabled={selectedDate <= SEMESTER_START_DATE}
+              className={`w-touch-target h-touch-target flex items-center justify-center text-on-surface-variant hover:bg-white/5 rounded-lg active:scale-95 transition-all ${
+                selectedDate <= SEMESTER_START_DATE ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'
+              }`}
+              title={selectedDate <= SEMESTER_START_DATE ? 'Semester starts July 27, 2026' : 'Previous Day'}
             >
               <span className="material-symbols-outlined">chevron_left</span>
             </button>
@@ -394,7 +400,20 @@ function StudentDashboard() {
               {/* Vertical Glowing Line */}
               <div className="absolute left-[15px] top-4 bottom-4 w-[2px] timeline-line rounded-full"></div>
 
-              {filteredSchedule.length === 0 ? (
+              {selectedDate < SEMESTER_START_DATE ? (
+                <div className="p-8 text-center glass-card rounded-xl border border-primary/30 bg-primary/5 my-4">
+                  <span className="material-symbols-outlined text-4xl text-primary mb-2">event_upcoming</span>
+                  <p className="text-on-surface font-headline-md text-base font-bold">Semester Has Not Started Yet</p>
+                  <p className="text-xs text-on-surface-variant mt-1">Semester 3 officially begins on July 27, 2026. Daily schedules are not available prior to this date.</p>
+                  <button
+                    onClick={() => setSelectedDate(SEMESTER_START_DATE)}
+                    className="mt-4 px-4 py-2 rounded-xl bg-primary text-on-primary font-label-bold text-xs cursor-pointer hover:opacity-90 shadow-md inline-flex items-center gap-1.5"
+                  >
+                    <span className="material-symbols-outlined text-sm">calendar_today</span>
+                    Go to Semester Start (July 27, 2026)
+                  </button>
+                </div>
+              ) : filteredSchedule.length === 0 ? (
                 <div className="p-8 text-center glass-card rounded-xl border border-white/5 my-4">
                   <span className="material-symbols-outlined text-4xl text-on-surface-variant mb-2">event_busy</span>
                   <p className="text-on-surface font-semibold">No Lectures Found</p>

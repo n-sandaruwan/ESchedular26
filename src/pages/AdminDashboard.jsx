@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getStoredModuleHours, saveStoredModuleHours } from '../data/moduleHoursData';
 import { getStoredDailyLogs, saveStoredDailyLogs, addAuditLog } from '../data/dailyLogsData';
 import { getModulesForDate, modifyScheduleSlot, addNotice } from '../data/scheduleStore';
-import { getSriLankaDateStr } from '../utils/dateUtils';
+import { getSriLankaDateStr, getValidSemesterDateStr, SEMESTER_START_DATE } from '../utils/dateUtils';
 import { exportCompleteDatabaseJSON, restoreCompleteDatabaseJSON } from '../data/backupRestore';
 import {
   getStoredSheetCsvUrl,
@@ -16,20 +16,20 @@ import {
 function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('reschedule');
 
-  const [logDate, setLogDate] = useState(getSriLankaDateStr());
+  const [logDate, setLogDate] = useState(getValidSemesterDateStr());
   const [logModules, setLogModules] = useState([]);
   const [selectedLogModule, setSelectedLogModule] = useState('');
   const [conductedHours, setConductedHours] = useState('');
   const [logNote, setLogNote] = useState('');
 
   const [reschedTargetModule, setReschedTargetModule] = useState('');
-  const [reschedTargetDate, setReschedTargetDate] = useState(getSriLankaDateStr());
+  const [reschedTargetDate, setReschedTargetDate] = useState(getValidSemesterDateStr());
   const [reschedStartTime, setReschedStartTime] = useState('08:30');
   const [reschedEndTime, setReschedEndTime] = useState('10:30');
   const [reschedVenue, setReschedVenue] = useState('LT1');
   const [reschedRemark, setReschedRemark] = useState('');
 
-  const [cancelDate, setCancelDate] = useState(getSriLankaDateStr());
+  const [cancelDate, setCancelDate] = useState(getValidSemesterDateStr());
   const [cancelAvailableModules, setCancelAvailableModules] = useState([]);
   const [selectedCancelModule, setSelectedCancelModule] = useState('');
   const [cancelRemark, setCancelRemark] = useState('');
@@ -292,6 +292,7 @@ function AdminDashboard() {
               <input
                 className={`${inputClasses} pr-10`}
                 type="date"
+                min={SEMESTER_START_DATE}
                 required
                 value={logDate}
                 onChange={e => setLogDate(e.target.value)}
@@ -458,6 +459,7 @@ function AdminDashboard() {
                   <input
                     className={`${inputClasses} pr-10`}
                     type="date"
+                    min={SEMESTER_START_DATE}
                     required
                     value={reschedTargetDate}
                     onChange={e => setReschedTargetDate(e.target.value)}
@@ -559,6 +561,7 @@ function AdminDashboard() {
                 <input
                   className={`${inputClasses} pr-10`}
                   type="date"
+                  min={SEMESTER_START_DATE}
                   required
                   value={cancelDate}
                   onChange={e => setCancelDate(e.target.value)}

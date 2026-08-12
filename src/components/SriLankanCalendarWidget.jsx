@@ -1,11 +1,16 @@
 import React, { useState, useMemo } from 'react';
-import { getSriLankaDateStr, getSriLankaDateObj } from '../utils/dateUtils';
+import { getSriLankaDateStr, getSriLankaDateObj, SEMESTER_START_DATE } from '../utils/dateUtils';
 import { sriLankaHolidays2026, getHolidayForDate } from '../data/sriLankaHolidaysData';
 
 function SriLankanCalendarWidget({ selectedDate, onSelectDate }) {
   const currentDate = useMemo(() => getSriLankaDateObj(), []);
-  const [viewYear, setViewYear] = useState(currentDate.getFullYear());
-  const [viewMonth, setViewMonth] = useState(currentDate.getMonth());
+  const initialDate = useMemo(() => {
+    const semStart = new Date(2026, 6, 27);
+    return currentDate < semStart ? semStart : currentDate;
+  }, [currentDate]);
+
+  const [viewYear, setViewYear] = useState(initialDate.getFullYear());
+  const [viewMonth, setViewMonth] = useState(initialDate.getMonth());
 
   const monthNames = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -43,7 +48,7 @@ function SriLankanCalendarWidget({ selectedDate, onSelectDate }) {
     daysArray.push(d);
   }
 
-  const upcomingHolidays = sriLankaHolidays2026.filter(h => h.date >= '2026-07-27');
+  const upcomingHolidays = sriLankaHolidays2026.filter(h => h.date >= SEMESTER_START_DATE);
 
   return (
     <div className="glass-card rounded-xl p-stack-md flex flex-col gap-4 overflow-hidden relative">
@@ -105,32 +110,36 @@ function SriLankanCalendarWidget({ selectedDate, onSelectDate }) {
           const todayDateStr = getSriLankaDateStr();
           const isToday = dateStr === todayDateStr;
           const isPast = dateStr < todayDateStr;
+          const isBeforeSemester = dateStr < SEMESTER_START_DATE;
 
           let dayStyle = 'bg-surface-container/40 border-white/5 text-on-surface hover:bg-surface-container';
 
-          if (isSelected) {
-            dayStyle = 'bg-primary text-on-primary font-bold border-primary shadow-[0_0_12px_rgba(56,189,248,0.6)]';
+          if (isBeforeSemester) {
+            dayStyle = 'bg-surface-container-low/20 border-white/5 text-on-surface-variant/20 cursor-not-allowed opacity-40';
+          } else if (isSelected) {
+            dayStyle = 'bg-primary text-on-primary font-bold border-primary shadow-[0_0_12px_rgba(56,189,248,0.6)] cursor-pointer';
           } else if (isToday) {
-            dayStyle = 'bg-secondary/20 border-secondary text-secondary font-bold ring-1 ring-secondary/60 shadow-[0_0_10px_rgba(78,222,163,0.4)]';
+            dayStyle = 'bg-secondary/20 border-secondary text-secondary font-bold ring-1 ring-secondary/60 shadow-[0_0_10px_rgba(78,222,163,0.4)] cursor-pointer';
           } else if (holiday) {
             if (holiday.isPoya) {
-              dayStyle = 'bg-yellow-500/20 border-yellow-500/50 text-yellow-400 font-bold ring-1 ring-yellow-500/30 shadow-[0_0_8px_rgba(234,179,8,0.3)]';
+              dayStyle = 'bg-yellow-500/20 border-yellow-500/50 text-yellow-400 font-bold ring-1 ring-yellow-500/30 shadow-[0_0_8px_rgba(234,179,8,0.3)] cursor-pointer';
             } else {
-              dayStyle = 'bg-pink-500/20 border-pink-500/50 text-pink-400 font-bold ring-1 ring-pink-500/30 shadow-[0_0_8px_rgba(236,72,153,0.3)]';
+              dayStyle = 'bg-pink-500/20 border-pink-500/50 text-pink-400 font-bold ring-1 ring-pink-500/30 shadow-[0_0_8px_rgba(236,72,153,0.3)] cursor-pointer';
             }
           } else if (isPast) {
-            dayStyle = 'bg-surface-container-low/30 border-white/5 text-on-surface-variant/40';
+            dayStyle = 'bg-surface-container-low/30 border-white/5 text-on-surface-variant/40 cursor-pointer';
           }
 
           return (
             <button
               key={idx}
-              onClick={() => onSelectDate && onSelectDate(dateStr)}
-              title={holiday ? `${holiday.name} (${holiday.type})` : isPast ? `${dateStr} (Past Day)` : dateStr}
-              className={`h-9 rounded-lg flex flex-col items-center justify-center relative transition-all cursor-pointer border ${dayStyle}`}
+              disabled={isBeforeSemester}
+              onClick={() => !isBeforeSemester && onSelectDate && onSelectDate(dateStr)}
+              title={isBeforeSemester ? 'Semester starts July 27, 2026' : holiday ? `${holiday.name} (${holiday.type})` : isPast ? `${dateStr} (Past Day)` : dateStr}
+              className={`h-9 rounded-lg flex flex-col items-center justify-center relative transition-all border ${dayStyle}`}
             >
-              <span className={isPast && !isSelected && !isToday ? 'line-through opacity-50 font-normal' : ''}>{day}</span>
-              {holiday && (
+              <span className={isPast && !isSelected && !isToday && !isBeforeSemester ? 'line-through opacity-50 font-normal' : ''}>{day}</span>
+              {holiday && !isBeforeSemester && (
                 <span className="absolute -bottom-0.5 text-[9px] leading-none">
                   {holiday.icon}
                 </span>

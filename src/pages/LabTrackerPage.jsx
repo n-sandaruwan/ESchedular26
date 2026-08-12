@@ -8,7 +8,7 @@ import {
   clearAllStoredAttendance,
   exportAttendanceCSV,
 } from '../data/labTrackerData';
-import { getSriLankaDateObj, getSriLankaDateStr } from '../utils/dateUtils';
+import { getSriLankaDateObj, getSriLankaDateStr, SEMESTER_START_DATE } from '../utils/dateUtils';
 
 function LabTrackerPage() {
   const role = localStorage.getItem('mis_role') || 'student';
@@ -30,7 +30,8 @@ function LabTrackerPage() {
     const yyyy = d.getFullYear();
     const mm = String(d.getMonth() + 1).padStart(2, '0');
     const dd = String(d.getDate()).padStart(2, '0');
-    return `${yyyy}-${mm}-${dd}`;
+    const dateStr = `${yyyy}-${mm}-${dd}`;
+    return dateStr < SEMESTER_START_DATE ? SEMESTER_START_DATE : dateStr;
   };
 
   // Daily Schedule state
@@ -68,7 +69,9 @@ function LabTrackerPage() {
       const yyyy = d.getFullYear();
       const mm = String(d.getMonth() + 1).padStart(2, '0');
       const dd = String(d.getDate()).padStart(2, '0');
-      setSelectedDate(`${yyyy}-${mm}-${dd}`);
+      const prevDate = `${yyyy}-${mm}-${dd}`;
+      if (prevDate < SEMESTER_START_DATE) return;
+      setSelectedDate(prevDate);
     } catch (e) {
       console.error('Error going to previous day', e);
     }
