@@ -22,7 +22,7 @@ function Login() {
       cleanUser === 'admin' ||
       cleanUser === 'admin@mis.com'
     ) {
-      if (cleanPass === 'adminadminelec26') {
+      if (cleanPass === '987') {
         localStorage.setItem('mis_role', 'admin');
         localStorage.setItem('mis_user', 'Department Administrator');
         navigate('/admin');
@@ -37,7 +37,7 @@ function Login() {
       cleanUser === 'lab' ||
       cleanUser === 'labadmin@mis.com'
     ) {
-      if (cleanPass === 'adminlabelec26') {
+      if (cleanPass === '654') {
         localStorage.setItem('mis_role', 'lab_admin');
         localStorage.setItem('mis_user', 'Lab Administrator');
         navigate('/lab-tracker');
@@ -46,14 +46,14 @@ function Login() {
     }
 
     // Direct password fallbacks regardless of portal selection
-    if (cleanPass === 'adminadminelec26') {
+    if (cleanPass === '987') {
       localStorage.setItem('mis_role', 'admin');
       localStorage.setItem('mis_user', 'Department Administrator');
       navigate('/admin');
       return;
     }
 
-    if (cleanPass === 'adminlabelec26') {
+    if (cleanPass === '654') {
       localStorage.setItem('mis_role', 'lab_admin');
       localStorage.setItem('mis_user', 'Lab Administrator');
       navigate('/lab-tracker');
