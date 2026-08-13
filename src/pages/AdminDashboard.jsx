@@ -16,12 +16,6 @@ import {
 function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('reschedule');
 
-  const [logDate, setLogDate] = useState(getValidSemesterDateStr());
-  const [logModules, setLogModules] = useState([]);
-  const [selectedLogModule, setSelectedLogModule] = useState('');
-  const [conductedHours, setConductedHours] = useState('2');
-  const [logNote, setLogNote] = useState('');
-
   const [reschedTargetModule, setReschedTargetModule] = useState('');
   const [reschedTargetDate, setReschedTargetDate] = useState(getValidSemesterDateStr());
   const [reschedStartTime, setReschedStartTime] = useState('08:30');
@@ -111,39 +105,6 @@ function AdminDashboard() {
   const handleApplyPresetTime = (start, end) => {
     setReschedStartTime(start);
     setReschedEndTime(end);
-  };
-
-  const handleDailyLogSubmit = (e) => {
-    e.preventDefault();
-    const hrs = parseInt(conductedHours, 10) || 0;
-    if (!selectedLogModule || hrs <= 0) return;
-
-    const currentLogs = getStoredDailyLogs();
-    const activeSlot = logModules.find(m => m.module === selectedLogModule);
-    const newLog = {
-      id: Date.now(),
-      date: logDate,
-      module: selectedLogModule,
-      hours: hrs,
-      topic: logNote || 'Regular Class Completed',
-      venue: activeSlot?.hall || 'LT1',
-      instructor: 'Department Faculty'
-    };
-    saveStoredDailyLogs([newLog, ...currentLogs]);
-
-    const currentHours = getStoredModuleHours();
-    const updatedHours = currentHours.map(m => {
-      if (m.code === selectedLogModule) {
-        return { ...m, conductedHours: Math.min(m.targetHours, m.conductedHours + hrs) };
-      }
-      return m;
-    });
-    saveStoredModuleHours(updatedHours);
-
-    addAuditLog('Evening Lecture Log', `Logged ${hrs} hrs for ${selectedLogModule} on ${logDate} ("${logNote || 'Regular lecture'}").`);
-    setStatusMsg(`Successfully logged ${hrs} hrs for ${selectedLogModule} on ${logDate}!`);
-    setTimeout(() => setStatusMsg(''), 4000);
-    setLogNote('');
   };
 
   // Execution Helpers after Confirmation Modal
@@ -247,25 +208,6 @@ function AdminDashboard() {
     setCancelAvailableModules(getModulesForDate(cancelDate));
   };
 
-  const handleResetLoggedLecture = (moduleCode) => {
-    setConfirmModal({
-      isOpen: true,
-      title: 'Confirm Reset Conducted Log',
-      message: `Are you sure you want to RESET / REMOVE the conducted log for ${moduleCode} on ${logDate}? This will subtract the logged hours and revert the class status.`,
-      btnText: 'Confirm Reset Log',
-      btnStyle: 'bg-orange-500 text-white hover:bg-orange-600 border-orange-500/50 shadow-[0_0_15px_rgba(249,115,22,0.3)]',
-      onConfirm: () => {
-        deleteDailyLogByModuleAndDate(logDate, moduleCode);
-        setStatusMsg(`Reset conducted log for ${moduleCode} on ${logDate}.`);
-        setTimeout(() => setStatusMsg(''), 4000);
-        setConfirmModal({ isOpen: false, title: '', message: '', onConfirm: null });
-        setLogModules(getModulesForDate(logDate));
-      }
-    });
-  };
-
-  const currentDailyLogsOnDate = getStoredDailyLogs().filter(l => l.date === logDate);
-
   const executeNoticeBroadcast = () => {
     addNotice(noticeTitle, noticeContent);
     addAuditLog('Notice Broadcast', `Posted announcement: "${noticeTitle}".`);
@@ -331,121 +273,7 @@ function AdminDashboard() {
         </div>
       )}
 
-      {/* PRIMARY FEATURED TOP CARD: Evening Daily Lecture Log */}
-      <form onSubmit={handleDailyLogSubmit} className="glass-card p-stack-md rounded-xl flex flex-col gap-5 border-t-4 border-t-secondary shadow-[0_0_20px_rgba(78,222,163,0.1)]">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-white/5">
-          <div>
-            <span className="font-label-bold text-[10px] bg-secondary/20 text-secondary px-2.5 py-1 rounded-full uppercase tracking-wider">
-              ⭐ Primary Daily Action
-            </span>
-            <h3 className="font-headline-md text-xl font-bold text-on-surface flex items-center gap-2 mt-1">
-              <span className="material-symbols-outlined text-secondary">task_alt</span> Evening Daily Lecture Log
-            </h3>
-          </div>
-          <p className="text-xs text-on-surface-variant max-w-sm">
-            Select a date to view scheduled modules and log completed hours & topic reviews.
-          </p>
-        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="flex flex-col gap-1">
-            <label className="text-[11px] font-label-bold uppercase text-on-surface-variant">1. Select Date (Calendar Popup)</label>
-            <div className="relative flex items-center">
-              <input
-                className={`${inputClasses} pr-10`}
-                type="date"
-                min={SEMESTER_START_DATE}
-                required
-                value={logDate}
-                onChange={e => setLogDate(e.target.value)}
-                onClick={e => e.target.showPicker && e.target.showPicker()}
-              />
-              <span
-                onClick={(e) => {
-                  const input = e.currentTarget.previousElementSibling;
-                  if (input && input.showPicker) input.showPicker();
-                }}
-                className="material-symbols-outlined absolute right-3 text-secondary cursor-pointer text-base pointer-events-auto"
-                title="Open Calendar Picker"
-              >
-                calendar_month
-              </span>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <label className="text-[11px] font-label-bold uppercase text-on-surface-variant">2. Modules Scheduled on {logDate}</label>
-            <select className={inputClasses} required value={selectedLogModule} onChange={e => setSelectedLogModule(e.target.value)}>
-              {logModules.length === 0 ? (
-                <option value="">No classes scheduled on this date</option>
-              ) : (
-                logModules.map((m, idx) => (
-                  <option key={idx} value={m.module}>
-                    {m.module} - {m.name || m.module} ({m.time}) {m.status !== 'Scheduled' ? `[${m.status}]` : '[Default Slot]'}
-                  </option>
-                ))
-              )}
-            </select>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="flex flex-col gap-1">
-            <label className="text-[11px] font-label-bold uppercase text-on-surface-variant">3. Conducted Hours</label>
-            <input className={inputClasses} type="number" placeholder="Hours Conducted (e.g. 2)" required value={conductedHours} onChange={e => setConductedHours(e.target.value)} />
-          </div>
-
-          <div className="flex flex-col gap-1 md:col-span-2">
-            <label className="text-[11px] font-label-bold uppercase text-on-surface-variant">4. Short Review / Topic Covered</label>
-            <input className={inputClasses} placeholder="e.g. Completed Chapter 3 tutorial questions" value={logNote} onChange={e => setLogNote(e.target.value)} />
-          </div>
-        </div>
-
-        <button
-          type="submit"
-          disabled={!selectedLogModule}
-          className="bg-secondary text-on-secondary py-3 rounded-lg font-label-bold text-xs uppercase tracking-wider hover:opacity-90 cursor-pointer disabled:opacity-50 transition-opacity"
-        >
-          Save Evening Lecture Log
-        </button>
-
-        {/* Logged / Conducted Lectures on logDate */}
-        {getStoredDailyLogs().filter(l => l.date === logDate).length > 0 && (
-          <div className="pt-3 border-t border-white/5 space-y-2">
-            <div className="flex justify-between items-center">
-              <span className="text-[11px] font-label-bold uppercase text-on-surface-variant flex items-center gap-1.5">
-                <span className="material-symbols-outlined text-xs text-secondary">task_alt</span>
-                Logged Lectures on {logDate}
-              </span>
-              <span className="text-[10px] font-label-bold text-secondary bg-secondary/10 px-2 py-0.5 rounded">
-                {getStoredDailyLogs().filter(l => l.date === logDate).length} Logged
-              </span>
-            </div>
-
-            <div className="space-y-2">
-              {getStoredDailyLogs().filter(l => l.date === logDate).map((log, idx) => (
-                <div key={idx} className="p-3 rounded-lg bg-surface-container/60 border border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-xs text-on-surface">{log.module}</span>
-                      <span className="text-xs text-secondary font-label-bold">+{log.hours} hrs</span>
-                      {log.topic && <span className="text-xs text-on-surface-variant">— "{log.topic}"</span>}
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleResetLoggedLecture(log.module)}
-                    className="px-2.5 py-1 rounded bg-orange-500/15 text-orange-400 border border-orange-500/30 text-xs font-label-bold hover:bg-orange-500/25 cursor-pointer flex items-center gap-1 shrink-0"
-                    title="Reset conducted log and subtract hours"
-                  >
-                    <span className="material-symbols-outlined text-xs">restart_alt</span> Reset Conducted Status
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-      </form>
 
       {/* SECONDARY SCHEDULE CONTROLS SECTION */}
       <div className="mt-4 flex flex-col gap-4">
