@@ -612,10 +612,6 @@ function StudentDashboard() {
                             <span className="material-symbols-outlined text-sm text-primary">location_on</span>
                             Venue: <strong className="text-on-surface">{slot.hall}</strong>
                           </span>
-                          <span className="flex items-center gap-1.5">
-                            <span className="material-symbols-outlined text-sm text-secondary">category</span>
-                            Type: <strong className="text-on-surface">{slot.type}</strong>
-                          </span>
                         </div>
 
                         {/* Live Progress Bar for Ongoing Classes */}

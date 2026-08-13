@@ -7,8 +7,7 @@ import { getSriLankaDateStr } from '../utils/dateUtils';
 
 // Initial Schedule Overrides (Cancellations, Reschedules, Swaps per date)
 export const initialOverrides = [
-  { id: 1, date: '2026-07-29', module: 'ALL', status: 'Canceled', reason: 'Esala Full Moon Poya Day Holiday', time: 'All Day' },
-  { id: 2, date: '2026-08-07', module: 'EE3301', status: 'Rescheduled', reason: 'EE3301 Lab 1 (Groups EE11 & EE12) rescheduled to Thursday, Aug 13th', time: '01:30 PM - 04:30 PM', venue: 'Communication Laboratory' }
+  { id: 1, date: '2026-07-29', module: 'ALL', status: 'Canceled', reason: 'Esala Full Moon Poya Day Holiday', time: 'All Day' }
 ];
 
 export const getStoredOverrides = () => {
@@ -17,13 +16,12 @@ export const getStoredOverrides = () => {
     try {
       const parsed = JSON.parse(local);
       if (Array.isArray(parsed)) {
-        const missing = initialOverrides.filter(i => !parsed.some(p => String(p.id) === String(i.id)));
-        if (missing.length > 0) {
-          const merged = [...parsed, ...missing];
-          localStorage.setItem('mis_schedule_overrides', JSON.stringify(merged));
-          return merged;
+        // Clean out any lab initial override (id: 2 or Lab 1)
+        const cleaned = parsed.filter(p => p.id !== 2 && !p.reason?.includes('Lab 1'));
+        if (cleaned.length !== parsed.length) {
+          localStorage.setItem('mis_schedule_overrides', JSON.stringify(cleaned));
         }
-        return parsed;
+        return cleaned;
       }
     } catch (e) { return initialOverrides; }
   }
@@ -40,7 +38,6 @@ export const saveStoredOverrides = (overrides) => {
 
 // Initial Notices Feed
 export const initialNotices = [
-  { id: 3, title: '🔄 LAB RESCHEDULED: EE3301 Analog Electronics Lab', date: '2026-08-07', type: 'Alert', content: 'All EE3301 Analog Electronics lab sessions (Groups EE11 & EE12) originally scheduled for Friday, Aug 7th have been rescheduled to Thursday, Aug 13th (01:30 PM - 04:30 PM) at Communication Laboratory.' },
   { id: 1, title: 'Department Holiday Notice', date: '2026-07-29', type: 'Holiday', content: 'Wednesday July 29 is Esala Full Moon Poya Day. Regular physical lectures resume Thursday July 30.' },
   { id: 2, title: 'Semester Started 27th July', date: '2026-07-27', type: 'Announcement', content: 'Semester 3 academic lectures are officially in progress.' }
 ];
@@ -51,13 +48,11 @@ export const getStoredNotices = () => {
     try {
       const parsed = JSON.parse(local);
       if (Array.isArray(parsed)) {
-        const missing = initialNotices.filter(i => !parsed.some(p => String(p.id) === String(i.id)));
-        if (missing.length > 0) {
-          const merged = [...missing, ...parsed];
-          localStorage.setItem('mis_notices', JSON.stringify(merged));
-          return merged;
+        const cleaned = parsed.filter(n => n.id !== 3 && !n.title?.includes('LAB RESCHEDULED'));
+        if (cleaned.length !== parsed.length) {
+          localStorage.setItem('mis_notices', JSON.stringify(cleaned));
         }
-        return parsed;
+        return cleaned;
       }
     } catch (e) { return initialNotices; }
   }
