@@ -545,9 +545,9 @@ function ModulePage() {
                   )}
                 </div>
 
-                {session.topic && session.topic !== 'Regular Class Completed' && session.topic !== 'Regular Lecture Session Completed' && (
+                {session.topic && (
                   <div className="pt-2 border-t border-white/5 text-xs">
-                    <p className="text-on-surface-variant italic font-body-md">Note: {session.topic}</p>
+                    <p className="text-on-surface-variant italic font-body-md text-xs">Note: {session.topic}</p>
                   </div>
                 )}
 

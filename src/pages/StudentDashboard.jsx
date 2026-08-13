@@ -44,7 +44,8 @@ function StudentDashboard() {
   const [verifyModal, setVerifyModal] = useState({
     isOpen: false,
     slot: null,
-    hours: 1
+    hours: 1,
+    note: ''
   });
   const [selectedNotice, setSelectedNotice] = useState(null);
   const [isEditingNotice, setIsEditingNotice] = useState(false);
@@ -212,14 +213,15 @@ function StudentDashboard() {
     });
   };
 
-  const handleQuickLogHours = (moduleCode, hours = 2) => {
+  const handleQuickLogHours = (moduleCode, hours = 2, note = '') => {
     const currentLogs = getStoredDailyLogs();
+    const cleanNote = note && note.trim() ? note.trim() : 'Regular Lecture Session Completed';
     const newLog = {
       id: Date.now(),
       date: selectedDate,
       module: moduleCode,
       hours: hours,
-      topic: 'Regular Lecture Session Completed',
+      topic: cleanNote,
       venue: 'LT1',
       instructor: 'Department Lecturer'
     };
@@ -660,11 +662,19 @@ function StudentDashboard() {
                               </button>
                             ) : (
                               <button
-                                onClick={() => handleQuickLogHours(slot.module, 2)}
+                                onClick={() => {
+                                  const calcHours = (slot.endMin - slot.startMin) / 60;
+                                  setVerifyModal({
+                                    isOpen: true,
+                                    slot: slot,
+                                    hours: calcHours > 0 ? calcHours : 2,
+                                    note: ''
+                                  });
+                                }}
                                 className="px-2.5 py-1 rounded bg-secondary/10 text-secondary border border-secondary/20 text-xs font-label-bold hover:bg-secondary/20 cursor-pointer"
-                                title="Log 2 hours for this class into Daily Logs"
+                                title="Verify and log hours & topic note for this class"
                               >
-                                + Log 2h to Logs
+                                + Log Hours & Note
                               </button>
                             )}
                             <button
@@ -873,22 +883,35 @@ function StudentDashboard() {
               </p>
             </div>
 
-            <div className="text-left bg-surface-container-low p-4 rounded-xl border border-white/5 space-y-2 text-sm">
-               <label className="text-on-surface-variant font-label-bold text-xs uppercase">Duration (Hours)</label>
-               <input
-                 type="number"
-                 value={verifyModal.hours}
-                 onChange={(e) => setVerifyModal({...verifyModal, hours: Number(e.target.value)})}
-                 step="0.5"
-                 min="0.5"
-                 className="w-full bg-surface-container border border-white/10 rounded-lg p-3 text-on-surface focus:border-primary focus:outline-none"
-               />
+            <div className="text-left bg-surface-container-low p-4 rounded-xl border border-white/5 space-y-3 text-sm">
+               <div>
+                 <label className="text-on-surface-variant font-label-bold text-xs uppercase block mb-1">Duration (Hours)</label>
+                 <input
+                   type="number"
+                   value={verifyModal.hours}
+                   onChange={(e) => setVerifyModal({...verifyModal, hours: Number(e.target.value)})}
+                   step="0.5"
+                   min="0.5"
+                   className="w-full bg-surface-container border border-white/10 rounded-lg p-3 text-on-surface font-bold focus:border-primary focus:outline-none"
+                 />
+               </div>
+
+               <div>
+                 <label className="text-on-surface-variant font-label-bold text-xs uppercase block mb-1">Topic / Lecture Note (Optional)</label>
+                 <input
+                   type="text"
+                   placeholder="e.g., Chapter 3 Diode Rectifiers & Tutorial 2"
+                   value={verifyModal.note || ''}
+                   onChange={(e) => setVerifyModal({...verifyModal, note: e.target.value})}
+                   className="w-full bg-surface-container border border-white/10 rounded-lg p-3 text-xs text-on-surface focus:border-primary focus:outline-none placeholder:text-on-surface-variant/40"
+                 />
+               </div>
             </div>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 border-t border-white/5">
               <button
                 type="button"
-                onClick={() => setVerifyModal({ isOpen: false, slot: null, hours: 0 })}
+                onClick={() => setVerifyModal({ isOpen: false, slot: null, hours: 0, note: '' })}
                 className="w-full sm:w-auto px-6 py-3 rounded-xl border border-white/10 text-on-surface hover:bg-white/5 hover:text-white transition-all text-sm font-label-bold cursor-pointer"
               >
                 Cancel
@@ -896,8 +919,8 @@ function StudentDashboard() {
               <button
                 type="button"
                 onClick={() => {
-                   handleQuickLogHours(verifyModal.slot.module, verifyModal.hours);
-                   setVerifyModal({ isOpen: false, slot: null, hours: 0 });
+                   handleQuickLogHours(verifyModal.slot.module, verifyModal.hours, verifyModal.note);
+                   setVerifyModal({ isOpen: false, slot: null, hours: 0, note: '' });
                 }}
                 className="w-full sm:w-auto px-6 py-3 rounded-xl text-sm font-label-bold transition-all shadow-lg cursor-pointer bg-primary text-on-primary hover:bg-primary/90"
               >
