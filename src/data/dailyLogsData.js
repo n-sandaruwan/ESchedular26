@@ -16,7 +16,7 @@ export const studentRegistry = [
 ];
 
 import { getStoredModuleHours, saveStoredModuleHours, recalculateModuleHoursFromLogs } from './moduleHoursData';
-import { pushDailyLogsToCloud, pushAuditLogsToCloud } from './firebaseSync';
+import { pushDailyLogsToCloud, pushAuditLogsToCloud, deleteDailyLogFromCloud } from './firebaseSync';
 import { getSriLankaTimestampStr } from '../utils/dateUtils';
 
 // Local Storage Wrappers
@@ -44,6 +44,10 @@ export const deleteDailyLogByModuleAndDate = (dateStr, moduleCode) => {
   const currentLogs = getStoredDailyLogs();
   const logsToDelete = currentLogs.filter(l => l.date === dateStr && l.module === moduleCode);
   if (logsToDelete.length === 0) return false;
+
+  logsToDelete.forEach(l => {
+    deleteDailyLogFromCloud(l.id || `${l.date}_${l.module}`);
+  });
 
   const totalHoursToSubtract = logsToDelete.reduce((sum, l) => sum + (Number(l.hours) || 0), 0);
 

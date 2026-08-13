@@ -1,5 +1,5 @@
 import { db, isFirebaseConfigured } from '../firebase';
-import { doc, setDoc, onSnapshot, collection } from 'firebase/firestore';
+import { doc, setDoc, onSnapshot, collection, deleteDoc, getDocs } from 'firebase/firestore';
 import { getSriLankaTimestampStr } from '../utils/dateUtils';
 
 // Callbacks registered by data stores to update UI on remote changes
@@ -102,11 +102,9 @@ export const initRealtimeCloudSync = () => {
       snapshot.forEach((docSnap) => {
         logsData.push({ id: docSnap.id, ...docSnap.data() });
       });
-      if (logsData.length > 0) {
-        logsData.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-        localStorage.setItem('mis_daily_logs', JSON.stringify(logsData));
-        notifySubscribers('daily_logs', logsData);
-      }
+      logsData.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+      localStorage.setItem('mis_daily_logs', JSON.stringify(logsData));
+      notifySubscribers('daily_logs', logsData);
     }, (err) => {
       console.warn("Firestore daily_logs subscription notice:", err);
     });
@@ -122,10 +120,8 @@ export const initRealtimeCloudSync = () => {
       snapshot.forEach((docSnap) => {
         hoursData.push({ code: docSnap.id, ...docSnap.data() });
       });
-      if (hoursData.length > 0) {
-        localStorage.setItem('mis_module_hours', JSON.stringify(hoursData));
-        notifySubscribers('module_hours', hoursData);
-      }
+      localStorage.setItem('mis_module_hours', JSON.stringify(hoursData));
+      notifySubscribers('module_hours', hoursData);
     }, (err) => {
       console.warn("Firestore module_hours subscription notice:", err);
     });
@@ -285,5 +281,41 @@ export const pushAuditLogsToCloud = async (logs) => {
     }
   } catch (err) {
     console.error("Failed to push audit logs to cloud:", err);
+  }
+};
+
+// Delete Daily Log document from Cloud Firestore
+export const deleteDailyLogFromCloud = async (docId) => {
+  if (!isFirebaseConfigured() || !db || !docId) return;
+  try {
+    await deleteDoc(doc(db, 'daily_logs', String(docId)));
+    console.log(`✅ Deleted daily log from cloud: ${docId}`);
+  } catch (err) {
+    console.error("Failed to delete daily log from cloud:", err);
+  }
+};
+
+// Wipe all Daily Logs & reset Module Conducted Hours to 0 in Cloud Firestore
+export const clearCloudDailyLogsAndHours = async () => {
+  if (!isFirebaseConfigured() || !db) return;
+  try {
+    const dailyLogsRef = collection(db, 'daily_logs');
+    const logsSnap = await getDocs(dailyLogsRef);
+    const deletePromises = [];
+    logsSnap.forEach((docSnap) => {
+      deletePromises.push(deleteDoc(doc(db, 'daily_logs', docSnap.id)));
+    });
+    await Promise.all(deletePromises);
+
+    const moduleHoursRef = collection(db, 'module_hours');
+    const hoursSnap = await getDocs(moduleHoursRef);
+    const updatePromises = [];
+    hoursSnap.forEach((docSnap) => {
+      updatePromises.push(setDoc(doc(db, 'module_hours', docSnap.id), { conductedHours: 0 }, { merge: true }));
+    });
+    await Promise.all(updatePromises);
+    console.log("✅ Successfully cleared all daily logs and reset module hours in Cloud Firestore!");
+  } catch (err) {
+    console.error("Failed to clear cloud daily logs and hours:", err);
   }
 };
