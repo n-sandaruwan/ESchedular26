@@ -1693,6 +1693,35 @@ function LabTrackerPage() {
                 })}
               </div>
             </div>
+
+            {isAdmin && (
+              <div className="pt-3 border-t border-error/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
+                <div>
+                  <h4 className="text-xs font-bold text-error uppercase tracking-wider flex items-center gap-1">
+                    <span className="material-symbols-outlined text-sm">warning</span>
+                    System Admin Reset Zone
+                  </h4>
+                  <p className="text-xs text-on-surface-variant mt-0.5">Permanently wipe all lab attendance records for all EE groups (System Admin only).</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (window.confirm('⚠️ CRITICAL ADMIN ACTION:\n\nAre you sure you want to RESET all lab attendance records across all EE01–EE12 groups? This action cannot be undone.')) {
+                      clearAllStoredAttendance();
+                      setStoredAttendance({});
+                      setLeaderAttendance({});
+                      setSaveSuccessMsg('All lab attendance records have been reset successfully!');
+                      setTimeout(() => setSaveSuccessMsg(''), 4000);
+                    }
+                  }}
+                  className="px-3.5 py-2 rounded-xl bg-error/15 hover:bg-error/25 border border-error/30 text-error text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer shrink-0 shadow-sm"
+                  title="Reset all lab attendance records (System Admin Only)"
+                >
+                  <span className="material-symbols-outlined text-sm">restart_alt</span>
+                  <span>Reset All Attendance</span>
+                </button>
+              </div>
+            )}
           </div>
 
           {/* 5. System Admin Control: Clear Lab Attendance Logs Only */}
