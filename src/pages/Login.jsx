@@ -15,39 +15,22 @@ function Login() {
     const cleanUser = username.trim().toLowerCase();
     const cleanPass = password.trim();
 
-    // 1. Full Department Admin Authentication
-    if (cleanUser === 'admin' || cleanUser === 'admin@mis.com') {
-      if (cleanPass === '987321' || cleanPass === '987') {
-        localStorage.setItem('mis_role', 'admin');
-        localStorage.setItem('mis_user', 'Department Administrator');
-        navigate('/admin');
-        return;
-      }
-    }
-
-    // 2. Lab Admin Authentication
+    // 1. Strict Full Department Admin Verification (Username + Password)
     if (
-      cleanUser === 'labadmin' ||
-      cleanUser === 'lab' ||
-      cleanUser === 'labadmin@mis.com'
+      (cleanUser === 'admin' || cleanUser === 'admin@mis.com') &&
+      (cleanPass === '987321' || cleanPass === '987')
     ) {
-      if (cleanPass === '654') {
-        localStorage.setItem('mis_role', 'lab_admin');
-        localStorage.setItem('mis_user', 'Lab Administrator');
-        navigate('/lab-tracker?tab=leader');
-        return;
-      }
-    }
-
-    // Password-based direct fallbacks
-    if (cleanPass === '987321' || cleanPass === '987') {
       localStorage.setItem('mis_role', 'admin');
       localStorage.setItem('mis_user', 'Department Administrator');
       navigate('/admin');
       return;
     }
 
-    if (cleanPass === '654') {
+    // 2. Strict Lab Admin Verification (Username + Password)
+    if (
+      (cleanUser === 'labadmin' || cleanUser === 'lab' || cleanUser === 'labadmin@mis.com') &&
+      cleanPass === '654'
+    ) {
       localStorage.setItem('mis_role', 'lab_admin');
       localStorage.setItem('mis_user', 'Lab Administrator');
       navigate('/lab-tracker?tab=leader');
