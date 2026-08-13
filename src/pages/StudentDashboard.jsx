@@ -48,6 +48,7 @@ function StudentDashboard() {
     note: ''
   });
   const [selectedNotice, setSelectedNotice] = useState(null);
+  const [showAllNoticesModal, setShowAllNoticesModal] = useState(false);
   const [isEditingNotice, setIsEditingNotice] = useState(false);
   const [editNoticeTitle, setEditNoticeTitle] = useState('');
   const [editNoticeContent, setEditNoticeContent] = useState('');
@@ -779,53 +780,75 @@ function StudentDashboard() {
           {/* 2. Calendar Widget */}
           <SriLankanCalendarWidget selectedDate={selectedDate} onSelectDate={(d) => setSelectedDate(d)} />
 
-          {/* 3. Department Announcements Feed */}
-          <div className="glass-card rounded-xl p-stack-md space-y-stack-md">
-            <div className="flex items-center justify-between pb-3 border-b border-white/5">
-              <h3 className="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-widest text-xs">
-                Announcements
-              </h3>
+          {/* 3. Department Announcements Tile (Compact View) */}
+          <div className="glass-card rounded-xl p-stack-md space-y-3 border border-white/10 shadow-lg">
+            <div className="flex items-center justify-between pb-2.5 border-b border-white/10">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary text-base">campaign</span>
+                <h3 className="font-label-bold text-label-bold text-on-surface uppercase tracking-wider text-xs">
+                  Announcements
+                </h3>
+                <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/30 text-[10px] font-mono font-bold">
+                  {notices.length}
+                </span>
+              </div>
               {isAdmin && (
-                <Link to="/admin" className="text-xs text-secondary hover:underline flex items-center gap-0.5 font-label-bold">
-                  <span className="material-symbols-outlined text-xs">add</span> Post Notice
+                <Link to="/admin" className="text-[11px] text-secondary hover:underline flex items-center gap-0.5 font-label-bold">
+                  <span className="material-symbols-outlined text-xs">add</span> Post
                 </Link>
               )}
             </div>
 
-            <div className="space-y-stack-md">
-              {notices.map((notice) => (
-                <div
-                  key={notice.id}
-                  onClick={() => setSelectedNotice(notice)}
-                  className="flex gap-stack-md p-3 hover:bg-white/10 rounded-xl transition-all group border border-white/5 hover:border-primary/40 cursor-pointer shadow-sm hover:shadow-md relative overflow-hidden"
-                  title="Click to open full notice"
-                >
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                    notice.type === 'Holiday' ? 'bg-tertiary/20 text-tertiary border border-tertiary/30' : notice.type === 'Canceled' || notice.type === 'Alert' ? 'bg-error/20 text-error border border-error/30' : 'bg-primary/20 text-primary border border-primary/30'
-                  }`}>
-                    <span className="material-symbols-outlined text-xl">
-                      {notice.type === 'Holiday' ? 'brightness_3' : notice.type === 'Canceled' ? 'event_busy' : notice.type === 'Alert' ? 'warning' : 'campaign'}
-                    </span>
-                  </div>
-                  <div className="flex-1 min-w-0 pr-1">
-                    <div className="flex items-center justify-between gap-1 mb-1">
-                      <h5 className="font-headline-md text-on-surface leading-tight text-xs font-bold truncate group-hover:text-primary transition-colors">
-                        {notice.title}
-                      </h5>
-                    </div>
-                    <p className="text-xs text-on-surface-variant line-clamp-2 leading-snug">
-                      {notice.content}
-                    </p>
-                    <div className="flex items-center justify-between mt-2 pt-1 border-t border-white/5 text-[10px] text-on-surface-variant/70 font-label-mono">
-                      <span>{notice.date}</span>
-                      <span className="text-primary font-bold flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform">
-                        Read Full <span className="material-symbols-outlined text-xs">open_in_full</span>
-                      </span>
-                    </div>
-                  </div>
+            {/* Display Top 2 Notices Only */}
+            <div className="space-y-2">
+              {notices.length === 0 ? (
+                <div className="p-3 bg-black/20 rounded-xl text-center text-xs text-on-surface-variant italic">
+                  No active announcements.
                 </div>
-              ))}
+              ) : (
+                notices.slice(0, 2).map((notice) => (
+                  <div
+                    key={notice.id}
+                    onClick={() => setSelectedNotice(notice)}
+                    className="p-3 bg-black/30 hover:bg-white/10 rounded-xl transition-all group border border-white/5 hover:border-primary/40 cursor-pointer shadow-sm relative overflow-hidden"
+                    title="Click to open notice"
+                  >
+                    <div className="flex items-start gap-2.5">
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${
+                        notice.type === 'Holiday' ? 'bg-tertiary/20 text-tertiary border border-tertiary/30' : notice.type === 'Canceled' || notice.type === 'Alert' ? 'bg-error/20 text-error border border-error/30' : 'bg-primary/20 text-primary border border-primary/30'
+                      }`}>
+                        <span className="material-symbols-outlined text-base">
+                          {notice.type === 'Holiday' ? 'brightness_3' : notice.type === 'Canceled' ? 'event_busy' : notice.type === 'Alert' ? 'warning' : 'campaign'}
+                        </span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-1">
+                          <h5 className="font-bold text-on-surface text-xs leading-snug truncate group-hover:text-primary transition-colors">
+                            {notice.title}
+                          </h5>
+                          <span className="text-[9px] font-mono text-on-surface-variant/70 shrink-0">{notice.date}</span>
+                        </div>
+                        <p className="text-[11px] text-on-surface-variant line-clamp-1 leading-normal mt-0.5">
+                          {notice.content}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
+
+            {/* "See More" Button */}
+            {notices.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setShowAllNoticesModal(true)}
+                className="w-full py-2 px-3 rounded-xl bg-white/5 hover:bg-primary/15 hover:text-primary border border-white/10 hover:border-primary/30 text-on-surface-variant text-xs font-label-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+              >
+                <span>See More Announcements ({notices.length})</span>
+                <span className="material-symbols-outlined text-sm">arrow_forward</span>
+              </button>
+            )}
           </div>
 
         </div>
@@ -1075,6 +1098,89 @@ function StudentDashboard() {
               </button>
             </div>
 
+          </div>
+        </div>
+      )}
+
+      {/* View All Announcements Modal */}
+      {showAllNoticesModal && (
+        <div className="fixed inset-0 bg-black/75 backdrop-blur-md flex items-center justify-center p-4 z-[9999] animate-fade-in">
+          <div className="bg-surface-container border border-white/10 rounded-2xl p-5 sm:p-6 max-w-2xl w-full shadow-2xl space-y-4 max-h-[85vh] flex flex-col relative overflow-hidden">
+            
+            {/* Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-white/10 shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/30 text-primary flex items-center justify-center">
+                  <span className="material-symbols-outlined text-xl">campaign</span>
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-on-surface text-base sm:text-lg">
+                    Department Announcements & Notices
+                  </h3>
+                  <p className="text-xs text-on-surface-variant">Official MIS broadcast updates and lecture notices ({notices.length})</p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowAllNoticesModal(false)}
+                className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 text-on-surface-variant hover:text-on-surface flex items-center justify-center transition-all cursor-pointer shrink-0"
+              >
+                <span className="material-symbols-outlined text-lg">close</span>
+              </button>
+            </div>
+
+            {/* Scrollable Feed of All Notices */}
+            <div className="flex-1 overflow-y-auto space-y-3 pr-1 custom-scrollbar">
+              {notices.map((notice) => (
+                <div
+                  key={notice.id}
+                  onClick={() => {
+                    setShowAllNoticesModal(false);
+                    setSelectedNotice(notice);
+                  }}
+                  className="p-4 bg-black/40 hover:bg-white/10 rounded-xl transition-all group border border-white/10 hover:border-primary/40 cursor-pointer shadow-md space-y-2"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-label-bold uppercase tracking-wider ${
+                      notice.type === 'Holiday' ? 'bg-tertiary/20 text-tertiary border border-tertiary/30' : notice.type === 'Canceled' || notice.type === 'Alert' ? 'bg-error/20 text-error border border-error/30' : 'bg-primary/20 text-primary border border-primary/30'
+                    }`}>
+                      {notice.type || 'Notice'}
+                    </span>
+                    <span className="text-xs font-mono text-on-surface-variant flex items-center gap-1">
+                      <span className="material-symbols-outlined text-xs text-primary">calendar_month</span>
+                      {notice.date}
+                    </span>
+                  </div>
+
+                  <h4 className="font-extrabold text-on-surface text-sm group-hover:text-primary transition-colors">
+                    {notice.title}
+                  </h4>
+
+                  <p className="text-xs text-on-surface-variant leading-relaxed line-clamp-3">
+                    {notice.content}
+                  </p>
+
+                  <div className="flex justify-end pt-1">
+                    <span className="text-xs text-primary font-bold flex items-center gap-1">
+                      <span>Read Full Notice</span>
+                      <span className="material-symbols-outlined text-xs">arrow_forward</span>
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Footer */}
+            <div className="pt-3 border-t border-white/10 flex justify-end shrink-0">
+              <button
+                type="button"
+                onClick={() => setShowAllNoticesModal(false)}
+                className="px-5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-on-surface text-xs font-label-bold cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { HashRouter as Router, Routes, Route } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import StudentDashboard from './pages/StudentDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import Login from './pages/Login';
@@ -14,14 +14,20 @@ import ProtectedRoute from './components/ProtectedRoute';
 import DashboardLayout from './components/DashboardLayout';
 import './index.css';
 
+function RootRedirect() {
+  const role = localStorage.getItem('mis_role');
+  if (role === 'admin') return <Navigate to="/admin" replace />;
+  if (role === 'lab_admin') return <Navigate to="/lab-tracker" replace />;
+  return <Navigate to="/login" replace />;
+}
+
 function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/" element={<RootRedirect />} />
         <Route path="/login" element={<Login />} />
-        
-        {/* Dashboard Routes wrapped in layout */}
-        <Route path="/" element={<DashboardLayout><StudentDashboard /></DashboardLayout>} />
+        <Route path="/dashboard" element={<DashboardLayout><StudentDashboard /></DashboardLayout>} />
         <Route path="/timetable" element={<DashboardLayout><TimetablePage /></DashboardLayout>} />
         <Route path="/modules" element={<DashboardLayout><ModuleTrackerPage /></DashboardLayout>} />
         <Route path="/modules/:moduleId" element={<DashboardLayout><ModulePage /></DashboardLayout>} />

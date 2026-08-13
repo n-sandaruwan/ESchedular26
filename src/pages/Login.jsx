@@ -149,10 +149,10 @@ function Login() {
         <div className="pt-2 border-t border-white/5 flex flex-col gap-2">
           <div className="text-center">
             <Link
-              to="/"
+              to="/dashboard"
               className="text-xs text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center gap-1 font-label-bold"
             >
-              <span className="material-symbols-outlined text-sm">arrow_back</span> Return to Basic Mode
+              <span className="material-symbols-outlined text-sm">arrow_back</span> Return to Student View
             </Link>
           </div>
         </div>

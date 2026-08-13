@@ -14,7 +14,7 @@ function DashboardLayout({ children }) {
   const isCloudSynced = isFirebaseConfigured();
 
   const allNavItems = [
-    { name: 'Home Dashboard', icon: 'home', path: '/' },
+    { name: 'Student Dashboard', icon: 'home', path: '/dashboard' },
     { name: 'Weekly Schedule', icon: 'calendar_month', path: '/timetable' },
     { name: 'Module Tracker', icon: 'view_module', path: '/modules' },
     { name: 'Lab Tracker', icon: 'biotech', path: '/lab-tracker' },
@@ -54,7 +54,7 @@ function DashboardLayout({ children }) {
             >
               {mobileMenuOpen ? 'close' : 'menu'}
             </button>
-            <Link to="/" className="flex items-center gap-2">
+            <Link to="/dashboard" className="flex items-center gap-2">
               <h1 className="font-headline-lg-mobile md:font-headline-md font-bold text-primary tracking-tight">
                 ESchedular26
               </h1>
@@ -247,9 +247,9 @@ function DashboardLayout({ children }) {
       {/* Mobile Bottom Navigation Shell */}
       <nav className="lg:hidden fixed bottom-0 w-full z-50 bg-surface/90 backdrop-blur-xl border-t border-white/5 shadow-[0_-4px_20px_rgba(0,0,0,0.5)] rounded-t-xl h-[72px] flex justify-around items-center px-2 pb-safe">
         <Link
-          to="/"
+          to="/dashboard"
           className={`flex flex-col items-center justify-center transition-all duration-200 active:scale-90 ${
-            location.pathname === '/' ? 'text-primary drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]' : 'text-on-surface-variant/60 hover:text-primary/80'
+            location.pathname === '/dashboard' ? 'text-primary drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]' : 'text-on-surface-variant/60 hover:text-primary/80'
           }`}
         >
           <span className="material-symbols-outlined text-xl">home</span>

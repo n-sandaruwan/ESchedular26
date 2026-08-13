@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import {
   LAB_GROUPS,
   INITIAL_STUDENTS,
@@ -11,12 +12,19 @@ import {
 import { getSriLankaDateObj, getSriLankaDateStr, SEMESTER_START_DATE } from '../utils/dateUtils';
 
 function LabTrackerPage() {
+  const location = useLocation();
   const role = localStorage.getItem('mis_role') || 'student';
   const isAdmin = role === 'admin';
   const isLabAdmin = role === 'lab_admin';
   const canMarkAttendance = isAdmin || isLabAdmin;
 
-  const [activeTab, setActiveTab] = useState('daily'); // 'daily' | 'search' | 'group' | 'leader' | 'admin'
+  const [activeTab, setActiveTab] = useState(() => {
+    const params = new URLSearchParams(location.search);
+    const tabParam = params.get('tab');
+    if (tabParam) return tabParam;
+    if (isLabAdmin) return 'leader'; // Directly open Lab Admin attendance marker portal for Lab Admins
+    return 'daily';
+  }); // 'daily' | 'search' | 'group' | 'leader' | 'admin'
   const [searchDigits, setSearchDigits] = useState('');
   const [searchedStudent, setSearchedStudent] = useState(null);
   const [studentSchedule, setStudentSchedule] = useState([]);
@@ -581,20 +589,22 @@ function LabTrackerPage() {
             }`}
           >
             <span className="material-symbols-outlined text-xl">how_to_reg</span>
-            <span className="text-xs font-label-bold text-center">Leader Portal</span>
+            <span className="text-xs font-label-bold text-center">Lab Admin (Attendance)</span>
           </button>
 
-          <button
-            onClick={() => setActiveTab('admin')}
-            className={`p-3 rounded-xl border flex flex-col items-center justify-center gap-1.5 transition-all cursor-pointer col-span-2 sm:col-span-1 ${
-              activeTab === 'admin'
-                ? 'bg-tertiary/20 border-tertiary text-tertiary font-bold shadow-lg shadow-tertiary/10'
-                : 'bg-black/30 border-white/5 text-on-surface-variant hover:text-on-surface hover:bg-white/5'
-            }`}
-          >
-            <span className="material-symbols-outlined text-xl">insights</span>
-            <span className="text-xs font-label-bold text-center">Admin</span>
-          </button>
+          {(isAdmin || isLabAdmin) && (
+            <button
+              onClick={() => setActiveTab('admin')}
+              className={`p-3 rounded-xl border flex flex-col items-center justify-center gap-1.5 transition-all cursor-pointer col-span-2 sm:col-span-1 ${
+                activeTab === 'admin'
+                  ? 'bg-tertiary/20 border-tertiary text-tertiary font-bold shadow-lg shadow-tertiary/10'
+                  : 'bg-black/30 border-white/5 text-on-surface-variant hover:text-on-surface hover:bg-white/5'
+              }`}
+            >
+              <span className="material-symbols-outlined text-xl">insights</span>
+              <span className="text-xs font-label-bold text-center">Admin Analytics</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -1453,9 +1463,29 @@ function LabTrackerPage() {
         </div>
       )}
 
-      {/* TAB 5: Admin Summary, Lab Progress, Absentees & Exports */}
-      {activeTab === 'admin' && (
+      {/* TAB 5: Admin Summary, Lab Progress, Absentees & Exports (Visible only to Full Admin & Lab Admin) */}
+      {activeTab === 'admin' && (isAdmin || isLabAdmin) && (
         <div className="space-y-6">
+          {/* Mode Indicator Banner */}
+          {isLabAdmin && !isAdmin && (
+            <div className="p-3 bg-tertiary/10 border border-tertiary/30 rounded-xl text-tertiary text-xs font-bold flex items-center justify-between gap-2 shadow-md">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-base">visibility</span>
+                <span><strong>Lab Admin Mode:</strong> You have <strong>Read-Only Analytics Access</strong> to view lab summaries, attendance rates, and absentee logs.</span>
+              </div>
+              <span className="px-2.5 py-0.5 rounded bg-tertiary/20 text-tertiary text-[10px] font-mono font-bold uppercase shrink-0">Read-Only</span>
+            </div>
+          )}
+
+          {isAdmin && (
+            <div className="p-3 bg-primary/10 border border-primary/30 rounded-xl text-primary text-xs font-bold flex items-center justify-between gap-2 shadow-md">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-base">admin_panel_settings</span>
+                <span><strong>Full Admin Mode:</strong> Complete access to analytics, CSV reports, and system reset controls.</span>
+              </div>
+              <span className="px-2.5 py-0.5 rounded bg-primary/20 text-primary text-[10px] font-mono font-bold uppercase shrink-0">Full Control</span>
+            </div>
+          )}
           {/* Top KPI Metrics Tile Grid (Matching Navigation Tile Style) */}
           <div className="grid grid-cols-3 gap-2 sm:gap-3">
             {/* Tile 1: Absent Records */}
