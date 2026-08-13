@@ -52,11 +52,10 @@ function AdminDashboard() {
   useEffect(() => {
     const handleOverridesUpdate = () => {
       setCancelAvailableModules(getModulesForDate(cancelDate));
-      setLogModules(getModulesForDate(logDate));
     };
     window.addEventListener('schedule_overrides_updated', handleOverridesUpdate);
     return () => window.removeEventListener('schedule_overrides_updated', handleOverridesUpdate);
-  }, [cancelDate, logDate]);
+  }, [cancelDate]);
 
   const handleSaveDriveConfig = async (e) => {
     e.preventDefault();
@@ -79,18 +78,6 @@ function AdminDashboard() {
     }
     setTimeout(() => setStatusMsg(''), 5000);
   };
-
-  useEffect(() => {
-    const list = getModulesForDate(logDate);
-    setLogModules(list);
-    if (list.length > 0) {
-      setSelectedLogModule(list[0].module);
-      setConductedHours('2');
-    } else {
-      setSelectedLogModule('');
-      setConductedHours('');
-    }
-  }, [logDate]);
 
   useEffect(() => {
     const list = getModulesForDate(cancelDate);
