@@ -27,6 +27,7 @@ export const studentRegistry = [
   { regNo: 'EG/2023/120', name: 'R. P. Jayawardena', labGroup: 'Group C1', practicalSlot: 'Wed 08:30 - 11:30 (Measurement Lab)' }
 ];
 
+import { getStoredModuleHours, saveStoredModuleHours } from './moduleHoursData';
 import { pushDailyLogsToCloud, pushAuditLogsToCloud } from './firebaseSync';
 import { getSriLankaTimestampStr } from '../utils/dateUtils';
 
@@ -42,6 +43,36 @@ export const getStoredDailyLogs = () => {
 export const saveStoredDailyLogs = (logs) => {
   localStorage.setItem('mis_daily_logs', JSON.stringify(logs));
   pushDailyLogsToCloud(logs);
+};
+
+export const deleteDailyLogByModuleAndDate = (dateStr, moduleCode) => {
+  const currentLogs = getStoredDailyLogs();
+  const logsToDelete = currentLogs.filter(l => l.date === dateStr && l.module === moduleCode);
+  if (logsToDelete.length === 0) return false;
+
+  const totalHoursToSubtract = logsToDelete.reduce((sum, l) => sum + (Number(l.hours) || 0), 0);
+
+  // 1. Remove matching logs from mis_daily_logs
+  const updatedLogs = currentLogs.filter(l => !(l.date === dateStr && l.module === moduleCode));
+  saveStoredDailyLogs(updatedLogs);
+
+  // 2. Subtract conducted hours from mis_module_hours
+  const currentHours = getStoredModuleHours();
+  const updatedHours = currentHours.map(m => {
+    if (m.code === moduleCode) {
+      return { ...m, conductedHours: Math.max(0, m.conductedHours - totalHoursToSubtract) };
+    }
+    return m;
+  });
+  saveStoredModuleHours(updatedHours);
+
+  // 3. Add Audit Log
+  addAuditLog('Reset Conducted Status', `Reset/Removed conducted log for ${moduleCode} on ${dateStr} (-${totalHoursToSubtract} hrs)`);
+
+  window.dispatchEvent(new Event('daily_logs_updated'));
+  window.dispatchEvent(new Event('schedule_overrides_updated'));
+
+  return true;
 };
 
 export const getStoredAuditLogs = () => {

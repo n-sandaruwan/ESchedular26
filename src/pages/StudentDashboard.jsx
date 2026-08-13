@@ -12,7 +12,7 @@ import {
   updateNotice
 } from '../data/scheduleStore';
 import { getHolidayForDate } from '../data/sriLankaHolidaysData';
-import { getStoredDailyLogs, saveStoredDailyLogs, addAuditLog } from '../data/dailyLogsData';
+import { getStoredDailyLogs, saveStoredDailyLogs, deleteDailyLogByModuleAndDate, addAuditLog } from '../data/dailyLogsData';
 import { subscribeToCloudEvent } from '../data/firebaseSync';
 import SriLankanCalendarWidget from '../components/SriLankanCalendarWidget';
 import { getSriLankaDateObj, SEMESTER_START_DATE, getValidSemesterDateStr } from '../utils/dateUtils';
@@ -67,8 +67,13 @@ function StudentDashboard() {
       setCurrentTime(new Date());
     };
     window.addEventListener('schedule_overrides_updated', handleOverridesUpdate);
+    window.addEventListener('daily_logs_updated', handleOverridesUpdate);
 
     subscribeToCloudEvent('overrides', () => {
+      setCurrentTime(new Date());
+    });
+
+    subscribeToCloudEvent('daily_logs', () => {
       setCurrentTime(new Date());
     });
 
@@ -85,6 +90,7 @@ function StudentDashboard() {
     return () => {
       clearInterval(interval);
       window.removeEventListener('schedule_overrides_updated', handleOverridesUpdate);
+      window.removeEventListener('daily_logs_updated', handleOverridesUpdate);
     };
   }, []);
 
@@ -173,6 +179,23 @@ function StudentDashboard() {
     });
     setAdminActionMsg(`Re-canceled ${moduleCode} on ${selectedDate}`);
     setTimeout(() => setAdminActionMsg(''), 3500);
+  };
+
+  const handleResetConductedStatus = (moduleCode) => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Confirm Reset Conducted Status',
+      message: `Are you sure you want to RESET / REMOVE the conducted log for ${moduleCode} on ${selectedDate}? This will subtract the logged hours and revert the class status back.`,
+      btnText: 'Confirm Reset Log',
+      btnStyle: 'bg-orange-500 text-white hover:bg-orange-600 border-orange-500/50 shadow-[0_0_15px_rgba(249,115,22,0.3)]',
+      onConfirm: () => {
+        deleteDailyLogByModuleAndDate(selectedDate, moduleCode);
+        setAdminActionMsg(`Reset conducted log for ${moduleCode} on ${selectedDate}`);
+        setTimeout(() => setAdminActionMsg(''), 3500);
+        setConfirmModal({ isOpen: false, title: '', message: '', onConfirm: null });
+        setCurrentTime(new Date());
+      }
+    });
   };
 
   const handleQuickReschedule = (moduleCode) => {
@@ -663,6 +686,20 @@ function StudentDashboard() {
                               className="px-2.5 py-1 rounded bg-error/15 text-error border border-error/30 text-xs font-label-bold hover:bg-error/25 cursor-pointer flex items-center gap-1"
                             >
                               <span className="material-symbols-outlined text-xs">edit_note</span> Re-cancel / Edit Reason
+                            </button>
+                          </div>
+                        )}
+
+                        {/* Inline Admin Controls for Conducted Slots */}
+                        {isAdmin && !isHoliday && isDone && (
+                          <div className="mt-3 pt-3 border-t border-white/5 flex flex-wrap items-center justify-end gap-2">
+                            <span className="text-[10px] font-label-bold text-on-surface-variant mr-auto">Admin Controls (Conducted Class):</span>
+                            <button
+                              onClick={() => handleResetConductedStatus(slot.module)}
+                              className="px-2.5 py-1 rounded bg-orange-500/15 text-orange-400 border border-orange-500/30 text-xs font-label-bold hover:bg-orange-500/25 cursor-pointer shadow-[0_0_10px_rgba(249,115,22,0.2)] flex items-center gap-1"
+                              title="Reset conducted status and remove logged hours for this class"
+                            >
+                              <span className="material-symbols-outlined text-xs">restart_alt</span> Reset Conducted Status
                             </button>
                           </div>
                         )}

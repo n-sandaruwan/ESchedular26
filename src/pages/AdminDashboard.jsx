@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getStoredModuleHours, saveStoredModuleHours } from '../data/moduleHoursData';
-import { getStoredDailyLogs, saveStoredDailyLogs, addAuditLog } from '../data/dailyLogsData';
+import { getStoredDailyLogs, saveStoredDailyLogs, deleteDailyLogByModuleAndDate, addAuditLog } from '../data/dailyLogsData';
 import { getModulesForDate, modifyScheduleSlot, uncancelScheduleSlot, getStoredOverrides, addNotice } from '../data/scheduleStore';
 import { getSriLankaDateStr, getValidSemesterDateStr, SEMESTER_START_DATE } from '../utils/dateUtils';
 import { exportCompleteDatabaseJSON, restoreCompleteDatabaseJSON } from '../data/backupRestore';
@@ -247,6 +247,25 @@ function AdminDashboard() {
     setCancelAvailableModules(getModulesForDate(cancelDate));
   };
 
+  const handleResetLoggedLecture = (moduleCode) => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Confirm Reset Conducted Log',
+      message: `Are you sure you want to RESET / REMOVE the conducted log for ${moduleCode} on ${logDate}? This will subtract the logged hours and revert the class status.`,
+      btnText: 'Confirm Reset Log',
+      btnStyle: 'bg-orange-500 text-white hover:bg-orange-600 border-orange-500/50 shadow-[0_0_15px_rgba(249,115,22,0.3)]',
+      onConfirm: () => {
+        deleteDailyLogByModuleAndDate(logDate, moduleCode);
+        setStatusMsg(`Reset conducted log for ${moduleCode} on ${logDate}.`);
+        setTimeout(() => setStatusMsg(''), 4000);
+        setConfirmModal({ isOpen: false, title: '', message: '', onConfirm: null });
+        setLogModules(getModulesForDate(logDate));
+      }
+    });
+  };
+
+  const currentDailyLogsOnDate = getStoredDailyLogs().filter(l => l.date === logDate);
+
   const executeNoticeBroadcast = () => {
     addNotice(noticeTitle, noticeContent);
     addAuditLog('Notice Broadcast', `Posted announcement: "${noticeTitle}".`);
@@ -389,6 +408,43 @@ function AdminDashboard() {
         >
           Save Evening Lecture Log
         </button>
+
+        {/* Logged / Conducted Lectures on logDate */}
+        {getStoredDailyLogs().filter(l => l.date === logDate).length > 0 && (
+          <div className="pt-3 border-t border-white/5 space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="text-[11px] font-label-bold uppercase text-on-surface-variant flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-xs text-secondary">task_alt</span>
+                Logged Lectures on {logDate}
+              </span>
+              <span className="text-[10px] font-label-bold text-secondary bg-secondary/10 px-2 py-0.5 rounded">
+                {getStoredDailyLogs().filter(l => l.date === logDate).length} Logged
+              </span>
+            </div>
+
+            <div className="space-y-2">
+              {getStoredDailyLogs().filter(l => l.date === logDate).map((log, idx) => (
+                <div key={idx} className="p-3 rounded-lg bg-surface-container/60 border border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-xs text-on-surface">{log.module}</span>
+                      <span className="text-xs text-secondary font-label-bold">+{log.hours} hrs</span>
+                      {log.topic && <span className="text-xs text-on-surface-variant">— "{log.topic}"</span>}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleResetLoggedLecture(log.module)}
+                    className="px-2.5 py-1 rounded bg-orange-500/15 text-orange-400 border border-orange-500/30 text-xs font-label-bold hover:bg-orange-500/25 cursor-pointer flex items-center gap-1 shrink-0"
+                    title="Reset conducted log and subtract hours"
+                  >
+                    <span className="material-symbols-outlined text-xs">restart_alt</span> Reset Conducted Status
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </form>
 
       {/* SECONDARY SCHEDULE CONTROLS SECTION */}
