@@ -74,14 +74,50 @@ export const initialModuleHours = [
     code: 'EE3202',
     title: 'Data Structures and Algorithms',
     conductedHours: 0,
-    targetHours: 45,
+    targetHours: 38,
     weeklyHours: 3,
     venue: 'LT1 / LT2',
     credits: 2,
     coordinator: 'Dr. Kushan Sudheera',
     email: 'kushan@eie.ruh.ac.lk',
     teachers: ['Dr. Kushan Sudheera'],
-    gradingScheme: defaultGradingScheme
+    gradingScheme: [
+      {
+        category: 'Continuous Assessments (CA)',
+        weight: '60%',
+        components: [
+          { name: 'Mini Project', weight: '25%' },
+          { name: 'In-class Assessment', weight: '35%' }
+        ]
+      },
+      {
+        category: 'End Semester Examination',
+        weight: '40%',
+        components: [
+          { name: 'Written Examination', weight: '40%' }
+        ]
+      }
+    ],
+    passConditions: [
+      {
+        title: 'Continuous Assessment Minimum',
+        criteria: 'Earn at least 35% (i.e. 21 / 60 marks) of Continuous Assessment marks',
+        minPercentage: '35%',
+        minMarks: '21 / 60 Marks'
+      },
+      {
+        title: 'End Semester Examination Minimum',
+        criteria: 'Achieve at least 35% (i.e. 14 / 40 marks) allocated for End Semester Examination',
+        minPercentage: '35%',
+        minMarks: '14 / 40 Marks'
+      },
+      {
+        title: 'Overall Module Minimum',
+        criteria: 'Obtain an overall aggregate score of at least 40% (i.e. 40 / 100 total marks)',
+        minPercentage: '40%',
+        minMarks: '40 / 100 Marks'
+      }
+    ]
   },
   {
     code: 'EE3203',
