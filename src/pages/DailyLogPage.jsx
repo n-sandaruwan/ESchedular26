@@ -3,6 +3,8 @@ import { getStoredDailyLogs, saveStoredDailyLogs } from '../data/dailyLogsData';
 import { getStoredModuleHours, saveStoredModuleHours } from '../data/moduleHoursData';
 import { getSriLankaDateStr } from '../utils/dateUtils';
 
+import { subscribeToCloudEvent } from '../data/firebaseSync';
+
 function DailyLogPage() {
   const [logs, setLogs] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -10,7 +12,19 @@ function DailyLogPage() {
   const isAdmin = localStorage.getItem('mis_role') === 'admin';
 
   useEffect(() => {
-    setLogs(getStoredDailyLogs());
+    const refresh = () => setLogs(getStoredDailyLogs());
+    refresh();
+
+    window.addEventListener('daily_logs_updated', refresh);
+
+    const unsubscribe = subscribeToCloudEvent('daily_logs', (newLogs) => {
+      setLogs(newLogs);
+    });
+
+    return () => {
+      window.removeEventListener('daily_logs_updated', refresh);
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
   const handleDeleteLog = (id) => {

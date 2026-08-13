@@ -2,13 +2,29 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getStoredModuleHours } from '../data/moduleHoursData';
 
+import { subscribeToCloudEvent } from '../data/firebaseSync';
+
 function ModuleTrackerPage() {
   const navigate = useNavigate();
   const [modules, setModules] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    setModules(getStoredModuleHours());
+    const refresh = () => setModules(getStoredModuleHours());
+    refresh();
+
+    window.addEventListener('module_hours_updated', refresh);
+    window.addEventListener('daily_logs_updated', refresh);
+
+    const unsubscribe = subscribeToCloudEvent('module_hours', (newHours) => {
+      setModules(newHours);
+    });
+
+    return () => {
+      window.removeEventListener('module_hours_updated', refresh);
+      window.removeEventListener('daily_logs_updated', refresh);
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
   const filteredModules = modules.filter((mod) => {
