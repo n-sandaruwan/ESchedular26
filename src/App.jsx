@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import StudentDashboard from './pages/StudentDashboard';
 import AdminDashboard from './pages/AdminDashboard';
@@ -15,6 +15,16 @@ import DashboardLayout from './components/DashboardLayout';
 import './index.css';
 
 function App() {
+  useEffect(() => {
+    if (!localStorage.getItem('mis_clean_reset_v1')) {
+      localStorage.removeItem('mis_daily_logs');
+      localStorage.removeItem('mis_module_hours');
+      localStorage.setItem('mis_clean_reset_v1', 'true');
+      window.dispatchEvent(new Event('daily_logs_updated'));
+      window.dispatchEvent(new Event('module_hours_updated'));
+    }
+  }, []);
+
   return (
     <Router>
       <Routes>

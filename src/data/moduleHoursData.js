@@ -22,7 +22,7 @@ export const initialModuleHours = [
   {
     code: 'EE3301',
     title: 'Analog Electronics',
-    conductedHours: 1,
+    conductedHours: 0,
     targetHours: 45,
     weeklyHours: 3,
     venue: 'LT2 / NCC',
@@ -35,7 +35,7 @@ export const initialModuleHours = [
   {
     code: 'EE3202',
     title: 'Data Structures and Algorithms',
-    conductedHours: 3,
+    conductedHours: 0,
     targetHours: 45,
     weeklyHours: 3,
     venue: 'LT1 / LT2',
@@ -48,7 +48,7 @@ export const initialModuleHours = [
   {
     code: 'EE3203',
     title: 'Electrical and Electronic Measurements',
-    conductedHours: 2,
+    conductedHours: 0,
     targetHours: 30,
     weeklyHours: 2,
     venue: 'NCC',
@@ -61,7 +61,7 @@ export const initialModuleHours = [
   {
     code: 'EE3304',
     title: 'Engineering Electromagnetism',
-    conductedHours: 2,
+    conductedHours: 0,
     targetHours: 45,
     weeklyHours: 3,
     venue: 'NLH2 / NCC',
@@ -74,7 +74,7 @@ export const initialModuleHours = [
   {
     code: 'EE3205',
     title: 'Power and Energy',
-    conductedHours: 2,
+    conductedHours: 0,
     targetHours: 27,
     weeklyHours: 2,
     venue: 'LT1',
@@ -119,7 +119,7 @@ export const initialModuleHours = [
   {
     code: 'EE3306',
     title: 'Signals and Systems',
-    conductedHours: 1,
+    conductedHours: 0,
     targetHours: 45,
     weeklyHours: 3,
     venue: 'LT2 / NCC',
@@ -132,7 +132,7 @@ export const initialModuleHours = [
   {
     code: 'IS3301',
     title: 'Complex Analysis and Mathematical Transforms',
-    conductedHours: 2,
+    conductedHours: 0,
     targetHours: 45,
     weeklyHours: 3,
     venue: 'AUD',
@@ -161,7 +161,7 @@ export const initialModuleHours = [
   {
     code: 'IS3321',
     title: 'Fundamentals of Management for Engineers',
-    conductedHours: 2,
+    conductedHours: 0,
     targetHours: 45,
     weeklyHours: 3,
     venue: 'AUD',
@@ -194,17 +194,7 @@ const getRawDailyLogs = () => {
       if (Array.isArray(parsed)) return parsed;
     } catch (e) {}
   }
-  return [
-    { id: 1, date: '2026-07-27', module: 'EE3203', hours: 2, topic: 'Introduction & Measurement Errors', venue: 'NCC', instructor: 'Dr. Fernando' },
-    { id: 2, date: '2026-07-27', module: 'EE3202', hours: 1, topic: 'Array & Linked List Fundamentals', venue: 'LT1', instructor: 'Dr. Perera' },
-    { id: 3, date: '2026-07-27', module: 'EE3304', hours: 2, topic: 'Electrostatics & Coulomb\'s Law', venue: 'NLH2', instructor: 'Prof. Silva' },
-    { id: 4, date: '2026-07-27', module: 'IS3301', hours: 2, topic: 'Complex Numbers & Functions', venue: 'AUD', instructor: 'Dr. Jayawardena' },
-    { id: 5, date: '2026-07-28', module: 'EE3306', hours: 1, topic: 'Signals & Continuous Systems Overview', venue: 'LT2', instructor: 'Dr. Fernando' },
-    { id: 6, date: '2026-07-28', module: 'EE3202', hours: 2, topic: 'Stack & Queue ADT Implementation', venue: 'LT2', instructor: 'Dr. Perera' },
-    { id: 7, date: '2026-07-28', module: 'IS3321', hours: 2, topic: 'Management Principles for Engineers', venue: 'AUD', instructor: 'Ms. Bandara' },
-    { id: 8, date: '2026-07-28', module: 'EE3205', hours: 2, topic: 'Power Systems & Energy Sources', venue: 'LT1', instructor: 'Prof. Silva' },
-    { id: 9, date: '2026-07-28', module: 'EE3301', hours: 1, topic: 'Diode Circuits & Rectifiers', venue: 'LT2', instructor: 'Dr. Perera' }
-  ];
+  return [];
 };
 
 export const getStoredModuleHours = () => {
