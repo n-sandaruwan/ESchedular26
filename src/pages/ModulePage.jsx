@@ -3,7 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import { getStoredModuleHours, saveStoredModuleHours } from '../data/moduleHoursData';
 import { weeklyTimetable } from '../data/timetableData';
 import { getStoredAssessments, toggleAssessmentStatus } from '../data/assessmentData';
-import { getStoredOverrides } from '../data/scheduleStore';
+import { getStoredOverrides, uncancelScheduleSlot, modifyScheduleSlot } from '../data/scheduleStore';
+import { subscribeToCloudEvent } from '../data/firebaseSync';
 import { getSriLankaDateObj } from '../utils/dateUtils';
 
 function ModulePage() {
@@ -13,7 +14,7 @@ function ModulePage() {
   const [assessments, setAssessments] = useState([]);
   const [canceledSessions, setCanceledSessions] = useState([]);
 
-  useEffect(() => {
+  const refreshModuleData = () => {
     const list = getStoredModuleHours();
     setModules(list);
     const match = list.find(m => m.code === moduleId) || list[0];
@@ -25,7 +26,37 @@ function ModulePage() {
       .filter(o => o.module === (match?.code || moduleId) && o.status === 'Canceled')
       .sort((a, b) => new Date(a.date) - new Date(b.date));
     setCanceledSessions(canceled);
+  };
+
+  useEffect(() => {
+    refreshModuleData();
+
+    window.addEventListener('schedule_overrides_updated', refreshModuleData);
+    subscribeToCloudEvent('overrides', refreshModuleData);
+
+    return () => {
+      window.removeEventListener('schedule_overrides_updated', refreshModuleData);
+    };
   }, [moduleId]);
+
+  const handleUncancelSession = (sessionDate, moduleCode) => {
+    if (window.confirm(`Are you sure you want to RESTORE / UN-CANCEL the ${moduleCode} session on ${sessionDate}?`)) {
+      uncancelScheduleSlot({ date: sessionDate, module: moduleCode, reason: 'Restored via Module Page' });
+      refreshModuleData();
+    }
+  };
+
+  const handleRecancelSession = (sessionDate, moduleCode, currentReason) => {
+    const newReason = prompt(`Re-cancel ${moduleCode} on ${sessionDate}.\nEnter updated cancellation reason:`, currentReason || 'Lecturer unavailable');
+    if (newReason === null) return;
+    modifyScheduleSlot({
+      date: sessionDate,
+      module: moduleCode,
+      status: 'Canceled',
+      reason: newReason || 'Lecturer unavailable'
+    });
+    refreshModuleData();
+  };
 
   const role = localStorage.getItem('mis_role');
   const isAdmin = role === 'admin';
@@ -514,6 +545,25 @@ function ModulePage() {
                 {session.reason && (
                   <div className="pt-2 border-t border-white/5 text-xs">
                     <p className="text-on-surface-variant italic">"{session.reason}"</p>
+                  </div>
+                )}
+
+                {isAdmin && (
+                  <div className="pt-2 border-t border-white/5 flex items-center justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleUncancelSession(session.date, selectedModule.code)}
+                      className="px-2.5 py-1 rounded bg-secondary/15 text-secondary border border-secondary/30 text-xs font-label-bold hover:bg-secondary/25 cursor-pointer flex items-center gap-1"
+                    >
+                      <span className="material-symbols-outlined text-xs">undo</span> Un-cancel / Restore
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleRecancelSession(session.date, selectedModule.code, session.reason)}
+                      className="px-2.5 py-1 rounded bg-error/15 text-error border border-error/30 text-xs font-label-bold hover:bg-error/25 cursor-pointer flex items-center gap-1"
+                    >
+                      <span className="material-symbols-outlined text-xs">edit_note</span> Re-cancel
+                    </button>
                   </div>
                 )}
               </div>

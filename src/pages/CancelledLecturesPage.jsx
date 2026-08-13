@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getStoredOverrides, getModulesForDate } from '../data/scheduleStore';
+import { getStoredOverrides, getModulesForDate, uncancelScheduleSlot, modifyScheduleSlot } from '../data/scheduleStore';
 import { sriLankaHolidays2026 } from '../data/sriLankaHolidaysData';
 import { getSriLankaDateStr } from '../utils/dateUtils';
+import { subscribeToCloudEvent } from '../data/firebaseSync';
 
 function CancelledLecturesPage() {
   const [cancellations, setCancellations] = useState([]);
   const [filter, setFilter] = useState('ALL'); // ALL, PAST, FUTURE
 
-  useEffect(() => {
+  const role = localStorage.getItem('mis_role');
+  const isAdmin = role === 'admin';
+
+  const loadCancellations = () => {
     const today = getSriLankaDateStr();
     
     // 1. Get Holiday Cancellations
@@ -25,20 +29,20 @@ function CancelledLecturesPage() {
         const modules = getModulesForDate(holiday.date).filter(m => m.status !== 'Swapped' && m.status !== 'Rescheduled' || (m.status === 'Canceled'));
         
         if (modules.length > 0) {
-        holidayCancellationsMap.set(holiday.date, {
-          id: `hol-${holiday.date}`,
-          date: holiday.date,
-          title: holiday.name,
-          type: 'Holiday',
-          icon: holiday.icon,
-          isPoya: holiday.isPoya,
-          isPast: holiday.date < today,
-          isToday: holiday.date === today,
-          modules: modules.map(m => ({
-            ...m,
-            cancelReason: `${holiday.type} - Physical lectures cancelled.`
-          }))
-        });
+          holidayCancellationsMap.set(holiday.date, {
+            id: `hol-${holiday.date}`,
+            date: holiday.date,
+            title: holiday.name,
+            type: 'Holiday',
+            icon: holiday.icon,
+            isPoya: holiday.isPoya,
+            isPast: holiday.date < today,
+            isToday: holiday.date === today,
+            modules: modules.map(m => ({
+              ...m,
+              cancelReason: `${holiday.type} - Physical lectures cancelled.`
+            }))
+          });
         }
       }
     });
@@ -53,18 +57,14 @@ function CancelledLecturesPage() {
       // Only include overrides within the semester period
       if (date >= semesterStart && date <= semesterEnd) {
         if (holidayCancellationsMap.has(date)) {
-          // If it's already a holiday, just append to existing or skip if it's 'ALL'
           const existing = holidayCancellationsMap.get(date);
           if (o.module !== 'ALL') {
-             // It's already fetched via getModulesForDate above since getModulesForDate includes overrides
-             // Let's just update the reason if needed
              const mod = existing.modules.find(m => m.module === o.module);
              if (mod) {
                mod.cancelReason = o.reason || 'Cancelled by Admin';
              }
           }
         } else {
-          // Create new admin cancellation entry for this date
           if (!adminCancellationsMap.has(date)) {
             adminCancellationsMap.set(date, {
               id: `admin-${date}`,
@@ -81,14 +81,12 @@ function CancelledLecturesPage() {
           const entry = adminCancellationsMap.get(date);
           
           if (o.module === 'ALL') {
-            // Fetch all base modules for this day
             const allModules = getModulesForDate(date);
             entry.modules = allModules.map(m => ({
               ...m,
               cancelReason: o.reason || 'Cancelled by Admin'
             }));
           } else {
-            // Find specific module info or create fallback
             const allModulesForDay = getModulesForDate(date);
             const specificModule = allModulesForDay.find(m => m.module === o.module) || {
               module: o.module,
@@ -97,8 +95,7 @@ function CancelledLecturesPage() {
               hall: o.venue || 'N/A'
             };
             
-            // prevent duplicates
-            if (!entry.modules.find(m => m.module === o.module)) {
+            if (!entry.modules.some(m => m.module === o.module)) {
               entry.modules.push({
                 ...specificModule,
                 cancelReason: o.reason || 'Cancelled by Admin'
@@ -109,12 +106,40 @@ function CancelledLecturesPage() {
       }
     });
 
-    // Merge and Sort chronologically (oldest first)
-    const allCancellations = [...holidayCancellationsMap.values(), ...adminCancellationsMap.values()];
-    allCancellations.sort((a, b) => a.date.localeCompare(b.date));
-    
-    setCancellations(allCancellations);
+    const combined = [...Array.from(holidayCancellationsMap.values()), ...Array.from(adminCancellationsMap.values())];
+    combined.sort((a, b) => new Date(a.date) - new Date(b.date));
+    setCancellations(combined);
+  };
+
+  useEffect(() => {
+    loadCancellations();
+
+    window.addEventListener('schedule_overrides_updated', loadCancellations);
+    subscribeToCloudEvent('overrides', loadCancellations);
+
+    return () => {
+      window.removeEventListener('schedule_overrides_updated', loadCancellations);
+    };
   }, []);
+
+  const handleUncancelFromPage = (dateStr, moduleCode) => {
+    if (window.confirm(`Are you sure you want to RESTORE / UN-CANCEL ${moduleCode} on ${dateStr}?`)) {
+      uncancelScheduleSlot({ date: dateStr, module: moduleCode, reason: 'Restored via Cancelled Lectures Page' });
+      loadCancellations();
+    }
+  };
+
+  const handleRecancelFromPage = (dateStr, moduleCode, currentReason) => {
+    const newReason = prompt(`Re-cancel ${moduleCode} on ${dateStr}.\nEnter updated cancellation reason:`, currentReason || 'Lecturer unavailable');
+    if (newReason === null) return;
+    modifyScheduleSlot({
+      date: dateStr,
+      module: moduleCode,
+      status: 'Canceled',
+      reason: newReason || 'Lecturer unavailable'
+    });
+    loadCancellations();
+  };
 
   const filteredCancellations = cancellations.filter(c => {
     if (filter === 'PAST') return c.isPast;
@@ -237,11 +262,32 @@ function CancelledLecturesPage() {
                             {mod.hall || mod.venue}
                           </span>
                           
-                          <div className="mt-1 pt-3 border-t border-error/10 flex items-start gap-2">
-                            <span className="material-symbols-outlined text-[16px] text-error shrink-0">error</span>
-                            <p className="text-xs font-body-md text-error/90 leading-tight">
-                              {mod.cancelReason || 'Session Cancelled'}
-                            </p>
+                          <div className="mt-1 pt-3 border-t border-error/10 flex flex-col gap-2">
+                            <div className="flex items-start gap-2">
+                              <span className="material-symbols-outlined text-[16px] text-error shrink-0">error</span>
+                              <p className="text-xs font-body-md text-error/90 leading-tight">
+                                {mod.cancelReason || 'Session Cancelled'}
+                              </p>
+                            </div>
+
+                            {isAdmin && item.type === 'Manual' && (
+                              <div className="flex items-center justify-end gap-1.5 pt-2 border-t border-white/5">
+                                <button
+                                  type="button"
+                                  onClick={() => handleUncancelFromPage(item.date, mod.module)}
+                                  className="px-2.5 py-1 rounded bg-secondary/15 text-secondary border border-secondary/30 text-[11px] font-label-bold hover:bg-secondary/25 cursor-pointer flex items-center gap-1"
+                                >
+                                  <span className="material-symbols-outlined text-[13px]">undo</span> Un-cancel / Restore
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleRecancelFromPage(item.date, mod.module, mod.cancelReason)}
+                                  className="px-2.5 py-1 rounded bg-error/15 text-error border border-error/30 text-[11px] font-label-bold hover:bg-error/25 cursor-pointer flex items-center gap-1"
+                                >
+                                  <span className="material-symbols-outlined text-[13px]">edit_note</span> Re-cancel
+                                </button>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>

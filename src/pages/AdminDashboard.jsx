@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getStoredModuleHours, saveStoredModuleHours } from '../data/moduleHoursData';
 import { getStoredDailyLogs, saveStoredDailyLogs, addAuditLog } from '../data/dailyLogsData';
-import { getModulesForDate, modifyScheduleSlot, addNotice } from '../data/scheduleStore';
+import { getModulesForDate, modifyScheduleSlot, uncancelScheduleSlot, getStoredOverrides, addNotice } from '../data/scheduleStore';
 import { getSriLankaDateStr, getValidSemesterDateStr, SEMESTER_START_DATE } from '../utils/dateUtils';
 import { exportCompleteDatabaseJSON, restoreCompleteDatabaseJSON } from '../data/backupRestore';
 import {
@@ -19,7 +19,7 @@ function AdminDashboard() {
   const [logDate, setLogDate] = useState(getValidSemesterDateStr());
   const [logModules, setLogModules] = useState([]);
   const [selectedLogModule, setSelectedLogModule] = useState('');
-  const [conductedHours, setConductedHours] = useState('');
+  const [conductedHours, setConductedHours] = useState('2');
   const [logNote, setLogNote] = useState('');
 
   const [reschedTargetModule, setReschedTargetModule] = useState('');
@@ -37,6 +37,11 @@ function AdminDashboard() {
   const [noticeTitle, setNoticeTitle] = useState('');
   const [noticeContent, setNoticeContent] = useState('');
 
+  const [sheetCsvUrl, setSheetCsvUrl] = useState(getStoredSheetCsvUrl());
+  const [sheetWebhookUrl, setSheetWebhookUrl] = useState(getStoredSheetWebhookUrl());
+  const [isDriveSyncing, setIsDriveSyncing] = useState(false);
+  const [showScriptModal, setShowScriptModal] = useState(false);
+
   const [statusMsg, setStatusMsg] = useState('');
   const [conflictWarning, setConflictWarning] = useState('');
 
@@ -50,11 +55,14 @@ function AdminDashboard() {
     onConfirm: null
   });
 
-  // Google Sheets & Drive Integration State
-  const [sheetCsvUrl, setSheetCsvUrl] = useState(getStoredSheetCsvUrl());
-  const [sheetWebhookUrl, setSheetWebhookUrl] = useState(getStoredSheetWebhookUrl());
-  const [isDriveSyncing, setIsDriveSyncing] = useState(false);
-  const [showScriptModal, setShowScriptModal] = useState(false);
+  useEffect(() => {
+    const handleOverridesUpdate = () => {
+      setCancelAvailableModules(getModulesForDate(cancelDate));
+      setLogModules(getModulesForDate(logDate));
+    };
+    window.addEventListener('schedule_overrides_updated', handleOverridesUpdate);
+    return () => window.removeEventListener('schedule_overrides_updated', handleOverridesUpdate);
+  }, [cancelDate, logDate]);
 
   const handleSaveDriveConfig = async (e) => {
     e.preventDefault();
@@ -202,6 +210,41 @@ function AdminDashboard() {
       btnStyle: 'bg-error text-on-error hover:bg-error/90 border-error/50 shadow-[0_0_15px_rgba(244,63,94,0.3)]',
       onConfirm: () => executeCancellation()
     });
+  };
+
+  const handleUncancelLecture = (moduleCode) => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Confirm Un-cancel / Restore Lecture',
+      message: `Are you sure you want to RESTORE / UN-CANCEL ${moduleCode} on ${cancelDate}? This will remove the cancellation override and reactivate the class.`,
+      btnText: 'Confirm Un-cancel',
+      btnStyle: 'bg-secondary text-on-secondary hover:bg-secondary/90 border-secondary/50 shadow-[0_0_15px_rgba(78,222,163,0.3)]',
+      onConfirm: () => {
+        uncancelScheduleSlot({
+          date: cancelDate,
+          module: moduleCode,
+          reason: 'Restored by Admin via Control Panel'
+        });
+        setStatusMsg(`Successfully Un-canceled / Restored ${moduleCode} on ${cancelDate}!`);
+        setTimeout(() => setStatusMsg(''), 4000);
+        setConfirmModal({ isOpen: false, title: '', message: '', onConfirm: null });
+        setCancelAvailableModules(getModulesForDate(cancelDate));
+      }
+    });
+  };
+
+  const handleRecancelLecture = (moduleCode, currentReason = '') => {
+    const newReason = prompt(`Re-cancel ${moduleCode} on ${cancelDate}.\nEnter updated cancellation reason:`, currentReason || 'Lecturer unavailable');
+    if (newReason === null) return;
+    modifyScheduleSlot({
+      date: cancelDate,
+      module: moduleCode,
+      status: 'Canceled',
+      reason: newReason || 'Lecturer unavailable'
+    });
+    setStatusMsg(`Re-canceled ${moduleCode} on ${cancelDate} with updated reason.`);
+    setTimeout(() => setStatusMsg(''), 4000);
+    setCancelAvailableModules(getModulesForDate(cancelDate));
   };
 
   const executeNoticeBroadcast = () => {
@@ -547,68 +590,122 @@ function AdminDashboard() {
 
         {/* TAB 2: Inside Cancellation Tool Panel */}
         {activeTab === 'cancel' && (
-          <form onSubmit={handleCancellationSubmit} className="glass-card p-stack-md rounded-xl flex flex-col gap-4 border-t-4 border-t-error">
-            <div>
-              <h4 className="font-headline-md text-base font-bold text-on-surface flex items-center gap-2">
-                <span className="material-symbols-outlined text-error">event_busy</span> Cancellation Tool Panel
-              </h4>
-              <p className="text-xs text-on-surface-variant mt-0.5">Select a date to view active scheduled modules and call off a lecture.</p>
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <label className="text-[11px] font-label-bold uppercase text-on-surface-variant">1. Select Cancellation Date (Calendar)</label>
-              <div className="relative flex items-center">
-                <input
-                  className={`${inputClasses} pr-10`}
-                  type="date"
-                  min={SEMESTER_START_DATE}
-                  required
-                  value={cancelDate}
-                  onChange={e => setCancelDate(e.target.value)}
-                  onClick={e => e.target.showPicker && e.target.showPicker()}
-                />
-                <span
-                  onClick={(e) => {
-                    const input = e.currentTarget.previousElementSibling;
-                    if (input && input.showPicker) input.showPicker();
-                  }}
-                  className="material-symbols-outlined absolute right-3 text-error cursor-pointer text-base pointer-events-auto"
-                >
-                  calendar_month
-                </span>
+          <div className="space-y-4">
+            <form onSubmit={handleCancellationSubmit} className="glass-card p-stack-md rounded-xl flex flex-col gap-4 border-t-4 border-t-error">
+              <div>
+                <h4 className="font-headline-md text-base font-bold text-on-surface flex items-center gap-2">
+                  <span className="material-symbols-outlined text-error">event_busy</span> Cancellation Tool Panel
+                </h4>
+                <p className="text-xs text-on-surface-variant mt-0.5">Select a date to view active scheduled modules and call off a lecture, or restore/re-cancel existing slots below.</p>
               </div>
-            </div>
 
-            <div className="flex flex-col gap-1">
-              <label className="text-[11px] font-label-bold uppercase text-on-surface-variant">
-                2. Scheduled Modules on {cancelDate}
-              </label>
-              <select className={inputClasses} required value={selectedCancelModule} onChange={e => setSelectedCancelModule(e.target.value)}>
-                {cancelAvailableModules.length === 0 ? (
-                  <option value="">No active classes scheduled on this date</option>
-                ) : (
-                  cancelAvailableModules.map((m, idx) => (
-                    <option key={idx} value={m.module}>
-                      {m.module} - {m.name || m.module} ({m.time}) {m.status !== 'Scheduled' ? `[Status: ${m.status}]` : '[Default Slot]'}
-                    </option>
-                  ))
-                )}
-              </select>
-            </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-[11px] font-label-bold uppercase text-on-surface-variant">1. Select Cancellation Date (Calendar)</label>
+                <div className="relative flex items-center">
+                  <input
+                    className={`${inputClasses} pr-10`}
+                    type="date"
+                    min={SEMESTER_START_DATE}
+                    required
+                    value={cancelDate}
+                    onChange={e => setCancelDate(e.target.value)}
+                    onClick={e => e.target.showPicker && e.target.showPicker()}
+                  />
+                  <span
+                    onClick={(e) => {
+                      const input = e.currentTarget.previousElementSibling;
+                      if (input && input.showPicker) input.showPicker();
+                    }}
+                    className="material-symbols-outlined absolute right-3 text-error cursor-pointer text-base pointer-events-auto"
+                  >
+                    calendar_month
+                  </span>
+                </div>
+              </div>
 
-            <div className="flex flex-col gap-1">
-              <label className="text-[11px] font-label-bold uppercase text-on-surface-variant">3. Reason for Cancellation</label>
-              <input className={inputClasses} placeholder="e.g. Lecturer out on official duty" required value={cancelRemark} onChange={e => setCancelRemark(e.target.value)} />
-            </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-[11px] font-label-bold uppercase text-on-surface-variant">
+                  2. Scheduled Modules on {cancelDate}
+                </label>
+                <select className={inputClasses} required value={selectedCancelModule} onChange={e => setSelectedCancelModule(e.target.value)}>
+                  {cancelAvailableModules.filter(m => m.status !== 'Canceled').length === 0 ? (
+                    <option value="">No active classes scheduled on this date (or all already canceled)</option>
+                  ) : (
+                    cancelAvailableModules.filter(m => m.status !== 'Canceled').map((m, idx) => (
+                      <option key={idx} value={m.module}>
+                        {m.module} - {m.name || m.module} ({m.time}) {m.status !== 'Scheduled' ? `[Status: ${m.status}]` : '[Default Slot]'}
+                      </option>
+                    ))
+                  )}
+                </select>
+              </div>
 
-            <button
-              type="submit"
-              disabled={!selectedCancelModule}
-              className="border border-error text-error hover:bg-error/10 py-3 rounded-lg font-label-bold text-xs uppercase tracking-wider cursor-pointer disabled:opacity-50"
-            >
-              Confirm Lecture Cancellation
-            </button>
-          </form>
+              <div className="flex flex-col gap-1">
+                <label className="text-[11px] font-label-bold uppercase text-on-surface-variant">3. Reason for Cancellation</label>
+                <input className={inputClasses} placeholder="e.g. Lecturer out on official duty" required value={cancelRemark} onChange={e => setCancelRemark(e.target.value)} />
+              </div>
+
+              <button
+                type="submit"
+                disabled={!selectedCancelModule}
+                className="border border-error text-error hover:bg-error/10 py-3 rounded-lg font-label-bold text-xs uppercase tracking-wider cursor-pointer disabled:opacity-50"
+              >
+                Confirm Lecture Cancellation
+              </button>
+            </form>
+
+            {/* Currently Canceled / Modified Slots for cancelDate */}
+            {cancelAvailableModules.filter(m => m.status === 'Canceled').length > 0 && (
+              <div className="glass-card p-stack-md rounded-xl flex flex-col gap-3 border-t-4 border-t-secondary bg-secondary/5">
+                <div className="flex justify-between items-center pb-2 border-b border-white/5">
+                  <div>
+                    <h5 className="font-bold text-sm text-on-surface flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-secondary text-sm">history_toggle_off</span>
+                      Currently Canceled Lectures on {cancelDate}
+                    </h5>
+                    <p className="text-[11px] text-on-surface-variant">Restore or edit reasons for canceled classes on this date.</p>
+                  </div>
+                  <span className="text-xs font-label-bold text-error bg-error/10 px-2 py-0.5 rounded border border-error/20">
+                    {cancelAvailableModules.filter(m => m.status === 'Canceled').length} Canceled
+                  </span>
+                </div>
+
+                <div className="space-y-2">
+                  {cancelAvailableModules.filter(m => m.status === 'Canceled').map((slot, idx) => (
+                    <div key={idx} className="p-3 rounded-lg bg-surface-container border border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-xs text-on-surface">{slot.module}</span>
+                          <span className="text-xs text-on-surface-variant">({slot.time})</span>
+                          <span className="text-[10px] font-label-bold text-error bg-error/10 px-2 py-0.5 rounded">Canceled</span>
+                        </div>
+                        {slot.reason && (
+                          <p className="text-[11px] text-error/80 italic mt-0.5">Reason: "{slot.reason}"</p>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => handleUncancelLecture(slot.module)}
+                          className="px-3 py-1.5 rounded-lg bg-secondary/15 border border-secondary/30 text-secondary hover:bg-secondary/25 text-xs font-label-bold flex items-center gap-1 cursor-pointer"
+                        >
+                          <span className="material-symbols-outlined text-xs">undo</span> Un-cancel / Restore
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleRecancelLecture(slot.module, slot.reason)}
+                          className="px-3 py-1.5 rounded-lg bg-error/15 border border-error/30 text-error hover:bg-error/25 text-xs font-label-bold flex items-center gap-1 cursor-pointer"
+                        >
+                          <span className="material-symbols-outlined text-xs">edit_note</span> Re-cancel / Edit Reason
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         )}
 
         {/* TAB 3: Inside Notice Tool Panel */}

@@ -35,6 +35,7 @@ export const saveStoredOverrides = (overrides) => {
   if (Array.isArray(overrides)) {
     overrides.forEach(o => pushOverrideToCloud(o));
   }
+  window.dispatchEvent(new Event('schedule_overrides_updated'));
 };
 
 // Initial Notices Feed
@@ -110,7 +111,6 @@ export const parseTimeRangeToMinutes = (timeStr) => {
     if (isPM && h < 12) h += 12;
     if (isAM && h === 12) h = 0;
 
-    // Heuristic: If 1 <= h <= 7 without explicit AM/PM, treat as afternoon/evening PM
     if (!isPM && !isAM && h >= 1 && h <= 7) {
       h += 12;
     }
@@ -203,12 +203,35 @@ export const getModulesForDate = (dateStr) => {
   return result;
 };
 
+// Function: Un-cancel / Restore a Canceled Lecture
+export const uncancelScheduleSlot = ({ date, module, reason = '' }) => {
+  const currentOverrides = getStoredOverrides();
+  const updatedOverrides = currentOverrides.filter(o => !(o.date === date && (o.module === module || o.module === 'ALL')));
+  saveStoredOverrides(updatedOverrides);
+
+  // Broadcast Restoration Notice
+  const noticeTitle = `✅ LECTURE RESTORED: ${module} (${date})`;
+  const noticeContent = `The ${module} lecture scheduled for ${date} has been RESTORED / UN-CANCELED. ${reason ? 'Note: ' + reason : 'Regular class schedule applies.'}`;
+  addNotice(noticeTitle, noticeContent, 'Announcement', date);
+
+  // Audit Trail
+  addAuditLog('Schedule Restored', `Restored/Un-canceled ${module} on ${date}. ${reason ? 'Details: ' + reason : 'Regular schedule restored.'}`);
+
+  return updatedOverrides;
+};
+
 // Function: Reschedule / Cancel / Swap a Lecture (Admin Action)
 export const modifyScheduleSlot = ({ date, module, status, newTime = '', newVenue = '', reason = '', swapModule = '' }) => {
+  if (status === 'Scheduled' || status === 'Restored' || status === 'Uncanceled') {
+    return uncancelScheduleSlot({ date, module, reason });
+  }
+
   const currentOverrides = getStoredOverrides();
+  const existingOverride = currentOverrides.find(o => o.date === date && o.module === module);
+  const isRecancel = existingOverride && existingOverride.status === 'Canceled';
 
   const newOverride = {
-    id: Date.now(),
+    id: existingOverride ? existingOverride.id : Date.now(),
     date,
     module,
     status,
@@ -227,8 +250,8 @@ export const modifyScheduleSlot = ({ date, module, status, newTime = '', newVenu
   let noticeContent = '';
 
   if (status === 'Canceled') {
-    noticeTitle = `⚠️ LECTURE CANCELED: ${module} (${date})`;
-    noticeContent = `The ${module} lecture scheduled for ${date} has been CANCELED. ${reason ? 'Reason: ' + reason : ''}`;
+    noticeTitle = isRecancel ? `⚠️ LECTURE RE-CANCELED: ${module} (${date})` : `⚠️ LECTURE CANCELED: ${module} (${date})`;
+    noticeContent = `The ${module} lecture scheduled for ${date} has been ${isRecancel ? 'RE-CANCELED with updated details' : 'CANCELED'}. ${reason ? 'Reason: ' + reason : ''}`;
   } else if (status === 'Rescheduled') {
     noticeTitle = `🔄 LECTURE RESCHEDULED: ${module}`;
     noticeContent = `The ${module} lecture for ${date} has been RESCHEDULED to ${newTime} at venue ${newVenue}.`;

@@ -7,6 +7,7 @@ import {
   getDayNameFromDate, 
   exportSemesterScheduleCSV,
   modifyScheduleSlot,
+  uncancelScheduleSlot,
   removeNotice,
   updateNotice
 } from '../data/scheduleStore';
@@ -62,6 +63,11 @@ function StudentDashboard() {
     setModuleHours(getStoredModuleHours());
     setNotices(getStoredNotices());
 
+    const handleOverridesUpdate = () => {
+      setCurrentTime(new Date());
+    };
+    window.addEventListener('schedule_overrides_updated', handleOverridesUpdate);
+
     subscribeToCloudEvent('overrides', () => {
       setCurrentTime(new Date());
     });
@@ -76,7 +82,10 @@ function StudentDashboard() {
       setModuleHours(getStoredModuleHours());
     }, 1000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('schedule_overrides_updated', handleOverridesUpdate);
+    };
   }, []);
 
   const getGreeting = () => {
@@ -131,6 +140,39 @@ function StudentDashboard() {
         setConfirmModal({ isOpen: false, title: '', message: '', onConfirm: null });
       }
     });
+  };
+
+  const handleQuickUncancelClass = (moduleCode) => {
+    setConfirmModal({
+      isOpen: true,
+      title: 'Confirm Restore / Un-cancel Lecture',
+      message: `Are you sure you want to RESTORE / UN-CANCEL the ${moduleCode} lecture on ${selectedDate}? This will reinstate the class back to Scheduled status.`,
+      btnText: 'Confirm Un-cancel',
+      btnStyle: 'bg-secondary text-on-secondary hover:bg-secondary/90 border-secondary/50 shadow-[0_0_15px_rgba(78,222,163,0.3)]',
+      onConfirm: () => {
+        uncancelScheduleSlot({
+          date: selectedDate,
+          module: moduleCode,
+          reason: 'Restored via Quick Admin Action on Daily Dashboard'
+        });
+        setAdminActionMsg(`Restored / Un-canceled ${moduleCode} on ${selectedDate}`);
+        setTimeout(() => setAdminActionMsg(''), 3500);
+        setConfirmModal({ isOpen: false, title: '', message: '', onConfirm: null });
+      }
+    });
+  };
+
+  const handleQuickRecancelClass = (moduleCode, currentReason = '') => {
+    const newReason = prompt(`Re-cancel ${moduleCode} on ${selectedDate}.\nEnter updated cancellation reason:`, currentReason || 'Lecturer unavailable');
+    if (newReason === null) return;
+    modifyScheduleSlot({
+      date: selectedDate,
+      module: moduleCode,
+      status: 'Canceled',
+      reason: newReason || 'Lecturer unavailable'
+    });
+    setAdminActionMsg(`Re-canceled ${moduleCode} on ${selectedDate}`);
+    setTimeout(() => setAdminActionMsg(''), 3500);
   };
 
   const handleQuickReschedule = (moduleCode) => {
@@ -602,6 +644,25 @@ function StudentDashboard() {
                               className="px-2.5 py-1 rounded bg-error/10 text-error border border-error/20 text-xs font-label-bold hover:bg-error/20 cursor-pointer"
                             >
                               Cancel Class
+                            </button>
+                          </div>
+                        )}
+
+                        {/* Inline Admin Controls for Canceled Slots */}
+                        {isAdmin && !isHoliday && isCanceled && (
+                          <div className="mt-3 pt-3 border-t border-white/5 flex flex-wrap items-center justify-end gap-2">
+                            <span className="text-[10px] font-label-bold text-on-surface-variant mr-auto">Admin Controls (Canceled Slot):</span>
+                            <button
+                              onClick={() => handleQuickUncancelClass(slot.module)}
+                              className="px-2.5 py-1 rounded bg-secondary/15 text-secondary border border-secondary/30 text-xs font-label-bold hover:bg-secondary/25 cursor-pointer shadow-[0_0_10px_rgba(78,222,163,0.2)] flex items-center gap-1"
+                            >
+                              <span className="material-symbols-outlined text-xs">undo</span> Un-cancel / Restore Class
+                            </button>
+                            <button
+                              onClick={() => handleQuickRecancelClass(slot.module, slot.reason)}
+                              className="px-2.5 py-1 rounded bg-error/15 text-error border border-error/30 text-xs font-label-bold hover:bg-error/25 cursor-pointer flex items-center gap-1"
+                            >
+                              <span className="material-symbols-outlined text-xs">edit_note</span> Re-cancel / Edit Reason
                             </button>
                           </div>
                         )}
