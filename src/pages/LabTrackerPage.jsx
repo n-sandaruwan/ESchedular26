@@ -64,6 +64,16 @@ function LabTrackerPage() {
   });
 
   useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const tabParam = params.get('tab');
+    if (tabParam) {
+      setActiveTab(tabParam);
+    } else if (isLabAdmin) {
+      setActiveTab('leader');
+    }
+  }, [location.search, isLabAdmin]);
+
+  useEffect(() => {
     // Initial load
     setStoredAttendance(getStoredAttendance());
 

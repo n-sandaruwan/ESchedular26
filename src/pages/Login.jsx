@@ -40,7 +40,7 @@ function Login() {
       if (cleanPass === '654') {
         localStorage.setItem('mis_role', 'lab_admin');
         localStorage.setItem('mis_user', 'Lab Administrator');
-        navigate('/lab-tracker');
+        navigate('/lab-tracker?tab=leader');
         return;
       }
     }
@@ -56,7 +56,7 @@ function Login() {
     if (cleanPass === '654') {
       localStorage.setItem('mis_role', 'lab_admin');
       localStorage.setItem('mis_user', 'Lab Administrator');
-      navigate('/lab-tracker');
+      navigate('/lab-tracker?tab=leader');
       return;
     }
 

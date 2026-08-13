@@ -17,7 +17,7 @@ import './index.css';
 function RootRedirect() {
   const role = localStorage.getItem('mis_role');
   if (role === 'admin') return <Navigate to="/admin" replace />;
-  if (role === 'lab_admin') return <Navigate to="/lab-tracker" replace />;
+  if (role === 'lab_admin') return <Navigate to="/lab-tracker?tab=leader" replace />;
   return <DashboardLayout><StudentDashboard /></DashboardLayout>;
 }
 
