@@ -27,6 +27,57 @@ const notifySubscribers = (event, data) => {
   }
 };
 
+// Reliable Retry Wrapper for Cloud Writes (Handles momentary network disconnects & blips)
+const withRetry = async (fn, maxRetries = 3, initialDelayMs = 500) => {
+  let attempt = 0;
+  while (attempt < maxRetries) {
+    try {
+      return await fn();
+    } catch (err) {
+      attempt++;
+      if (attempt >= maxRetries) {
+        console.error(`🚨 Cloud write failed after ${maxRetries} attempts:`, err);
+        throw err;
+      }
+      const delay = initialDelayMs * Math.pow(2, attempt - 1);
+      console.warn(`⚠️ Cloud write attempt ${attempt} failed. Retrying in ${delay}ms...`, err);
+      await new Promise((res) => setTimeout(res, delay));
+    }
+  }
+};
+
+// Global Online/Offline & Tab Sync Lifecycle Listeners
+if (typeof window !== 'undefined') {
+  // Re-sync instantly when device regains internet connection
+  window.addEventListener('online', () => {
+    console.log("🌐 Network reconnected! Flushing cloud sync & refreshing UI state...");
+    window.dispatchEvent(new Event('schedule_overrides_updated'));
+    window.dispatchEvent(new Event('daily_logs_updated'));
+    window.dispatchEvent(new Event('module_hours_updated'));
+    window.dispatchEvent(new Event('notices_updated'));
+    window.dispatchEvent(new Event('lab_attendance_updated'));
+  });
+
+  // Re-check state on tab focus or screen unlock
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      window.dispatchEvent(new Event('schedule_overrides_updated'));
+      window.dispatchEvent(new Event('daily_logs_updated'));
+      window.dispatchEvent(new Event('module_hours_updated'));
+      window.dispatchEvent(new Event('notices_updated'));
+    }
+  });
+
+  // Real-time tab sync on same browser
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'mis_schedule_overrides') window.dispatchEvent(new Event('schedule_overrides_updated'));
+    if (e.key === 'mis_daily_logs') window.dispatchEvent(new Event('daily_logs_updated'));
+    if (e.key === 'mis_module_hours') window.dispatchEvent(new Event('module_hours_updated'));
+    if (e.key === 'mis_notices') window.dispatchEvent(new Event('notices_updated'));
+    if (e.key === 'eschedular26_lab_attendance') window.dispatchEvent(new Event('lab_attendance_updated'));
+  });
+}
+
 // Initialize Realtime Listeners for Firestore Collections
 export const initRealtimeCloudSync = () => {
   if (!isFirebaseConfigured() || !db) {
@@ -192,7 +243,7 @@ export const pushOverrideToCloud = async (override) => {
   try {
     const docId = String(override.id || `${override.date}_${override.module}`);
     const cleanPayload = sanitizeFirestoreData(override);
-    await setDoc(doc(db, 'schedule_overrides', docId), cleanPayload);
+    await withRetry(() => setDoc(doc(db, 'schedule_overrides', docId), cleanPayload));
     console.log(`✅ Override synced to cloud: ${docId}`, cleanPayload);
   } catch (err) {
     console.error("Failed to push override to cloud:", err);
@@ -205,7 +256,7 @@ export const pushNoticeToCloud = async (notice) => {
   try {
     const docId = String(notice.id || Date.now());
     const cleanPayload = sanitizeFirestoreData(notice);
-    await setDoc(doc(db, 'notices', docId), cleanPayload);
+    await withRetry(() => setDoc(doc(db, 'notices', docId), cleanPayload));
     console.log(`✅ Notice synced to cloud: ${docId}`, cleanPayload);
   } catch (err) {
     console.error("Failed to push notice to cloud:", err);
@@ -223,7 +274,7 @@ export const pushLabAttendanceToCloud = async (dateStr, labName, records) => {
       records: records,
       updated_at: getSriLankaTimestampStr(),
     });
-    await setDoc(doc(db, 'lab_attendance', docId), payload);
+    await withRetry(() => setDoc(doc(db, 'lab_attendance', docId), payload));
     console.log(`✅ Lab Attendance synced to cloud: ${docId}`);
   } catch (err) {
     console.error("Failed to push lab attendance to cloud:", err);
@@ -236,7 +287,7 @@ export const pushDailyLogsToCloud = async (logs) => {
   try {
     for (const log of logs) {
       const docId = String(log.id || `${log.date}_${log.module}`);
-      await setDoc(doc(db, 'daily_logs', docId), sanitizeFirestoreData(log));
+      await withRetry(() => setDoc(doc(db, 'daily_logs', docId), sanitizeFirestoreData(log)));
     }
     console.log("✅ Daily logs synced to cloud");
   } catch (err) {
@@ -250,7 +301,7 @@ export const pushModuleHoursToCloud = async (hoursArray) => {
   try {
     for (const mod of hoursArray) {
       const docId = String(mod.code);
-      await setDoc(doc(db, 'module_hours', docId), sanitizeFirestoreData(mod));
+      await withRetry(() => setDoc(doc(db, 'module_hours', docId), sanitizeFirestoreData(mod)));
     }
     console.log("✅ Module hours synced to cloud");
   } catch (err) {
@@ -264,7 +315,7 @@ export const pushAssessmentsToCloud = async (assessments) => {
   try {
     for (const item of assessments) {
       const docId = String(item.id);
-      await setDoc(doc(db, 'assessments', docId), sanitizeFirestoreData(item));
+      await withRetry(() => setDoc(doc(db, 'assessments', docId), sanitizeFirestoreData(item)));
     }
     console.log("✅ Assessments synced to cloud");
   } catch (err) {
@@ -278,7 +329,7 @@ export const pushAuditLogsToCloud = async (logs) => {
   try {
     for (const log of logs) {
       const docId = String(log.id || Date.now());
-      await setDoc(doc(db, 'audit_logs', docId), sanitizeFirestoreData(log));
+      await withRetry(() => setDoc(doc(db, 'audit_logs', docId), sanitizeFirestoreData(log)));
     }
   } catch (err) {
     console.error("Failed to push audit logs to cloud:", err);
@@ -289,7 +340,7 @@ export const pushAuditLogsToCloud = async (logs) => {
 export const deleteDailyLogFromCloud = async (docId) => {
   if (!isFirebaseConfigured() || !db || !docId) return;
   try {
-    await deleteDoc(doc(db, 'daily_logs', String(docId)));
+    await withRetry(() => deleteDoc(doc(db, 'daily_logs', String(docId))));
     console.log(`✅ Deleted daily log from cloud: ${docId}`);
   } catch (err) {
     console.error("Failed to delete daily log from cloud:", err);
@@ -304,7 +355,7 @@ export const clearCloudDailyLogsAndHours = async () => {
     const logsSnap = await getDocs(dailyLogsRef);
     const deletePromises = [];
     logsSnap.forEach((docSnap) => {
-      deletePromises.push(deleteDoc(doc(db, 'daily_logs', docSnap.id)));
+      deletePromises.push(withRetry(() => deleteDoc(doc(db, 'daily_logs', docSnap.id))));
     });
     await Promise.all(deletePromises);
 
@@ -312,7 +363,7 @@ export const clearCloudDailyLogsAndHours = async () => {
     const hoursSnap = await getDocs(moduleHoursRef);
     const updatePromises = [];
     hoursSnap.forEach((docSnap) => {
-      updatePromises.push(setDoc(doc(db, 'module_hours', docSnap.id), { conductedHours: 0 }, { merge: true }));
+      updatePromises.push(withRetry(() => setDoc(doc(db, 'module_hours', docSnap.id), { conductedHours: 0 }, { merge: true })));
     });
     await Promise.all(updatePromises);
     console.log("✅ Successfully cleared all daily logs and reset module hours in Cloud Firestore!");
@@ -325,7 +376,7 @@ export const clearCloudDailyLogsAndHours = async () => {
 export const deleteOverrideFromCloud = async (docId) => {
   if (!isFirebaseConfigured() || !db || !docId) return;
   try {
-    await deleteDoc(doc(db, 'schedule_overrides', String(docId)));
+    await withRetry(() => deleteDoc(doc(db, 'schedule_overrides', String(docId))));
     console.log(`✅ Deleted schedule override from cloud: ${docId}`);
   } catch (err) {
     console.error("Failed to delete schedule override from cloud:", err);
@@ -336,7 +387,7 @@ export const deleteOverrideFromCloud = async (docId) => {
 export const deleteNoticeFromCloud = async (docId) => {
   if (!isFirebaseConfigured() || !docId) return;
   try {
-    await deleteDoc(doc(db, 'notices', String(docId)));
+    await withRetry(() => deleteDoc(doc(db, 'notices', String(docId))));
     console.log(`✅ Deleted notice from cloud: ${docId}`);
   } catch (err) {
     console.error("Failed to delete notice from cloud:", err);
