@@ -23,14 +23,52 @@ export const initialModuleHours = [
     code: 'EE3301',
     title: 'Analog Electronics',
     conductedHours: 0,
-    targetHours: 45,
+    targetHours: 38,
     weeklyHours: 3,
     venue: 'LT2 / NCC',
     credits: 3,
     coordinator: 'Dr. K.M.S.Y. Konara',
     email: 'konara@eie.ruh.ac.lk',
     teachers: ['Dr. K.M.S.Y. Konara', 'Mr. Neel Karunasena', 'Mr. Pavithran Sathiyamoorthi'],
-    gradingScheme: defaultGradingScheme
+    gradingScheme: [
+      {
+        category: 'Continuous Assessments (CA)',
+        weight: '50%',
+        components: [
+          { name: 'Take Home Assignment', weight: '5%' },
+          { name: 'Tutorial Assessment', weight: '5%' },
+          { name: 'Laboratories (4 Labs)', weight: '20%' },
+          { name: 'In-class Assessment', weight: '20%' }
+        ]
+      },
+      {
+        category: 'End Semester Examination',
+        weight: '50%',
+        components: [
+          { name: 'Written Examination', weight: '50%' }
+        ]
+      }
+    ],
+    passConditions: [
+      {
+        title: 'Continuous Assessment Minimum',
+        criteria: 'Earn at least 35% (i.e. 17.5 / 50 marks) of Continuous Assessment marks',
+        minPercentage: '35%',
+        minMarks: '17.5 / 50 Marks'
+      },
+      {
+        title: 'End Semester Examination Minimum',
+        criteria: 'Achieve at least 35% (i.e. 17.5 / 50 marks) allocated for End Semester Examination',
+        minPercentage: '35%',
+        minMarks: '17.5 / 50 Marks'
+      },
+      {
+        title: 'Overall Module Minimum',
+        criteria: 'Obtain an overall aggregate score of at least 40% (i.e. 40 / 100 total marks)',
+        minPercentage: '40%',
+        minMarks: '40 / 100 Marks'
+      }
+    ]
   },
   {
     code: 'EE3202',
