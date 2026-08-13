@@ -186,18 +186,42 @@ export const initialModuleHours = [
   }
 ];
 
+const getRawDailyLogs = () => {
+  const local = localStorage.getItem('mis_daily_logs');
+  if (local) {
+    try {
+      const parsed = JSON.parse(local);
+      if (Array.isArray(parsed)) return parsed;
+    } catch (e) {}
+  }
+  return [
+    { id: 1, date: '2026-07-27', module: 'EE3203', hours: 2, topic: 'Introduction & Measurement Errors', venue: 'NCC', instructor: 'Dr. Fernando' },
+    { id: 2, date: '2026-07-27', module: 'EE3202', hours: 1, topic: 'Array & Linked List Fundamentals', venue: 'LT1', instructor: 'Dr. Perera' },
+    { id: 3, date: '2026-07-27', module: 'EE3304', hours: 2, topic: 'Electrostatics & Coulomb\'s Law', venue: 'NLH2', instructor: 'Prof. Silva' },
+    { id: 4, date: '2026-07-27', module: 'IS3301', hours: 2, topic: 'Complex Numbers & Functions', venue: 'AUD', instructor: 'Dr. Jayawardena' },
+    { id: 5, date: '2026-07-28', module: 'EE3306', hours: 1, topic: 'Signals & Continuous Systems Overview', venue: 'LT2', instructor: 'Dr. Fernando' },
+    { id: 6, date: '2026-07-28', module: 'EE3202', hours: 2, topic: 'Stack & Queue ADT Implementation', venue: 'LT2', instructor: 'Dr. Perera' },
+    { id: 7, date: '2026-07-28', module: 'IS3321', hours: 2, topic: 'Management Principles for Engineers', venue: 'AUD', instructor: 'Ms. Bandara' },
+    { id: 8, date: '2026-07-28', module: 'EE3205', hours: 2, topic: 'Power Systems & Energy Sources', venue: 'LT1', instructor: 'Prof. Silva' },
+    { id: 9, date: '2026-07-28', module: 'EE3301', hours: 1, topic: 'Diode Circuits & Rectifiers', venue: 'LT2', instructor: 'Dr. Perera' }
+  ];
+};
+
 export const getStoredModuleHours = () => {
+  const dailyLogs = getRawDailyLogs();
+  const semesterLogs = Array.isArray(dailyLogs) ? dailyLogs.filter(l => l.date >= '2026-07-27') : [];
+
+  let base = initialModuleHours;
   const local = localStorage.getItem('mis_module_hours');
   if (local) {
     try {
       const parsed = JSON.parse(local);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        return initialModuleHours.map(init => {
+        base = initialModuleHours.map(init => {
           const match = parsed.find(p => p.code === init.code);
           if (match) {
             return {
               ...init,
-              conductedHours: match.conductedHours !== undefined ? match.conductedHours : init.conductedHours,
               targetHours: init.targetHours,
               weeklyHours: match.weeklyHours || init.weeklyHours,
               venue: match.venue || init.venue,
@@ -209,15 +233,32 @@ export const getStoredModuleHours = () => {
         });
       }
     } catch (e) {
-      return initialModuleHours;
+      base = initialModuleHours;
     }
   }
-  return initialModuleHours;
+
+  // Compute conductedHours dynamically from daily logs (July 27th onwards)
+  return base.map(m => {
+    const loggedHours = semesterLogs
+      .filter(l => l.module === m.code)
+      .reduce((sum, l) => sum + (Number(l.hours) || 0), 0);
+
+    return {
+      ...m,
+      conductedHours: loggedHours
+    };
+  });
 };
 
 export const saveStoredModuleHours = (hoursArray) => {
   localStorage.setItem('mis_module_hours', JSON.stringify(hoursArray));
   pushModuleHoursToCloud(hoursArray);
+};
+
+export const recalculateModuleHoursFromLogs = () => {
+  const updatedHours = getStoredModuleHours();
+  saveStoredModuleHours(updatedHours);
+  return updatedHours;
 };
 
 export const resetToInitialHours = () => {

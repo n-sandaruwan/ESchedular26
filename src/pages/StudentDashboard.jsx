@@ -630,33 +630,13 @@ function StudentDashboard() {
                           </div>
                         )}
 
-                        {/* Reason / Remarks if Canceled or Rescheduled */}
-                        {slot.reason && (
-                          <div className="mt-3 p-2.5 rounded-lg bg-surface-container/70 border border-white/10 flex items-start gap-2">
-                            <span className="material-symbols-outlined text-[16px] text-primary shrink-0 mt-0.5">info</span>
-                            <p className="text-xs text-on-surface-variant italic font-body-md leading-relaxed">
-                              Note: {slot.reason}
+                        {/* Small Note Part if Reason or Topic exists */}
+                        {(slot.reason || (slot.logEntry?.topic && slot.logEntry.topic !== 'Regular Class Completed' && slot.logEntry.topic !== 'Regular Lecture Session Completed')) && (
+                          <div className="mt-2.5 p-2 rounded-lg bg-surface-container/50 border border-white/5 flex items-center gap-2">
+                            <span className="material-symbols-outlined text-xs text-primary shrink-0">info</span>
+                            <p className="text-xs text-on-surface-variant italic font-body-md">
+                              Note: {slot.reason || slot.logEntry.topic}
                             </p>
-                          </div>
-                        )}
-
-                        {/* Conducted Lecture Log Details Box */}
-                        {isDone && slot.logEntry && (
-                          <div className="mt-3 p-3 rounded-xl bg-secondary/10 border border-secondary/20 space-y-1.5 shadow-[0_0_15px_rgba(78,222,163,0.08)]">
-                            <div className="flex items-center justify-between text-xs font-label-bold text-secondary">
-                              <span className="flex items-center gap-1.5">
-                                <span className="material-symbols-outlined text-sm">verified</span>
-                                Conducted Lecture Log
-                              </span>
-                              <span className="font-mono text-[11px] bg-secondary/20 border border-secondary/30 px-2 py-0.5 rounded text-secondary font-bold">
-                                +{slot.logEntry.hours} hrs Logged
-                              </span>
-                            </div>
-                            {slot.logEntry.topic && (
-                              <p className="text-xs text-on-surface-variant font-body-md">
-                                <strong className="text-on-surface font-semibold">Content / Review:</strong> {slot.logEntry.topic}
-                              </p>
-                            )}
                           </div>
                         )}
 

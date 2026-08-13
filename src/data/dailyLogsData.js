@@ -27,7 +27,7 @@ export const studentRegistry = [
   { regNo: 'EG/2023/120', name: 'R. P. Jayawardena', labGroup: 'Group C1', practicalSlot: 'Wed 08:30 - 11:30 (Measurement Lab)' }
 ];
 
-import { getStoredModuleHours, saveStoredModuleHours } from './moduleHoursData';
+import { getStoredModuleHours, saveStoredModuleHours, recalculateModuleHoursFromLogs } from './moduleHoursData';
 import { pushDailyLogsToCloud, pushAuditLogsToCloud } from './firebaseSync';
 import { getSriLankaTimestampStr } from '../utils/dateUtils';
 
@@ -43,7 +43,9 @@ export const getStoredDailyLogs = () => {
 export const saveStoredDailyLogs = (logs) => {
   localStorage.setItem('mis_daily_logs', JSON.stringify(logs));
   pushDailyLogsToCloud(logs);
+  recalculateModuleHoursFromLogs();
   window.dispatchEvent(new Event('daily_logs_updated'));
+  window.dispatchEvent(new Event('module_hours_updated'));
   window.dispatchEvent(new Event('schedule_overrides_updated'));
 };
 
