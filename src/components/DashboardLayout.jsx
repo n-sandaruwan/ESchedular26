@@ -59,12 +59,12 @@ function DashboardLayout({ children }) {
                 ESchedular26
               </h1>
               {isAdmin && (
-                <span className="text-[10px] font-label-bold px-2 py-0.5 rounded-full border uppercase bg-secondary/10 text-secondary border-secondary/30">
+                <span className="hidden sm:inline-flex text-[10px] font-label-bold px-2 py-0.5 rounded-full border uppercase bg-secondary/10 text-secondary border-secondary/30">
                   Full Admin
                 </span>
               )}
               {isLabAdmin && (
-                <span className="text-[10px] font-label-bold px-2 py-0.5 rounded-full border uppercase bg-tertiary/10 text-tertiary border-tertiary/30">
+                <span className="hidden sm:inline-flex text-[10px] font-label-bold px-2 py-0.5 rounded-full border uppercase bg-tertiary/10 text-tertiary border-tertiary/30">
                   Lab Admin
                 </span>
               )}
@@ -286,30 +286,43 @@ function DashboardLayout({ children }) {
           <span className="font-label-sm text-[11px]">Labs</span>
         </Link>
 
-        {isAdmin || isLabAdmin ? (
+        {isAdmin && (
           <>
-            {isAdmin && (
-              <Link
-                to="/logs"
-                className={`flex flex-col items-center justify-center transition-all duration-200 active:scale-90 ${
-                  location.pathname === '/logs' ? 'text-primary drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]' : 'text-on-surface-variant/60 hover:text-primary/80'
-                }`}
-              >
-                <span className="material-symbols-outlined text-xl">history_edu</span>
-                <span className="font-label-sm text-[11px]">Logs</span>
-              </Link>
-            )}
-
-            <button
-              onClick={handleLeaveAdmin}
-              className="flex flex-col items-center justify-center text-error transition-all duration-200 active:scale-90 cursor-pointer"
-              title={`Leave ${isLabAdmin ? 'Lab Admin' : 'Admin'} Mode`}
+            <Link
+              to="/logs"
+              className={`flex flex-col items-center justify-center transition-all duration-200 active:scale-90 ${
+                location.pathname === '/logs' ? 'text-primary drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]' : 'text-on-surface-variant/60 hover:text-primary/80'
+              }`}
             >
-              <span className="material-symbols-outlined text-xl">logout</span>
-              <span className="font-label-sm text-[10px]">Leave {isLabAdmin ? 'Lab Admin' : 'Admin'}</span>
-            </button>
+              <span className="material-symbols-outlined text-xl">history_edu</span>
+              <span className="font-label-sm text-[11px]">Logs</span>
+            </Link>
+
+            <Link
+              to="/admin"
+              className={`flex flex-col items-center justify-center transition-all duration-200 active:scale-90 ${
+                location.pathname === '/admin' ? 'text-primary drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]' : 'text-on-surface-variant/60 hover:text-primary/80'
+              }`}
+            >
+              <span className="material-symbols-outlined text-xl">admin_panel_settings</span>
+              <span className="font-label-sm text-[11px]">Admin</span>
+            </Link>
           </>
-        ) : (
+        )}
+
+        {isLabAdmin && (
+          <Link
+            to="/lab-tracker?tab=leader"
+            className={`flex flex-col items-center justify-center transition-all duration-200 active:scale-90 ${
+              location.search.includes('tab=leader') ? 'text-primary drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]' : 'text-on-surface-variant/60 hover:text-primary/80'
+            }`}
+          >
+            <span className="material-symbols-outlined text-xl">biotech</span>
+            <span className="font-label-sm text-[11px]">Lab Portal</span>
+          </Link>
+        )}
+
+        {!isAdmin && !isLabAdmin && (
           <Link
             to="/login"
             className="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-primary/80 transition-all duration-200 active:scale-90"
