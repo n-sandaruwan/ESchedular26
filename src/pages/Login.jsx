@@ -3,7 +3,6 @@ import { useNavigate, Link } from 'react-router-dom';
 import InteractiveShaderBackground from '../components/InteractiveShaderBackground';
 
 function Login() {
-  const [selectedPortal, setSelectedPortal] = useState('admin'); // 'admin' | 'lab_admin'
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -16,13 +15,9 @@ function Login() {
     const cleanUser = username.trim().toLowerCase();
     const cleanPass = password.trim();
 
-    // 1. Department Admin Authentication
-    if (
-      selectedPortal === 'admin' ||
-      cleanUser === 'admin' ||
-      cleanUser === 'admin@mis.com'
-    ) {
-      if (cleanPass === '987') {
+    // 1. Full Department Admin Authentication
+    if (cleanUser === 'admin' || cleanUser === 'admin@mis.com') {
+      if (cleanPass === '987321' || cleanPass === '987') {
         localStorage.setItem('mis_role', 'admin');
         localStorage.setItem('mis_user', 'Department Administrator');
         navigate('/admin');
@@ -32,7 +27,6 @@ function Login() {
 
     // 2. Lab Admin Authentication
     if (
-      selectedPortal === 'lab_admin' ||
       cleanUser === 'labadmin' ||
       cleanUser === 'lab' ||
       cleanUser === 'labadmin@mis.com'
@@ -45,8 +39,8 @@ function Login() {
       }
     }
 
-    // Direct password fallbacks regardless of portal selection
-    if (cleanPass === '987') {
+    // Password-based direct fallbacks
+    if (cleanPass === '987321' || cleanPass === '987') {
       localStorage.setItem('mis_role', 'admin');
       localStorage.setItem('mis_user', 'Department Administrator');
       navigate('/admin');
@@ -75,35 +69,24 @@ function Login() {
           <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 mx-auto flex items-center justify-center text-primary mb-3">
             <span className="material-symbols-outlined text-2xl">lock</span>
           </div>
-          <h1 className="font-headline-md text-2xl font-bold text-on-surface">ESchedular26 Portal</h1>
-          <p className="text-xs text-on-surface-variant mt-1">Authorized Access for Department & Lab Administrators.</p>
+          <h1 className="font-headline-md text-2xl font-bold text-on-surface">Admin Login</h1>
+          <p className="text-xs text-on-surface-variant mt-1">Authorized Access for Department & Lab Administrators</p>
         </div>
 
-        {/* Portal Mode Tabs */}
-        <div className="grid grid-cols-2 gap-2 p-1 bg-black/40 rounded-xl border border-white/5">
-          <button
-            type="button"
-            onClick={() => { setSelectedPortal('admin'); setError(''); }}
-            className={`py-2 px-3 rounded-lg text-xs font-label-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-              selectedPortal === 'admin'
-                ? 'bg-primary/20 text-primary border border-primary/40 shadow-sm'
-                : 'text-on-surface-variant hover:text-on-surface'
-            }`}
-          >
-            <span className="material-symbols-outlined text-sm">admin_panel_settings</span> Admin Portal
-          </button>
-
-          <button
-            type="button"
-            onClick={() => { setSelectedPortal('lab_admin'); setError(''); }}
-            className={`py-2 px-3 rounded-lg text-xs font-label-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-              selectedPortal === 'lab_admin'
-                ? 'bg-secondary/20 text-secondary border border-secondary/40 shadow-sm'
-                : 'text-on-surface-variant hover:text-on-surface'
-            }`}
-          >
-            <span className="material-symbols-outlined text-sm">biotech</span> Lab Admin
-          </button>
+        {/* Credentials Guidance Directions Card */}
+        <div className="p-3.5 bg-black/40 border border-white/10 rounded-xl space-y-2 text-xs font-mono">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-primary pb-1.5 border-b border-white/5">
+            <span className="font-bold flex items-center gap-1">
+              <span className="material-symbols-outlined text-sm">admin_panel_settings</span> Full Admin:
+            </span>
+            <span className="text-[11px] text-on-surface-variant">User: <strong className="text-primary">admin</strong> | Pass: <strong className="text-primary">987321</strong></span>
+          </div>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-secondary pt-0.5">
+            <span className="font-bold flex items-center gap-1">
+              <span className="material-symbols-outlined text-sm">biotech</span> Lab Admin:
+            </span>
+            <span className="text-[11px] text-on-surface-variant">User: <strong className="text-secondary">labadmin</strong> | Pass: <strong className="text-secondary">654</strong></span>
+          </div>
         </div>
 
         {error && (
@@ -122,7 +105,7 @@ function Login() {
               required
               value={username}
               onChange={e => setUsername(e.target.value)}
-              placeholder={selectedPortal === 'admin' ? 'admin' : 'labadmin'}
+              placeholder="e.g. admin or labadmin"
             />
           </div>
 
@@ -142,7 +125,7 @@ function Login() {
             type="submit"
             className="btn-electric py-3 rounded-lg font-label-bold uppercase tracking-wider text-xs mt-1 cursor-pointer shadow-[0_0_15px_rgba(56,189,248,0.3)]"
           >
-            Sign In as {selectedPortal === 'admin' ? 'Administrator' : 'Lab Admin'}
+            Sign In to Portal
           </button>
         </form>
 
