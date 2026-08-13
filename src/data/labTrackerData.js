@@ -257,7 +257,7 @@ export function clearAllStoredAttendance() {
 }
 
 // Helper to save attendance records for a date and lab name
-export function saveStoredAttendance(dateStr, labName, attendanceMap) {
+export function saveStoredAttendance(dateStr, labName, attendanceMap, note = '') {
   const current = getStoredAttendance();
   const safeLabName = labName.replace(/[^a-zA-Z0-9_-]/g, '_');
   const key = `${dateStr}_${safeLabName}`;
@@ -266,14 +266,18 @@ export function saveStoredAttendance(dateStr, labName, attendanceMap) {
   const existingRecords = current[key] && current[key].records ? current[key].records : {};
   const mergedRecords = { ...existingRecords, ...attendanceMap };
 
+  const existingNote = current[key] && current[key].note ? current[key].note : '';
+  const finalNote = note.trim() !== '' ? note.trim() : existingNote;
+
   current[key] = {
     date: dateStr,
     lab_name: labName, // keep original for display
     updated_at: getSriLankaTimestampStr(),
     records: mergedRecords, // { reg_no: true/false }
+    note: finalNote
   };
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(current));
-  pushLabAttendanceToCloud(dateStr, labName, mergedRecords);
+  pushLabAttendanceToCloud(dateStr, labName, mergedRecords, finalNote);
   
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new Event('lab_attendance_updated'));

@@ -264,7 +264,7 @@ export const pushNoticeToCloud = async (notice) => {
 };
 
 // Save EE Lab Attendance record to Cloud
-export const pushLabAttendanceToCloud = async (dateStr, labName, records) => {
+export const pushLabAttendanceToCloud = async (dateStr, labName, records, note = '') => {
   if (!isFirebaseConfigured() || !db) return;
   try {
     const docId = `${dateStr}_${labName.replace(/[^a-zA-Z0-9_-]/g, '_')}`;
@@ -272,6 +272,7 @@ export const pushLabAttendanceToCloud = async (dateStr, labName, records) => {
       date: dateStr,
       lab_name: labName,
       records: records,
+      note: note || '',
       updated_at: getSriLankaTimestampStr(),
     });
     await withRetry(() => setDoc(doc(db, 'lab_attendance', docId), payload));

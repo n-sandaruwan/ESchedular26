@@ -44,6 +44,7 @@ function LabTrackerPage() {
   // Leader Portal state
   const [selectedGroupCode, setSelectedGroupCode] = useState('EE01');
   const [leaderAttendance, setLeaderAttendance] = useState({});
+  const [sessionNote, setSessionNote] = useState('');
   const [saveSuccessMsg, setSaveSuccessMsg] = useState('');
 
   // Confirmation Modal state
@@ -268,6 +269,7 @@ function LabTrackerPage() {
             : null;
       });
       setLeaderAttendance(initialMap);
+      setSessionNote(entry && entry.note ? entry.note : '');
     }
   }, [selectedGroupCode, selectedDate, storedAttendance]);
 
@@ -300,7 +302,8 @@ function LabTrackerPage() {
     const updatedData = saveStoredAttendance(
       selectedDate,
       currentLeaderSchedule.lab_name,
-      finalizedAttendance
+      finalizedAttendance,
+      sessionNote
     );
     setStoredAttendance(updatedData);
     setSaveSuccessMsg(
@@ -1028,6 +1031,15 @@ function LabTrackerPage() {
                         )}
                       </div>
                     </div>
+
+                    {entry && entry.note && (
+                      <div className="mt-3 pt-2.5 border-t border-white/10 flex items-start gap-2">
+                        <span className="material-symbols-outlined text-sm text-secondary shrink-0 mt-0.5">sticky_note_2</span>
+                        <p className="text-xs text-on-surface-variant font-medium italic">
+                          <strong className="text-secondary font-bold not-italic">Lab Admin Note:</strong> {entry.note}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 );
               })
@@ -1398,6 +1410,23 @@ function LabTrackerPage() {
                   </table>
                 </div>
 
+                {/* Optional Lab Session Note Field */}
+                {canMarkAttendance && (
+                  <div className="bg-black/30 border border-white/10 rounded-2xl p-3.5 space-y-1.5 shadow-md">
+                    <label className="text-xs font-label-bold uppercase text-secondary tracking-wider flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-sm">edit_note</span>
+                      <span>Lab Session Note / Remarks (Optional):</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={sessionNote}
+                      onChange={(e) => setSessionNote(e.target.value)}
+                      placeholder="e.g. Completed Experiment 3, Bench 4 multimeter calibrated, all hardware tested..."
+                      className="w-full px-3.5 py-2.5 bg-black/60 border border-white/15 rounded-xl text-xs sm:text-sm text-on-surface placeholder-on-surface-variant/40 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all"
+                    />
+                  </div>
+                )}
+
                 <div className="flex justify-end pt-3 border-t border-white/10">
                   {canMarkAttendance ? (
                     <button
@@ -1405,7 +1434,7 @@ function LabTrackerPage() {
                       className="btn-electric w-full sm:w-auto px-6 py-3 rounded-2xl text-xs font-label-bold flex items-center justify-center gap-2 shadow-xl cursor-pointer text-center"
                     >
                       <span className="material-symbols-outlined text-base">save</span>
-                      <span>Save Attendance Records</span>
+                      <span>Save Attendance Records & Notes</span>
                     </button>
                   ) : (
                     <span className="text-xs text-amber-400/80 font-bold flex items-center gap-1">
