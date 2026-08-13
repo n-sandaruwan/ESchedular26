@@ -74,7 +74,7 @@ export const initialModuleHours = [
     code: 'EE3202',
     title: 'Data Structures and Algorithms',
     conductedHours: 0,
-    targetHours: 38,
+    targetHours: 0,
     weeklyHours: 3,
     venue: 'LT1 / LT2',
     credits: 2,

@@ -101,8 +101,8 @@ function ModulePage() {
     return <div className="p-8 text-center text-on-surface-variant text-sm">Loading module data...</div>;
   }
 
-  const percentage = Math.min(100, Math.round((selectedModule.conductedHours / selectedModule.targetHours) * 100));
-  const remainingHours = Math.max(0, selectedModule.targetHours - selectedModule.conductedHours);
+  const percentage = selectedModule.targetHours > 0 ? Math.min(100, Math.round((selectedModule.conductedHours / selectedModule.targetHours) * 100)) : 0;
+  const remainingHours = selectedModule.targetHours > 0 ? `${Math.max(0, selectedModule.targetHours - selectedModule.conductedHours)} hrs` : 'TBD';
 
   const handleAddHour = (amount) => {
     const updated = modules.map(m => {
@@ -416,7 +416,9 @@ function ModulePage() {
         <div className="glass-card p-3.5 rounded-xl flex items-center justify-between border-white/5">
           <div>
             <span className="text-xs font-label-bold uppercase text-on-surface-variant/80 tracking-wider">Target</span>
-            <h3 className="text-xl sm:text-2xl font-bold text-primary mt-0.5">{selectedModule.targetHours} hrs</h3>
+            <h3 className="text-xl sm:text-2xl font-bold text-primary mt-0.5">
+              {selectedModule.targetHours > 0 ? `${selectedModule.targetHours} hrs` : 'TBD (Pending)'}
+            </h3>
             <p className="text-xs text-on-surface-variant/70">Required total</p>
           </div>
           <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
@@ -428,7 +430,7 @@ function ModulePage() {
         <div className="glass-card p-3.5 rounded-xl flex items-center justify-between border-white/5">
           <div>
             <span className="text-xs font-label-bold uppercase text-on-surface-variant/80 tracking-wider">Remaining</span>
-            <h3 className="text-xl sm:text-2xl font-bold text-tertiary mt-0.5">{remainingHours} hrs</h3>
+            <h3 className="text-xl sm:text-2xl font-bold text-tertiary mt-0.5">{remainingHours}</h3>
             <p className="text-xs text-on-surface-variant/70">Left in semester</p>
           </div>
           <div className="w-10 h-10 rounded-xl bg-tertiary/10 border border-tertiary/20 flex items-center justify-center text-tertiary shrink-0">
