@@ -14,7 +14,7 @@ function DashboardLayout({ children }) {
   const isCloudSynced = isFirebaseConfigured();
 
   const allNavItems = [
-    { name: 'Basic Mode', icon: 'home', path: '/' },
+    { name: 'Home Dashboard', icon: 'home', path: '/' },
     { name: 'Weekly Schedule', icon: 'calendar_month', path: '/timetable' },
     { name: 'Module Tracker', icon: 'view_module', path: '/modules' },
     { name: 'Lab Tracker', icon: 'biotech', path: '/lab-tracker' },
@@ -253,7 +253,7 @@ function DashboardLayout({ children }) {
           }`}
         >
           <span className="material-symbols-outlined text-xl">home</span>
-          <span className="font-label-sm text-[11px]">Basic Mode</span>
+          <span className="font-label-sm text-[11px]">Home</span>
         </Link>
 
         <Link

@@ -1,7 +1,7 @@
 # ESchedular26 Authentication & Routing Rules
 
 - **Default Root Route (`/`)**:
-  - Unauthenticated / guest access opens **Basic Mode Dashboard** directly.
+  - Unauthenticated / guest access opens **Home Dashboard** directly.
   - Does NOT force-redirect unauthenticated users to `/login`.
 
 - **Admin Login Portal (`/login`)**:
