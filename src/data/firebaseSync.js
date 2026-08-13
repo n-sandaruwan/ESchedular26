@@ -372,6 +372,50 @@ export const clearCloudDailyLogsAndHours = async () => {
   }
 };
 
+// Wipe all Daily Logs, Schedule Overrides & reset Module Conducted Hours to 0 in Cloud Firestore & LocalStorage (Preserving Lab Logs)
+export const clearCloudLectureLogsAndOverrides = async () => {
+  localStorage.setItem('mis_daily_logs', JSON.stringify([]));
+  localStorage.setItem('mis_schedule_overrides', JSON.stringify([]));
+
+  if (!isFirebaseConfigured() || !db) return;
+  try {
+    // 1. Delete all daily_logs
+    const dailyLogsRef = collection(db, 'daily_logs');
+    const logsSnap = await getDocs(dailyLogsRef);
+    const deletePromises = [];
+    logsSnap.forEach((docSnap) => {
+      deletePromises.push(withRetry(() => deleteDoc(doc(db, 'daily_logs', docSnap.id))));
+    });
+    await Promise.all(deletePromises);
+
+    // 2. Delete all schedule_overrides (Cancellations, Reschedules)
+    const overridesRef = collection(db, 'schedule_overrides');
+    const overridesSnap = await getDocs(overridesRef);
+    const deleteOverridePromises = [];
+    overridesSnap.forEach((docSnap) => {
+      deleteOverridePromises.push(withRetry(() => deleteDoc(doc(db, 'schedule_overrides', docSnap.id))));
+    });
+    await Promise.all(deleteOverridePromises);
+
+    // 3. Reset conductedHours in module_hours to 0
+    const moduleHoursRef = collection(db, 'module_hours');
+    const hoursSnap = await getDocs(moduleHoursRef);
+    const updatePromises = [];
+    hoursSnap.forEach((docSnap) => {
+      updatePromises.push(withRetry(() => setDoc(doc(db, 'module_hours', docSnap.id), { conductedHours: 0 }, { merge: true })));
+    });
+    await Promise.all(updatePromises);
+
+    console.log("✅ Successfully cleared all lecture logs & schedule overrides in Cloud Firestore!");
+  } catch (err) {
+    console.error("Failed to clear cloud lecture logs and overrides:", err);
+  }
+
+  window.dispatchEvent(new Event('daily_logs_updated'));
+  window.dispatchEvent(new Event('schedule_overrides_updated'));
+  window.dispatchEvent(new Event('module_hours_updated'));
+};
+
 // Delete Schedule Override document from Cloud Firestore
 export const deleteOverrideFromCloud = async (docId) => {
   if (!isFirebaseConfigured() || !db || !docId) return;

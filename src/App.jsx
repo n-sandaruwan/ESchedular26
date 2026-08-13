@@ -12,17 +12,17 @@ import LabTrackerPage from './pages/LabTrackerPage';
 import CancelledLecturesPage from './pages/CancelledLecturesPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import DashboardLayout from './components/DashboardLayout';
-import { clearCloudDailyLogsAndHours } from './data/firebaseSync';
+import { clearCloudLectureLogsAndOverrides } from './data/firebaseSync';
 import './index.css';
 
 function App() {
   useEffect(() => {
-    if (!localStorage.getItem('mis_clean_reset_v3')) {
+    if (!localStorage.getItem('mis_clean_reset_v5')) {
       localStorage.setItem('mis_daily_logs', JSON.stringify([]));
-      localStorage.setItem('mis_module_hours', JSON.stringify([]));
-      localStorage.setItem('mis_clean_reset_v3', 'true');
+      localStorage.setItem('mis_schedule_overrides', JSON.stringify([]));
+      localStorage.setItem('mis_clean_reset_v5', 'true');
       
-      clearCloudDailyLogsAndHours();
+      clearCloudLectureLogsAndOverrides();
 
       window.dispatchEvent(new Event('daily_logs_updated'));
       window.dispatchEvent(new Event('module_hours_updated'));

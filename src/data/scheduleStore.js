@@ -5,10 +5,8 @@ import { pushOverrideToCloud, pushNoticeToCloud, deleteOverrideFromCloud, delete
 import { pushRecordToGoogleSheetWebhook } from './googleSheetsSync';
 import { getSriLankaDateStr } from '../utils/dateUtils';
 
-// Initial Schedule Overrides (Cancellations, Reschedules, Swaps per date)
-export const initialOverrides = [
-  { id: 1, date: '2026-07-29', module: 'ALL', status: 'Canceled', reason: 'Esala Full Moon Poya Day Holiday', time: 'All Day' }
-];
+// Initial Schedule Overrides (Cancellations, Reschedules, Swaps per date) - Clean Start
+export const initialOverrides = [];
 
 export const getStoredOverrides = () => {
   const local = localStorage.getItem('mis_schedule_overrides');
