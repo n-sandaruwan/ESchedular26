@@ -259,7 +259,7 @@ function StudentDashboard() {
       // Check if this slot has a log entry for the current date
       const isLogged = dailyLogs.some(log => log.date === dateStr && log.module === slot.module);
 
-      if (slot.status === 'Canceled' || slot.status === 'Rescheduled' || slot.status === 'Swapped') {
+      if (slot.status === 'Canceled' || slot.status === 'Swapped') {
         liveStatus = slot.status;
       } else if (selectedHoliday) {
         liveStatus = 'Holiday';
@@ -496,7 +496,8 @@ function StudentDashboard() {
                   const isDone = slot.liveStatus === 'Done';
                   const isCanceled = slot.liveStatus === 'Canceled';
                   const isUnverified = slot.liveStatus === 'Awaiting Verification';
-                  const isSwapped = slot.liveStatus === 'Swapped' || slot.liveStatus === 'Rescheduled';
+                  const isSwapped = slot.liveStatus === 'Swapped';
+                  const isRescheduled = slot.isRescheduled || slot.status === 'Rescheduled';
                   const isHoliday = slot.liveStatus === 'Holiday';
 
                   return (
@@ -511,7 +512,7 @@ function StudentDashboard() {
                           ? 'bg-secondary opacity-60'
                           : isUnverified
                           ? 'bg-orange-500'
-                          : isSwapped
+                          : isSwapped || isRescheduled
                           ? 'bg-tertiary'
                           : 'bg-on-surface-variant'
                       }`}></div>
@@ -553,8 +554,14 @@ function StudentDashboard() {
                             </h4>
                           </div>
 
-                          {/* Live Status Badge */}
-                          <div className="shrink-0 flex items-center gap-2">
+                          {/* Live Status Badges */}
+                          <div className="shrink-0 flex flex-wrap items-center gap-2">
+                            {isRescheduled && (
+                              <span className="bg-primary/15 text-primary border border-primary/30 px-3 py-1 rounded-lg font-label-bold text-xs flex items-center gap-1.5 shadow-[0_0_10px_rgba(56,189,248,0.15)]">
+                                <span className="material-symbols-outlined text-[14px]">update</span>
+                                Rescheduled
+                              </span>
+                            )}
                             {isOngoing && (
                               <span className="bg-primary/20 text-primary border border-primary/30 px-3 py-1 rounded-lg font-label-bold text-xs flex items-center gap-1.5">
                                 <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
@@ -572,7 +579,7 @@ function StudentDashboard() {
                                 Awaiting Verification
                               </span>
                             )}
-                            {slot.liveStatus === 'Upcoming' && (
+                            {slot.liveStatus === 'Upcoming' && !isRescheduled && (
                               <span className="bg-surface-container-highest text-on-surface-variant px-3 py-1 rounded-lg font-label-bold text-xs">
                                 Upcoming
                               </span>
@@ -584,7 +591,7 @@ function StudentDashboard() {
                             )}
                             {isSwapped && (
                               <span className="bg-tertiary/20 text-tertiary border border-tertiary/30 px-3 py-1 rounded-lg font-label-bold text-xs">
-                                {slot.liveStatus}
+                                Swapped
                               </span>
                             )}
                             {isHoliday && (
@@ -599,19 +606,20 @@ function StudentDashboard() {
                         <div className="flex flex-wrap gap-x-6 gap-y-2 text-on-surface-variant text-xs mt-3">
                           <span className="flex items-center gap-1.5">
                             <span className="material-symbols-outlined text-sm text-primary">location_on</span>
-                            Venue: <b className="text-on-surface">{slot.hall}</b>
+                            Venue: <strong className="text-on-surface">{slot.hall}</strong>
+                          </span>
+                          <span className="flex items-center gap-1.5">
+                            <span className="material-symbols-outlined text-sm text-secondary">category</span>
+                            Type: <strong className="text-on-surface">{slot.type}</strong>
                           </span>
                         </div>
 
-                        {/* Live Session Progress Bar for Ongoing Lectures */}
+                        {/* Live Progress Bar for Ongoing Classes */}
                         {isOngoing && (
-                          <div className="mt-4 pt-3 border-t border-white/5 space-y-1">
-                            <div className="flex justify-between text-[11px] font-label-bold">
-                              <span className="text-primary flex items-center gap-1">
-                                <span className="material-symbols-outlined text-xs">schedule</span>
-                                Live Lecture Progress
-                              </span>
-                              <span className="text-secondary">{slot.progressPercent}% Completed</span>
+                          <div className="mt-3 space-y-1">
+                            <div className="flex justify-between text-[11px] font-label-bold text-primary">
+                              <span>Class Progress</span>
+                              <span>{slot.progressPercent}%</span>
                             </div>
                             <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
                               <div
@@ -624,13 +632,16 @@ function StudentDashboard() {
 
                         {/* Reason / Remarks if Canceled or Rescheduled */}
                         {slot.reason && (
-                  <p className="mt-3 text-xs text-error italic bg-error/5 p-2 rounded-lg border border-error/10">
-                            Note: {slot.reason}
-                          </p>
+                          <div className="mt-3 p-2.5 rounded-lg bg-surface-container/70 border border-white/10 flex items-start gap-2">
+                            <span className="material-symbols-outlined text-[16px] text-primary shrink-0 mt-0.5">info</span>
+                            <p className="text-xs text-on-surface-variant italic font-body-md leading-relaxed">
+                              Note: {slot.reason}
+                            </p>
+                          </div>
                         )}
 
                         {/* Inline Admin Controls (Only visible to Admin) */}
-                        {isAdmin && !isHoliday && !isDone && !isCanceled && !isSwapped && (
+                        {isAdmin && !isHoliday && !isDone && !isCanceled && (
                           <div className="mt-3 pt-3 border-t border-white/5 flex flex-wrap items-center justify-end gap-2">
                             <span className="text-[10px] font-label-bold text-on-surface-variant mr-auto">Admin Controls:</span>
                             {isUnverified ? (

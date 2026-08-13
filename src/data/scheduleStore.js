@@ -139,6 +139,23 @@ export const getDayNameFromDate = (dateStr) => {
   return days[d.getDay()] || 'Monday';
 };
 
+// Helper: Module Code to Title Mapping
+export const getModuleName = (moduleCode) => {
+  const moduleNames = {
+    'EE3203': 'Electrical & Electronic Measurements',
+    'EE3202': 'Data Structures & Algorithms',
+    'EE3304': 'Engineering Electromagnetism',
+    'IS3301': 'Complex Analysis and Mathematical Transforms',
+    'EE3306': 'Signals & Systems',
+    'IS3321': 'Management for Engineers',
+    'EE3205': 'Power & Energy',
+    'EE3301': 'Analog Electronics',
+    'IS3322': 'Society & the Engineers',
+    'CCSSD': 'Soft Skills Development'
+  };
+  return moduleNames[moduleCode] || moduleCode;
+};
+
 // Helper: Get Modules Scheduled on a Specific Date (Including Overrides & Minutes)
 export const getModulesForDate = (dateStr) => {
   if (!dateStr) return [];
@@ -155,11 +172,15 @@ export const getModulesForDate = (dateStr) => {
     let status = 'Scheduled';
     let reason = '';
     let swapModule = '';
+    let isRescheduled = false;
 
     if (override) {
       status = override.status;
       reason = override.reason || '';
       swapModule = override.swapModule || '';
+      if (override.status === 'Rescheduled') {
+        isRescheduled = true;
+      }
       if (override.time) timeRange = override.time;
       if (override.venue) venue = override.venue;
     }
@@ -173,6 +194,7 @@ export const getModulesForDate = (dateStr) => {
       status,
       reason,
       swapModule,
+      isRescheduled,
       startMin: slot.startMin || startMin,
       endMin: slot.endMin || endMin
     });
@@ -183,13 +205,15 @@ export const getModulesForDate = (dateStr) => {
     if (o.status === 'Rescheduled' && !result.some(r => r.module === o.module)) {
       const timeRange = o.time || '10:30 - 12:30';
       const { startMin, endMin } = parseTimeRangeToMinutes(timeRange);
+      const realName = getModuleName(o.module);
       result.push({
         time: timeRange,
         module: o.module,
-        name: `Rescheduled ${o.module}`,
+        name: realName,
         hall: o.venue || 'LT1',
         type: 'Lecture',
         status: 'Rescheduled',
+        isRescheduled: true,
         reason: o.reason || '',
         startMin,
         endMin
