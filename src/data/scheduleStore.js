@@ -1,7 +1,7 @@
 import { weeklyTimetable } from './timetableData';
 import { getStoredModuleHours, saveStoredModuleHours } from './moduleHoursData';
 import { getStoredDailyLogs, saveStoredDailyLogs, addAuditLog } from './dailyLogsData';
-import { pushOverrideToCloud, pushNoticeToCloud } from './firebaseSync';
+import { pushOverrideToCloud, pushNoticeToCloud, deleteOverrideFromCloud, deleteNoticeFromCloud } from './firebaseSync';
 import { pushRecordToGoogleSheetWebhook } from './googleSheetsSync';
 import { getSriLankaDateStr } from '../utils/dateUtils';
 
@@ -73,20 +73,28 @@ export const removeNotice = (id) => {
   const current = getStoredNotices();
   const updated = current.filter(n => n.id !== id);
   localStorage.setItem('mis_notices', JSON.stringify(updated));
+  deleteNoticeFromCloud(id);
   addAuditLog('Removed Notice', `Admin deleted notice ID: ${id}`);
+  window.dispatchEvent(new Event('notices_updated'));
   return updated;
 };
 
 export const updateNotice = (id, title, content) => {
   const current = getStoredNotices();
+  let updatedNotice = null;
   const updated = current.map(n => {
     if (n.id === id) {
-      return { ...n, title, content };
+      updatedNotice = { ...n, title, content };
+      return updatedNotice;
     }
     return n;
   });
   localStorage.setItem('mis_notices', JSON.stringify(updated));
+  if (updatedNotice) {
+    pushNoticeToCloud(updatedNotice);
+  }
   addAuditLog('Updated Notice', `Admin edited notice: "${title}"`);
+  window.dispatchEvent(new Event('notices_updated'));
   return updated;
 };
 
@@ -225,6 +233,12 @@ export const getModulesForDate = (dateStr) => {
 // Function: Un-cancel / Restore a Canceled Lecture
 export const uncancelScheduleSlot = ({ date, module, reason = '' }) => {
   const currentOverrides = getStoredOverrides();
+  const overridesToRemove = currentOverrides.filter(o => o.date === date && (o.module === module || o.module === 'ALL'));
+  
+  overridesToRemove.forEach(o => {
+    deleteOverrideFromCloud(o.id || `${o.date}_${o.module}`);
+  });
+
   const updatedOverrides = currentOverrides.filter(o => !(o.date === date && (o.module === module || o.module === 'ALL')));
   saveStoredOverrides(updatedOverrides);
 

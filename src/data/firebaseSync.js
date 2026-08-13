@@ -44,10 +44,9 @@ export const initRealtimeCloudSync = () => {
       snapshot.forEach((docSnap) => {
         cloudData.push({ id: docSnap.id, ...docSnap.data() });
       });
-      if (cloudData.length > 0) {
-        localStorage.setItem('mis_schedule_overrides', JSON.stringify(cloudData));
-        notifySubscribers('overrides', cloudData);
-      }
+      localStorage.setItem('mis_schedule_overrides', JSON.stringify(cloudData));
+      notifySubscribers('overrides', cloudData);
+      window.dispatchEvent(new Event('schedule_overrides_updated'));
     }, (err) => {
       console.warn("Firestore overrides subscription notice:", err);
     });
@@ -63,11 +62,10 @@ export const initRealtimeCloudSync = () => {
       snapshot.forEach((docSnap) => {
         cloudNotices.push({ id: docSnap.id, ...docSnap.data() });
       });
-      if (cloudNotices.length > 0) {
-        cloudNotices.sort((a, b) => b.id - a.id);
-        localStorage.setItem('mis_notices', JSON.stringify(cloudNotices));
-        notifySubscribers('notices', cloudNotices);
-      }
+      cloudNotices.sort((a, b) => b.id - a.id);
+      localStorage.setItem('mis_notices', JSON.stringify(cloudNotices));
+      notifySubscribers('notices', cloudNotices);
+      window.dispatchEvent(new Event('notices_updated'));
     }, (err) => {
       console.warn("Firestore notices subscription notice:", err);
     });
@@ -83,10 +81,9 @@ export const initRealtimeCloudSync = () => {
       snapshot.forEach((docSnap) => {
         attendanceMap[docSnap.id] = docSnap.data();
       });
-      if (Object.keys(attendanceMap).length > 0) {
-        localStorage.setItem('eschedular26_lab_attendance', JSON.stringify(attendanceMap));
-        notifySubscribers('lab_attendance', attendanceMap);
-      }
+      localStorage.setItem('eschedular26_lab_attendance', JSON.stringify(attendanceMap));
+      notifySubscribers('lab_attendance', attendanceMap);
+      window.dispatchEvent(new Event('lab_attendance_updated'));
     }, (err) => {
       console.warn("Firestore lab attendance subscription notice:", err);
     });
@@ -105,6 +102,9 @@ export const initRealtimeCloudSync = () => {
       logsData.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
       localStorage.setItem('mis_daily_logs', JSON.stringify(logsData));
       notifySubscribers('daily_logs', logsData);
+      window.dispatchEvent(new Event('daily_logs_updated'));
+      window.dispatchEvent(new Event('module_hours_updated'));
+      window.dispatchEvent(new Event('schedule_overrides_updated'));
     }, (err) => {
       console.warn("Firestore daily_logs subscription notice:", err);
     });
@@ -122,6 +122,7 @@ export const initRealtimeCloudSync = () => {
       });
       localStorage.setItem('mis_module_hours', JSON.stringify(hoursData));
       notifySubscribers('module_hours', hoursData);
+      window.dispatchEvent(new Event('module_hours_updated'));
     }, (err) => {
       console.warn("Firestore module_hours subscription notice:", err);
     });
@@ -317,5 +318,27 @@ export const clearCloudDailyLogsAndHours = async () => {
     console.log("✅ Successfully cleared all daily logs and reset module hours in Cloud Firestore!");
   } catch (err) {
     console.error("Failed to clear cloud daily logs and hours:", err);
+  }
+};
+
+// Delete Schedule Override document from Cloud Firestore
+export const deleteOverrideFromCloud = async (docId) => {
+  if (!isFirebaseConfigured() || !db || !docId) return;
+  try {
+    await deleteDoc(doc(db, 'schedule_overrides', String(docId)));
+    console.log(`✅ Deleted schedule override from cloud: ${docId}`);
+  } catch (err) {
+    console.error("Failed to delete schedule override from cloud:", err);
+  }
+};
+
+// Delete Department Notice document from Cloud Firestore
+export const deleteNoticeFromCloud = async (docId) => {
+  if (!isFirebaseConfigured() || !docId) return;
+  try {
+    await deleteDoc(doc(db, 'notices', String(docId)));
+    console.log(`✅ Deleted notice from cloud: ${docId}`);
+  } catch (err) {
+    console.error("Failed to delete notice from cloud:", err);
   }
 };
