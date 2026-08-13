@@ -123,14 +123,51 @@ export const initialModuleHours = [
     code: 'EE3203',
     title: 'Electrical and Electronic Measurements',
     conductedHours: 0,
-    targetHours: 30,
+    targetHours: 25,
     weeklyHours: 2,
     venue: 'NCC',
     credits: 2,
     coordinator: 'Dr. Geeth Priyankara',
     email: 'geeth@eie.ruh.ac.lk',
     teachers: ['Dr. Geeth Priyankara', 'Mr. Chamod Dissanayake'],
-    gradingScheme: defaultGradingScheme
+    gradingScheme: [
+      {
+        category: 'Continuous Assessments (CA)',
+        weight: '40%',
+        components: [
+          { name: 'Laboratories', weight: '15%' },
+          { name: 'Take Home Assignment', weight: '5%' },
+          { name: 'In-class Assessment', weight: '20%' }
+        ]
+      },
+      {
+        category: 'End Semester Examination',
+        weight: '60%',
+        components: [
+          { name: 'Written Examination', weight: '60%' }
+        ]
+      }
+    ],
+    passConditions: [
+      {
+        title: 'Continuous Assessment Minimum',
+        criteria: 'Earn at least 35% (i.e. 14 / 40 marks) of Continuous Assessment marks',
+        minPercentage: '35%',
+        minMarks: '14 / 40 Marks'
+      },
+      {
+        title: 'End Semester Examination Minimum',
+        criteria: 'Achieve at least 35% (i.e. 21 / 60 marks) allocated for End Semester Examination',
+        minPercentage: '35%',
+        minMarks: '21 / 60 Marks'
+      },
+      {
+        title: 'Overall Module Minimum',
+        criteria: 'Obtain an overall aggregate score of at least 40% (i.e. 40 / 100 total marks)',
+        minPercentage: '40%',
+        minMarks: '40 / 100 Marks'
+      }
+    ]
   },
   {
     code: 'EE3304',
