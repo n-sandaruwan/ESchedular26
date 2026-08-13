@@ -12,7 +12,8 @@ export const studentRegistry = [
   { regNo: 'EG/2023/015', name: 'K. L. Silva', labGroup: 'Group A2', practicalSlot: 'Wed 08:30 - 11:30 (Software Lab)' },
   { regNo: 'EG/2023/042', name: 'M. N. Fernando', labGroup: 'Group B1', practicalSlot: 'Fri 01:30 - 03:30 (Power Lab)' },
   { regNo: 'EG/2023/088', name: 'S. T. Bandara', labGroup: 'Group B2', practicalSlot: 'Fri 01:30 - 03:30 (Machines Lab)' },
-  { regNo: 'EG/2023/120', name: 'R. P. Jayawardena', labGroup: 'Group C1', practicalSlot: 'Wed 08:30 - 11:30 (Measurement Lab)' }
+  { regNo: 'EG/2023/120', name: 'R. P. Jayawardena', labGroup: 'Group C1', practicalSlot: 'Wed 08:30 - 11:30 (Measurement Lab)' },
+  { regNo: 'EG/2023/5528', name: 'BASNAYAKA B.M.V.H.', labGroup: 'EE12', practicalSlot: 'EE12 Lab Slot' }
 ];
 
 import { getStoredModuleHours, saveStoredModuleHours, recalculateModuleHoursFromLogs } from './moduleHoursData';

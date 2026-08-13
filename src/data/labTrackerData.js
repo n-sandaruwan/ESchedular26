@@ -125,6 +125,7 @@ export const INITIAL_STUDENTS = [
   { reg_no: 'EG/2024/6535', name: 'WIDURUSINGHE L.S.', group_id: 12, group_code: 'EE12' },
   { reg_no: 'EG/2024/6548', name: 'WIJEWEERA C.D.', group_id: 12, group_code: 'EE12' },
   { reg_no: 'EG/2024/6550', name: 'DE SILVA S.I.M', group_id: 12, group_code: 'EE12' },
+  { reg_no: 'EG/2023/5528', name: 'BASNAYAKA B.M.V.H.', group_id: 12, group_code: 'EE12' },
 ];
 
 // Helper array generators for groups
