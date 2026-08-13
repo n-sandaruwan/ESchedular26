@@ -70,7 +70,6 @@ function Login() {
             <span className="material-symbols-outlined text-2xl">lock</span>
           </div>
           <h1 className="font-headline-md text-2xl font-bold text-on-surface">Admin Login</h1>
-          <p className="text-xs text-on-surface-variant mt-1">Authorized Access for Department & Lab Administrators</p>
         </div>
 
         {/* Credentials Guidance Directions Card */}
