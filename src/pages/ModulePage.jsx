@@ -16,6 +16,9 @@ function ModulePage() {
   const [canceledSessions, setCanceledSessions] = useState([]);
   const [rescheduledSessions, setRescheduledSessions] = useState([]);
   const [conductedSessions, setConductedSessions] = useState([]);
+  const [showAllConducted, setShowAllConducted] = useState(false);
+  const [showAllRescheduled, setShowAllRescheduled] = useState(false);
+  const [showAllCanceled, setShowAllCanceled] = useState(false);
 
   const refreshModuleData = () => {
     const list = getStoredModuleHours();
@@ -509,61 +512,80 @@ function ModulePage() {
             No conducted lecture logs recorded yet for {selectedModule.code}.
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {conductedSessions.map((session, index) => (
-              <div
-                key={index}
-                className="bg-surface-container/70 border border-secondary/20 hover:border-secondary/40 rounded-xl p-3.5 flex flex-col justify-between gap-2.5 transition-all shadow-md"
-              >
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-secondary text-base">verified</span>
-                    <h4 className="font-headline-md font-bold text-on-surface text-sm">{session.date}</h4>
+          <div className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {(showAllConducted ? conductedSessions : conductedSessions.slice(0, 4)).map((session, index) => (
+                <div
+                  key={index}
+                  className="bg-surface-container/70 border border-secondary/20 hover:border-secondary/40 rounded-xl p-3.5 flex flex-col justify-between gap-2.5 transition-all shadow-md"
+                >
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <span className="material-symbols-outlined text-secondary text-base">verified</span>
+                      <h4 className="font-headline-md font-bold text-on-surface text-sm">{session.date}</h4>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-xs bg-secondary/15 text-secondary border border-secondary/30 px-2 py-0.5 rounded-full font-bold">
+                        +{session.hours} hrs
+                      </span>
+                      <span className="font-label-bold text-[11px] px-2 py-0.5 rounded-full bg-secondary/10 text-secondary border border-secondary/20">
+                        ✓ Done
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-xs bg-secondary/15 text-secondary border border-secondary/30 px-2 py-0.5 rounded-full font-bold">
-                      +{session.hours} hrs
-                    </span>
-                    <span className="font-label-bold text-[11px] px-2 py-0.5 rounded-full bg-secondary/10 text-secondary border border-secondary/20">
-                      ✓ Done
-                    </span>
-                  </div>
-                </div>
 
-                <div className="flex flex-wrap gap-3 text-xs pt-2 border-t border-white/5">
-                  {session.venue && (
-                    <span className="flex items-center gap-1 text-on-surface-variant font-label-bold">
-                      <span className="material-symbols-outlined text-xs text-primary">location_on</span>
-                      Venue: <strong className="text-on-surface">{session.venue}</strong>
-                    </span>
+                  <div className="flex flex-wrap gap-3 text-xs pt-2 border-t border-white/5">
+                    {session.venue && (
+                      <span className="flex items-center gap-1 text-on-surface-variant font-label-bold">
+                        <span className="material-symbols-outlined text-xs text-primary">location_on</span>
+                        Venue: <strong className="text-on-surface">{session.venue}</strong>
+                      </span>
+                    )}
+                    {session.instructor && (
+                      <span className="flex items-center gap-1 text-on-surface-variant font-label-bold">
+                        <span className="material-symbols-outlined text-xs text-secondary">person</span>
+                        <strong className="text-on-surface">{session.instructor}</strong>
+                      </span>
+                    )}
+                  </div>
+
+                  {session.topic && (
+                    <div className="pt-2 border-t border-white/5 text-xs">
+                      <p className="text-on-surface-variant italic font-body-md text-xs">Note: {session.topic}</p>
+                    </div>
                   )}
-                  {session.instructor && (
-                    <span className="flex items-center gap-1 text-on-surface-variant font-label-bold">
-                      <span className="material-symbols-outlined text-xs text-secondary">person</span>
-                      <strong className="text-on-surface">{session.instructor}</strong>
-                    </span>
+
+                  {isAdmin && (
+                    <div className="pt-2.5 border-t border-white/5 flex items-center justify-end gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleResetConductedSession(session.date, selectedModule.code)}
+                        className="px-2.5 py-1 rounded bg-orange-500/15 text-orange-400 border border-orange-500/30 text-xs font-label-bold hover:bg-orange-500/25 cursor-pointer flex items-center gap-1"
+                      >
+                        <span className="material-symbols-outlined text-xs">restart_alt</span> Reset Conducted Status
+                      </button>
+                    </div>
                   )}
                 </div>
+              ))}
+            </div>
 
-                {session.topic && (
-                  <div className="pt-2 border-t border-white/5 text-xs">
-                    <p className="text-on-surface-variant italic font-body-md text-xs">Note: {session.topic}</p>
-                  </div>
-                )}
-
-                {isAdmin && (
-                  <div className="pt-2.5 border-t border-white/5 flex items-center justify-end gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleResetConductedSession(session.date, selectedModule.code)}
-                      className="px-2.5 py-1 rounded bg-orange-500/15 text-orange-400 border border-orange-500/30 text-xs font-label-bold hover:bg-orange-500/25 cursor-pointer flex items-center gap-1"
-                    >
-                      <span className="material-symbols-outlined text-xs">restart_alt</span> Reset Conducted Status
-                    </button>
-                  </div>
-                )}
+            {conductedSessions.length > 4 && (
+              <div className="pt-1 text-center">
+                <button
+                  type="button"
+                  onClick={() => setShowAllConducted(!showAllConducted)}
+                  className="px-4 py-2 rounded-xl bg-secondary/15 text-secondary border border-secondary/30 hover:bg-secondary/25 text-xs font-label-bold inline-flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+                >
+                  <span className="material-symbols-outlined text-base">
+                    {showAllConducted ? 'expand_less' : 'expand_more'}
+                  </span>
+                  <span>
+                    {showAllConducted ? 'Show Less' : `See More (${conductedSessions.length - 4} More Conducted Sessions)`}
+                  </span>
+                </button>
               </div>
-            ))}
+            )}
           </div>
         )}
       </div>
@@ -588,63 +610,82 @@ function ModulePage() {
             No rescheduled lecture slots recorded for {selectedModule.code}.
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {rescheduledSessions.map((session, index) => (
-              <div
-                key={index}
-                className="bg-surface-container/70 border border-primary/20 hover:border-primary/40 bg-primary/5 rounded-xl p-4 flex flex-col justify-between gap-2.5 transition-all shadow-md"
-              >
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-primary text-base">update</span>
-                    <h4 className="font-headline-md font-bold text-on-surface text-sm">{session.date}</h4>
+          <div className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {(showAllRescheduled ? rescheduledSessions : rescheduledSessions.slice(0, 3)).map((session, index) => (
+                <div
+                  key={index}
+                  className="bg-surface-container/70 border border-primary/20 hover:border-primary/40 bg-primary/5 rounded-xl p-4 flex flex-col justify-between gap-2.5 transition-all shadow-md"
+                >
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <span className="material-symbols-outlined text-primary text-base">update</span>
+                      <h4 className="font-headline-md font-bold text-on-surface text-sm">{session.date}</h4>
+                    </div>
+                    <span className="font-label-bold text-xs px-2.5 py-0.5 rounded-full bg-primary/15 text-primary border border-primary/30">
+                      🔄 Rescheduled
+                    </span>
                   </div>
-                  <span className="font-label-bold text-xs px-2.5 py-0.5 rounded-full bg-primary/15 text-primary border border-primary/30">
-                    🔄 Rescheduled
+
+                  <div className="flex flex-wrap gap-3 text-xs pt-2 border-t border-white/5">
+                    {session.time && (
+                      <span className="flex items-center gap-1 text-primary font-label-bold">
+                        <span className="material-symbols-outlined text-xs">schedule</span>
+                        {session.time}
+                      </span>
+                    )}
+                    {session.venue && (
+                      <span className="flex items-center gap-1 text-on-surface-variant font-label-bold">
+                        <span className="material-symbols-outlined text-xs">location_on</span>
+                        Venue: <strong className="text-on-surface">{session.venue}</strong>
+                      </span>
+                    )}
+                  </div>
+
+                  {session.reason && (
+                    <div className="pt-2 border-t border-white/5 text-xs">
+                      <p className="text-on-surface-variant italic font-body-md">"{session.reason}"</p>
+                    </div>
+                  )}
+
+                  {isAdmin && (
+                    <div className="pt-2.5 border-t border-white/5 flex items-center justify-end gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleUncancelSession(session.date, selectedModule.code)}
+                        className="px-2.5 py-1 rounded bg-secondary/15 text-secondary border border-secondary/30 text-xs font-label-bold hover:bg-secondary/25 cursor-pointer flex items-center gap-1"
+                      >
+                        <span className="material-symbols-outlined text-xs">undo</span> Un-cancel / Restore
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleRecancelSession(session.date, selectedModule.code, session.reason)}
+                        className="px-2.5 py-1 rounded bg-error/15 text-error border border-error/30 text-xs font-label-bold hover:bg-error/25 cursor-pointer flex items-center gap-1"
+                      >
+                        <span className="material-symbols-outlined text-xs">edit_note</span> Re-cancel
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {rescheduledSessions.length > 3 && (
+              <div className="pt-1 text-center">
+                <button
+                  type="button"
+                  onClick={() => setShowAllRescheduled(!showAllRescheduled)}
+                  className="px-4 py-2 rounded-xl bg-primary/15 text-primary border border-primary/30 hover:bg-primary/25 text-xs font-label-bold inline-flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+                >
+                  <span className="material-symbols-outlined text-base">
+                    {showAllRescheduled ? 'expand_less' : 'expand_more'}
                   </span>
-                </div>
-
-                <div className="flex flex-wrap gap-3 text-xs pt-2 border-t border-white/5">
-                  {session.time && (
-                    <span className="flex items-center gap-1 text-primary font-label-bold">
-                      <span className="material-symbols-outlined text-xs">schedule</span>
-                      {session.time}
-                    </span>
-                  )}
-                  {session.venue && (
-                    <span className="flex items-center gap-1 text-on-surface-variant font-label-bold">
-                      <span className="material-symbols-outlined text-xs">location_on</span>
-                      Venue: <strong className="text-on-surface">{session.venue}</strong>
-                    </span>
-                  )}
-                </div>
-
-                {session.reason && (
-                  <div className="pt-2 border-t border-white/5 text-xs">
-                    <p className="text-on-surface-variant italic font-body-md">"{session.reason}"</p>
-                  </div>
-                )}
-
-                {isAdmin && (
-                  <div className="pt-2.5 border-t border-white/5 flex items-center justify-end gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleUncancelSession(session.date, selectedModule.code)}
-                      className="px-2.5 py-1 rounded bg-secondary/15 text-secondary border border-secondary/30 text-xs font-label-bold hover:bg-secondary/25 cursor-pointer flex items-center gap-1"
-                    >
-                      <span className="material-symbols-outlined text-xs">undo</span> Un-cancel / Restore
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleRecancelSession(session.date, selectedModule.code, session.reason)}
-                      className="px-2.5 py-1 rounded bg-error/15 text-error border border-error/30 text-xs font-label-bold hover:bg-error/25 cursor-pointer flex items-center gap-1"
-                    >
-                      <span className="material-symbols-outlined text-xs">edit_note</span> Re-cancel
-                    </button>
-                  </div>
-                )}
+                  <span>
+                    {showAllRescheduled ? 'Show Less' : `See More (${rescheduledSessions.length - 3} More Rescheduled)`}
+                  </span>
+                </button>
               </div>
-            ))}
+            )}
           </div>
         )}
       </div>
@@ -669,48 +710,67 @@ function ModulePage() {
             No canceled sessions recorded for {selectedModule.code}.
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {canceledSessions.map((session, index) => (
-              <div
-                key={index}
-                className="bg-surface-container/70 border border-error/20 hover:border-error/40 bg-error/5 rounded-xl p-4 flex flex-col justify-between gap-2.5 transition-all shadow-md"
-              >
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center gap-2">
-                    <span className="material-symbols-outlined text-error text-base">event_busy</span>
-                    <h4 className="font-headline-md font-bold text-on-surface text-sm">{session.date}</h4>
+          <div className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {(showAllCanceled ? canceledSessions : canceledSessions.slice(0, 3)).map((session, index) => (
+                <div
+                  key={index}
+                  className="bg-surface-container/70 border border-error/20 hover:border-error/40 bg-error/5 rounded-xl p-4 flex flex-col justify-between gap-2.5 transition-all shadow-md"
+                >
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <span className="material-symbols-outlined text-error text-base">event_busy</span>
+                      <h4 className="font-headline-md font-bold text-on-surface text-sm">{session.date}</h4>
+                    </div>
+                    <span className="font-label-bold text-xs px-2.5 py-0.5 rounded-full bg-error/10 text-error border border-error/20">
+                      Canceled
+                    </span>
                   </div>
-                  <span className="font-label-bold text-xs px-2.5 py-0.5 rounded-full bg-error/10 text-error border border-error/20">
-                    Canceled
-                  </span>
+
+                  {session.reason && (
+                    <div className="pt-2 border-t border-white/5 text-xs">
+                      <p className="text-on-surface-variant italic font-body-md">"{session.reason}"</p>
+                    </div>
+                  )}
+
+                  {isAdmin && (
+                    <div className="pt-2.5 border-t border-white/5 flex items-center justify-end gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleUncancelSession(session.date, selectedModule.code)}
+                        className="px-2.5 py-1 rounded bg-secondary/15 text-secondary border border-secondary/30 text-xs font-label-bold hover:bg-secondary/25 cursor-pointer flex items-center gap-1"
+                      >
+                        <span className="material-symbols-outlined text-xs">undo</span> Un-cancel / Restore
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleRecancelSession(session.date, selectedModule.code, session.reason)}
+                        className="px-2.5 py-1 rounded bg-error/15 text-error border border-error/30 text-xs font-label-bold hover:bg-error/25 cursor-pointer flex items-center gap-1"
+                      >
+                        <span className="material-symbols-outlined text-xs">edit_note</span> Re-cancel
+                      </button>
+                    </div>
+                  )}
                 </div>
+              ))}
+            </div>
 
-                {session.reason && (
-                  <div className="pt-2 border-t border-white/5 text-xs">
-                    <p className="text-on-surface-variant italic font-body-md">"{session.reason}"</p>
-                  </div>
-                )}
-
-                {isAdmin && (
-                  <div className="pt-2.5 border-t border-white/5 flex items-center justify-end gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleUncancelSession(session.date, selectedModule.code)}
-                      className="px-2.5 py-1 rounded bg-secondary/15 text-secondary border border-secondary/30 text-xs font-label-bold hover:bg-secondary/25 cursor-pointer flex items-center gap-1"
-                    >
-                      <span className="material-symbols-outlined text-xs">undo</span> Un-cancel / Restore
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleRecancelSession(session.date, selectedModule.code, session.reason)}
-                      className="px-2.5 py-1 rounded bg-error/15 text-error border border-error/30 text-xs font-label-bold hover:bg-error/25 cursor-pointer flex items-center gap-1"
-                    >
-                      <span className="material-symbols-outlined text-xs">edit_note</span> Re-cancel
-                    </button>
-                  </div>
-                )}
+            {canceledSessions.length > 3 && (
+              <div className="pt-1 text-center">
+                <button
+                  type="button"
+                  onClick={() => setShowAllCanceled(!showAllCanceled)}
+                  className="px-4 py-2 rounded-xl bg-error/15 text-error border border-error/30 hover:bg-error/25 text-xs font-label-bold inline-flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+                >
+                  <span className="material-symbols-outlined text-base">
+                    {showAllCanceled ? 'expand_less' : 'expand_more'}
+                  </span>
+                  <span>
+                    {showAllCanceled ? 'Show Less' : `See More (${canceledSessions.length - 3} More Canceled)`}
+                  </span>
+                </button>
               </div>
-            ))}
+            )}
           </div>
         )}
       </div>
