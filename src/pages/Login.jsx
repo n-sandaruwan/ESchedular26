@@ -146,14 +146,29 @@ function Login() {
           </button>
         </form>
 
-        {/* Footer Return Link */}
-        <div className="pt-2 border-t border-white/5 text-center">
-          <Link
-            to="/"
-            className="text-xs text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center gap-1 font-label-bold"
+        {/* Quick 1-Click Admin Access */}
+        <div className="pt-2 border-t border-white/5 flex flex-col gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              localStorage.setItem('mis_role', 'admin');
+              localStorage.setItem('mis_user', 'Department Administrator');
+              navigate('/admin');
+            }}
+            className="w-full py-2.5 rounded-lg bg-secondary/15 border border-secondary/30 text-secondary font-label-bold text-xs hover:bg-secondary/25 transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-[0_0_15px_rgba(78,222,163,0.15)]"
           >
-            <span className="material-symbols-outlined text-sm">arrow_back</span> Return to Basic Mode
-          </Link>
+            <span className="material-symbols-outlined text-sm text-secondary">bolt</span>
+            1-Click Admin Access (Passcode: 987)
+          </button>
+          
+          <div className="text-center">
+            <Link
+              to="/"
+              className="text-xs text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center gap-1 font-label-bold"
+            >
+              <span className="material-symbols-outlined text-sm">arrow_back</span> Return to Basic Mode
+            </Link>
+          </div>
         </div>
 
       </div>

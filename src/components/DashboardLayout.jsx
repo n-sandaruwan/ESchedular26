@@ -21,7 +21,7 @@ function DashboardLayout({ children }) {
     { name: 'Cancellations', icon: 'event_busy', path: '/cancellations' },
     { name: 'Daily Lecture Logs', icon: 'history_edu', path: '/logs', adminOnly: true },
     { name: 'Audit Trail', icon: 'history', path: '/audit', adminOnly: true },
-    { name: 'Admin Portal', icon: 'admin_panel_settings', path: '/admin', adminOnly: true }
+    { name: 'Admin Portal', icon: 'admin_panel_settings', path: '/admin' }
   ];
 
   const navItems = allNavItems.filter(item => !item.adminOnly || isAdmin);
