@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { getStoredModuleHours, saveStoredModuleHours } from '../data/moduleHoursData';
 import { getStoredDailyLogs, saveStoredDailyLogs, deleteDailyLogByModuleAndDate, addAuditLog } from '../data/dailyLogsData';
 import { getModulesForDate, modifyScheduleSlot, uncancelScheduleSlot, getStoredOverrides, addNotice } from '../data/scheduleStore';
@@ -239,13 +240,21 @@ function AdminDashboard() {
           <h2 className="font-headline-md text-headline-md text-on-surface mt-2">Master Schedule & Log Management</h2>
           <p className="text-on-surface-variant text-xs mt-0.5">Evening Daily Lecture Log is your primary tool. Secondary schedule adjustments available below.</p>
         </div>
-        <button
-          type="button"
-          onClick={handleExitAdmin}
-          className="px-4 py-2 rounded-xl bg-error/10 border border-error/30 text-error hover:bg-error/20 font-label-bold text-xs flex items-center gap-1.5 cursor-pointer shrink-0 self-start md:self-auto"
-        >
-          <span className="material-symbols-outlined text-sm">logout</span> Leave Admin Mode
-        </button>
+        <div className="flex flex-wrap items-center gap-2 self-start md:self-auto shrink-0">
+          <Link
+            to="/"
+            className="px-3.5 py-2 rounded-xl bg-primary/10 border border-primary/30 text-primary hover:bg-primary/20 font-label-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-sm"
+          >
+            <span className="material-symbols-outlined text-sm">home</span> View Home Dashboard
+          </Link>
+          <button
+            type="button"
+            onClick={handleExitAdmin}
+            className="px-3.5 py-2 rounded-xl bg-error/10 border border-error/30 text-error hover:bg-error/20 font-label-bold text-xs flex items-center gap-1.5 cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-sm">logout</span> Leave Admin Mode
+          </button>
+        </div>
       </div>
 
       {statusMsg && (

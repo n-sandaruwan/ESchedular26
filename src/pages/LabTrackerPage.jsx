@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import {
   LAB_GROUPS,
   INITIAL_STUDENTS,
@@ -538,18 +538,27 @@ function LabTrackerPage() {
 
       {/* Sleek Top Banner Header with Tile Navigation */}
       <div className="bg-surface-container/60 backdrop-blur-xl border border-white/10 rounded-2xl p-4 sm:p-5 shadow-xl space-y-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center text-primary shrink-0">
-            <span className="material-symbols-outlined text-xl">biotech</span>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center text-primary shrink-0">
+              <span className="material-symbols-outlined text-xl">biotech</span>
+            </div>
+            <div>
+              <h1 className="font-headline-lg font-extrabold text-on-surface text-lg sm:text-xl tracking-tight">
+                EE Semester 3 Lab Portal
+              </h1>
+              <span className="text-[10px] font-mono text-primary/80 font-bold uppercase tracking-wider block">
+                EE01 – EE12 Academic Directory
+              </span>
+            </div>
           </div>
-          <div>
-            <h1 className="font-headline-lg font-extrabold text-on-surface text-lg sm:text-xl tracking-tight">
-              EE Semester 3 Lab Portal
-            </h1>
-            <span className="text-[10px] font-mono text-primary/80 font-bold uppercase tracking-wider block">
-              EE01 – EE12 Academic Directory
-            </span>
-          </div>
+
+          <Link
+            to="/"
+            className="px-3.5 py-2 rounded-xl bg-primary/10 border border-primary/30 text-primary hover:bg-primary/20 font-label-bold text-xs flex items-center gap-1.5 cursor-pointer shrink-0 self-start sm:self-auto shadow-sm"
+          >
+            <span className="material-symbols-outlined text-sm">home</span> View Home Dashboard
+          </Link>
         </div>
 
         {/* Responsive Navigation Tile Grid */}

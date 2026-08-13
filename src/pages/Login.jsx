@@ -55,22 +55,6 @@ function Login() {
           <h1 className="font-headline-md text-2xl font-bold text-on-surface">Admin Login</h1>
         </div>
 
-        {/* Credentials Guidance Directions Card */}
-        <div className="p-3.5 bg-black/40 border border-white/10 rounded-xl space-y-2 text-xs font-mono">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-primary pb-1.5 border-b border-white/5">
-            <span className="font-bold flex items-center gap-1">
-              <span className="material-symbols-outlined text-sm">admin_panel_settings</span> Full Admin:
-            </span>
-            <span className="text-[11px] text-on-surface-variant">User: <strong className="text-primary">admin</strong> | Pass: <strong className="text-primary">987321</strong></span>
-          </div>
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-secondary pt-0.5">
-            <span className="font-bold flex items-center gap-1">
-              <span className="material-symbols-outlined text-sm">biotech</span> Lab Admin:
-            </span>
-            <span className="text-[11px] text-on-surface-variant">User: <strong className="text-secondary">labadmin</strong> | Pass: <strong className="text-secondary">654</strong></span>
-          </div>
-        </div>
-
         {error && (
           <div className="p-3 rounded-lg bg-error/20 border border-error text-error text-xs text-center font-bold">
             {error}
@@ -87,7 +71,7 @@ function Login() {
               required
               value={username}
               onChange={e => setUsername(e.target.value)}
-              placeholder="e.g. admin or labadmin"
+              placeholder="Username / ID"
             />
           </div>
 
@@ -117,7 +101,7 @@ function Login() {
               to="/"
               className="text-xs text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center gap-1 font-label-bold"
             >
-              <span className="material-symbols-outlined text-sm">arrow_back</span> Return to Home Dashboard
+              <span className="material-symbols-outlined text-sm">arrow_back</span> Go with Basic Mode
             </Link>
           </div>
         </div>
