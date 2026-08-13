@@ -257,7 +257,8 @@ function StudentDashboard() {
       let minsUntilStart = 0;
 
       // Check if this slot has a log entry for the current date
-      const isLogged = dailyLogs.some(log => log.date === dateStr && log.module === slot.module);
+      const logEntry = dailyLogs.find(log => log.date === dateStr && log.module === slot.module);
+      const isLogged = !!logEntry;
 
       if (slot.status === 'Canceled' || slot.status === 'Swapped') {
         liveStatus = slot.status;
@@ -266,13 +267,15 @@ function StudentDashboard() {
       } else if (isPast) {
         liveStatus = isLogged ? 'Done' : 'Awaiting Verification';
       } else if (isFuture) {
-        liveStatus = 'Upcoming';
+        liveStatus = isLogged ? 'Done' : 'Upcoming';
       } else if (isToday) {
         const start = slot.startMin || 510;
         const end = slot.endMin || 630;
 
-        if (nowMin > end) {
-          liveStatus = isLogged ? 'Done' : 'Awaiting Verification';
+        if (isLogged) {
+          liveStatus = 'Done';
+        } else if (nowMin > end) {
+          liveStatus = 'Awaiting Verification';
         } else if (nowMin >= start && nowMin <= end) {
           liveStatus = 'Ongoing';
           const totalDuration = Math.max(1, end - start);
@@ -289,7 +292,8 @@ function StudentDashboard() {
         liveStatus,
         progressPercent,
         minsRemaining,
-        minsUntilStart
+        minsUntilStart,
+        logEntry
       };
     });
   };
@@ -637,6 +641,26 @@ function StudentDashboard() {
                             <p className="text-xs text-on-surface-variant italic font-body-md leading-relaxed">
                               Note: {slot.reason}
                             </p>
+                          </div>
+                        )}
+
+                        {/* Conducted Lecture Log Details Box */}
+                        {isDone && slot.logEntry && (
+                          <div className="mt-3 p-3 rounded-xl bg-secondary/10 border border-secondary/20 space-y-1.5 shadow-[0_0_15px_rgba(78,222,163,0.08)]">
+                            <div className="flex items-center justify-between text-xs font-label-bold text-secondary">
+                              <span className="flex items-center gap-1.5">
+                                <span className="material-symbols-outlined text-sm">verified</span>
+                                Conducted Lecture Log
+                              </span>
+                              <span className="font-mono text-[11px] bg-secondary/20 border border-secondary/30 px-2 py-0.5 rounded text-secondary font-bold">
+                                +{slot.logEntry.hours} hrs Logged
+                              </span>
+                            </div>
+                            {slot.logEntry.topic && (
+                              <p className="text-xs text-on-surface-variant font-body-md">
+                                <strong className="text-on-surface font-semibold">Content / Review:</strong> {slot.logEntry.topic}
+                              </p>
+                            )}
                           </div>
                         )}
 

@@ -43,6 +43,8 @@ export const getStoredDailyLogs = () => {
 export const saveStoredDailyLogs = (logs) => {
   localStorage.setItem('mis_daily_logs', JSON.stringify(logs));
   pushDailyLogsToCloud(logs);
+  window.dispatchEvent(new Event('daily_logs_updated'));
+  window.dispatchEvent(new Event('schedule_overrides_updated'));
 };
 
 export const deleteDailyLogByModuleAndDate = (dateStr, moduleCode) => {
