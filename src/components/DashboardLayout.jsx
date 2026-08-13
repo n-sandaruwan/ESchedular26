@@ -90,15 +90,15 @@ function DashboardLayout({ children }) {
             {isAdmin || isLabAdmin ? (
               <button
                 onClick={handleLeaveAdmin}
-                className="hidden sm:flex items-center gap-1.5 bg-error/10 border border-error/30 hover:bg-error/20 px-3 py-1 rounded-full text-xs font-label-bold text-error transition-colors cursor-pointer"
-                title="Exit Admin/Lab Admin Mode and return to Basic View"
+                className="flex items-center gap-1.5 bg-error/10 border border-error/30 hover:bg-error/20 px-2.5 py-1 rounded-full text-xs font-label-bold text-error transition-colors cursor-pointer"
+                title="Exit Admin / Lab Admin Mode"
               >
                 <span className="material-symbols-outlined text-sm">logout</span> Leave {isLabAdmin ? 'Lab Admin' : 'Admin'}
               </button>
             ) : (
               <Link
                 to="/login"
-                className="hidden sm:flex items-center gap-1.5 btn-electric px-3 py-1 rounded-full text-xs font-label-bold"
+                className="flex items-center gap-1.5 btn-electric px-3 py-1 rounded-full text-xs font-label-bold"
               >
                 <span className="material-symbols-outlined text-sm">login</span> Login / Modes
               </Link>
@@ -106,9 +106,9 @@ function DashboardLayout({ children }) {
 
             {/* Avatar */}
             <div 
-              onClick={() => navigate(isAdmin ? '/admin' : '/login')}
+              onClick={() => navigate(isAdmin ? '/admin' : isLabAdmin ? '/lab-tracker?tab=leader' : '/login')}
               className="w-8 h-8 rounded-full overflow-hidden border border-primary/30 cursor-pointer hover:border-primary transition-colors shrink-0"
-              title={isAdmin ? "Logged in as Admin" : "Click to Login"}
+              title={isAdmin ? "Logged in as Admin" : isLabAdmin ? "Logged in as Lab Admin" : "Click to Login"}
             >
               <img
                 className="w-full h-full object-cover"
@@ -161,7 +161,7 @@ function DashboardLayout({ children }) {
             </div>
 
             <div className="pt-4 border-t border-white/10">
-              {isAdmin ? (
+              {isAdmin || isLabAdmin ? (
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
@@ -170,7 +170,7 @@ function DashboardLayout({ children }) {
                   className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-error/10 border border-error/20 text-error hover:bg-error/20 transition-all text-sm font-label-bold cursor-pointer"
                 >
                   <span className="material-symbols-outlined text-xl">logout</span>
-                  <span>Leave Admin Mode</span>
+                  <span>Leave {isLabAdmin ? 'Lab Admin' : 'Admin'} Mode</span>
                 </button>
               ) : (
                 <button
@@ -224,13 +224,13 @@ function DashboardLayout({ children }) {
         </div>
 
         <div className="mt-auto border-t border-white/10 pt-4 px-2">
-          {isAdmin ? (
+          {isAdmin || isLabAdmin ? (
             <button
               onClick={handleLeaveAdmin}
               className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl bg-error/10 border border-error/20 text-error hover:bg-error/20 transition-all text-sm font-label-bold cursor-pointer"
             >
               <span className="material-symbols-outlined text-xl">logout</span>
-              <span>Leave Admin Mode</span>
+              <span>Leave {isLabAdmin ? 'Lab Admin' : 'Admin'} Mode</span>
             </button>
           ) : (
             <button
@@ -286,25 +286,27 @@ function DashboardLayout({ children }) {
           <span className="font-label-sm text-[11px]">Labs</span>
         </Link>
 
-        {isAdmin ? (
+        {isAdmin || isLabAdmin ? (
           <>
-            <Link
-              to="/logs"
-              className={`flex flex-col items-center justify-center transition-all duration-200 active:scale-90 ${
-                location.pathname === '/logs' ? 'text-primary drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]' : 'text-on-surface-variant/60 hover:text-primary/80'
-              }`}
-            >
-              <span className="material-symbols-outlined text-xl">history_edu</span>
-              <span className="font-label-sm text-[11px]">Logs</span>
-            </Link>
+            {isAdmin && (
+              <Link
+                to="/logs"
+                className={`flex flex-col items-center justify-center transition-all duration-200 active:scale-90 ${
+                  location.pathname === '/logs' ? 'text-primary drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]' : 'text-on-surface-variant/60 hover:text-primary/80'
+                }`}
+              >
+                <span className="material-symbols-outlined text-xl">history_edu</span>
+                <span className="font-label-sm text-[11px]">Logs</span>
+              </Link>
+            )}
 
             <button
               onClick={handleLeaveAdmin}
               className="flex flex-col items-center justify-center text-error transition-all duration-200 active:scale-90 cursor-pointer"
-              title="Leave Admin Mode"
+              title={`Leave ${isLabAdmin ? 'Lab Admin' : 'Admin'} Mode`}
             >
               <span className="material-symbols-outlined text-xl">logout</span>
-              <span className="font-label-sm text-[11px]">Leave Admin</span>
+              <span className="font-label-sm text-[10px]">Leave {isLabAdmin ? 'Lab Admin' : 'Admin'}</span>
             </button>
           </>
         ) : (

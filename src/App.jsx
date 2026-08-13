@@ -14,18 +14,11 @@ import ProtectedRoute from './components/ProtectedRoute';
 import DashboardLayout from './components/DashboardLayout';
 import './index.css';
 
-function RootRedirect() {
-  const role = localStorage.getItem('mis_role');
-  if (role === 'admin') return <Navigate to="/admin" replace />;
-  if (role === 'lab_admin') return <Navigate to="/lab-tracker?tab=leader" replace />;
-  return <DashboardLayout><StudentDashboard /></DashboardLayout>;
-}
-
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<RootRedirect />} />
+        <Route path="/" element={<DashboardLayout><StudentDashboard /></DashboardLayout>} />
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<DashboardLayout><StudentDashboard /></DashboardLayout>} />
         <Route path="/timetable" element={<DashboardLayout><TimetablePage /></DashboardLayout>} />
