@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getStoredModuleHours, saveStoredModuleHours } from '../data/moduleHoursData';
+import { getStoredDailyLogs, deleteDailyLogByModuleAndDate } from '../data/dailyLogsData';
 import { weeklyTimetable } from '../data/timetableData';
 import { getStoredAssessments, toggleAssessmentStatus } from '../data/assessmentData';
 import { getStoredOverrides, uncancelScheduleSlot, modifyScheduleSlot } from '../data/scheduleStore';
@@ -14,6 +15,7 @@ function ModulePage() {
   const [assessments, setAssessments] = useState([]);
   const [canceledSessions, setCanceledSessions] = useState([]);
   const [rescheduledSessions, setRescheduledSessions] = useState([]);
+  const [conductedSessions, setConductedSessions] = useState([]);
 
   const refreshModuleData = () => {
     const list = getStoredModuleHours();
@@ -22,8 +24,10 @@ function ModulePage() {
     setSelectedModule(match);
     setAssessments(getStoredAssessments());
     
+    const targetCode = match?.code || moduleId;
+
     const overrides = getStoredOverrides();
-    const moduleOverrides = overrides.filter(o => o.module === (match?.code || moduleId));
+    const moduleOverrides = overrides.filter(o => o.module === targetCode);
 
     const canceled = moduleOverrides
       .filter(o => o.status === 'Canceled')
@@ -33,8 +37,14 @@ function ModulePage() {
       .filter(o => o.status === 'Rescheduled')
       .sort((a, b) => new Date(a.date) - new Date(b.date));
 
+    const dailyLogs = getStoredDailyLogs();
+    const conducted = dailyLogs
+      .filter(l => l.module === targetCode && l.date >= '2026-07-27')
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
+
     setCanceledSessions(canceled);
     setRescheduledSessions(rescheduled);
+    setConductedSessions(conducted);
   };
 
   useEffect(() => {
@@ -72,6 +82,13 @@ function ModulePage() {
       reason: newReason || 'Lecturer unavailable'
     });
     refreshModuleData();
+  };
+
+  const handleResetConductedSession = (sessionDate, moduleCode) => {
+    if (window.confirm(`Are you sure you want to RESET / REMOVE the conducted log for ${moduleCode} on ${sessionDate}? This will subtract the logged hours.`)) {
+      deleteDailyLogByModuleAndDate(sessionDate, moduleCode);
+      refreshModuleData();
+    }
   };
 
   const role = localStorage.getItem('mis_role');
@@ -468,6 +485,87 @@ function ModulePage() {
             </h4>
           </div>
         </div>
+      </div>
+
+      {/* Conducted Sessions (Done) Panel */}
+      <div className="glass-card rounded-2xl p-4 sm:p-5 space-y-3.5 border-secondary/20 bg-secondary/5">
+        <div className="flex justify-between items-center pb-3 border-b border-secondary/10">
+          <div>
+            <h3 className="font-headline-md text-base sm:text-lg font-bold text-secondary flex items-center gap-2">
+              <span className="material-symbols-outlined text-secondary text-xl">check_circle</span>
+              Conducted Sessions (Done)
+            </h3>
+            <p className="text-xs text-on-surface-variant mt-0.5">
+              Completed lecture log history for {selectedModule.code} (Total: <strong className="text-secondary">{selectedModule.conductedHours} hrs</strong>)
+            </p>
+          </div>
+          <span className="font-label-bold text-xs text-secondary bg-secondary/10 px-3 py-1 rounded-full border border-secondary/20">
+            {conductedSessions.length} Session{conductedSessions.length !== 1 ? 's' : ''} Conducted
+          </span>
+        </div>
+
+        {conductedSessions.length === 0 ? (
+          <div className="p-4 text-center text-on-surface-variant text-xs">
+            No conducted lecture logs recorded yet for {selectedModule.code}.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {conductedSessions.map((session, index) => (
+              <div
+                key={index}
+                className="bg-surface-container/70 border border-secondary/20 hover:border-secondary/40 rounded-xl p-3.5 flex flex-col justify-between gap-2.5 transition-all shadow-md"
+              >
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-secondary text-base">verified</span>
+                    <h4 className="font-headline-md font-bold text-on-surface text-sm">{session.date}</h4>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-xs bg-secondary/15 text-secondary border border-secondary/30 px-2 py-0.5 rounded-full font-bold">
+                      +{session.hours} hrs
+                    </span>
+                    <span className="font-label-bold text-[11px] px-2 py-0.5 rounded-full bg-secondary/10 text-secondary border border-secondary/20">
+                      ✓ Done
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-3 text-xs pt-2 border-t border-white/5">
+                  {session.venue && (
+                    <span className="flex items-center gap-1 text-on-surface-variant font-label-bold">
+                      <span className="material-symbols-outlined text-xs text-primary">location_on</span>
+                      Venue: <strong className="text-on-surface">{session.venue}</strong>
+                    </span>
+                  )}
+                  {session.instructor && (
+                    <span className="flex items-center gap-1 text-on-surface-variant font-label-bold">
+                      <span className="material-symbols-outlined text-xs text-secondary">person</span>
+                      <strong className="text-on-surface">{session.instructor}</strong>
+                    </span>
+                  )}
+                </div>
+
+                {session.topic && session.topic !== 'Regular Class Completed' && session.topic !== 'Regular Lecture Session Completed' && (
+                  <div className="pt-2 border-t border-white/5 text-xs">
+                    <p className="text-on-surface-variant italic font-body-md">Note: {session.topic}</p>
+                  </div>
+                )}
+
+                {isAdmin && (
+                  <div className="pt-2.5 border-t border-white/5 flex items-center justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleResetConductedSession(session.date, selectedModule.code)}
+                      className="px-2.5 py-1 rounded bg-orange-500/15 text-orange-400 border border-orange-500/30 text-xs font-label-bold hover:bg-orange-500/25 cursor-pointer flex items-center gap-1"
+                    >
+                      <span className="material-symbols-outlined text-xs">restart_alt</span> Reset Conducted Status
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Rescheduled Sessions Panel */}
