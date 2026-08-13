@@ -13,6 +13,7 @@ function ModulePage() {
   const [selectedModule, setSelectedModule] = useState(null);
   const [assessments, setAssessments] = useState([]);
   const [canceledSessions, setCanceledSessions] = useState([]);
+  const [rescheduledSessions, setRescheduledSessions] = useState([]);
 
   const refreshModuleData = () => {
     const list = getStoredModuleHours();
@@ -22,10 +23,18 @@ function ModulePage() {
     setAssessments(getStoredAssessments());
     
     const overrides = getStoredOverrides();
-    const modified = overrides
-      .filter(o => o.module === (match?.code || moduleId) && (o.status === 'Canceled' || o.status === 'Rescheduled'))
+    const moduleOverrides = overrides.filter(o => o.module === (match?.code || moduleId));
+
+    const canceled = moduleOverrides
+      .filter(o => o.status === 'Canceled')
       .sort((a, b) => new Date(a.date) - new Date(b.date));
-    setCanceledSessions(modified);
+
+    const rescheduled = moduleOverrides
+      .filter(o => o.status === 'Rescheduled')
+      .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    setCanceledSessions(canceled);
+    setRescheduledSessions(rescheduled);
   };
 
   useEffect(() => {
@@ -461,102 +470,149 @@ function ModulePage() {
         </div>
       </div>
 
-      {/* Canceled & Rescheduled Sessions Panel */}
+      {/* Rescheduled Sessions Panel */}
       <div className="glass-card rounded-2xl p-4 sm:p-5 space-y-3.5 border-white/5">
         <div className="flex justify-between items-center pb-3 border-b border-white/5">
           <div>
             <h3 className="font-headline-md text-base sm:text-lg font-bold text-on-surface flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary text-xl">event_repeat</span>
-              Canceled & Rescheduled Sessions
+              <span className="material-symbols-outlined text-primary text-xl">update</span>
+              Rescheduled Sessions
             </h3>
-            <p className="text-xs text-on-surface-variant mt-0.5">Recorded cancellations and rescheduled slot changes for {selectedModule.code}</p>
+            <p className="text-xs text-on-surface-variant mt-0.5">Recorded rescheduled lecture slots for {selectedModule.code}</p>
           </div>
           <span className="font-label-bold text-xs text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
-            {canceledSessions.length} Entry{canceledSessions.length !== 1 ? 'ies' : ''}
+            {rescheduledSessions.length} Rescheduled
+          </span>
+        </div>
+
+        {rescheduledSessions.length === 0 ? (
+          <div className="p-4 text-center text-on-surface-variant text-xs">
+            No rescheduled lecture slots recorded for {selectedModule.code}.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {rescheduledSessions.map((session, index) => (
+              <div
+                key={index}
+                className="bg-surface-container/70 border border-primary/20 hover:border-primary/40 bg-primary/5 rounded-xl p-4 flex flex-col justify-between gap-2.5 transition-all shadow-md"
+              >
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-primary text-base">update</span>
+                    <h4 className="font-headline-md font-bold text-on-surface text-sm">{session.date}</h4>
+                  </div>
+                  <span className="font-label-bold text-xs px-2.5 py-0.5 rounded-full bg-primary/15 text-primary border border-primary/30">
+                    🔄 Rescheduled
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap gap-3 text-xs pt-2 border-t border-white/5">
+                  {session.time && (
+                    <span className="flex items-center gap-1 text-primary font-label-bold">
+                      <span className="material-symbols-outlined text-xs">schedule</span>
+                      {session.time}
+                    </span>
+                  )}
+                  {session.venue && (
+                    <span className="flex items-center gap-1 text-on-surface-variant font-label-bold">
+                      <span className="material-symbols-outlined text-xs">location_on</span>
+                      Venue: <strong className="text-on-surface">{session.venue}</strong>
+                    </span>
+                  )}
+                </div>
+
+                {session.reason && (
+                  <div className="pt-2 border-t border-white/5 text-xs">
+                    <p className="text-on-surface-variant italic font-body-md">"{session.reason}"</p>
+                  </div>
+                )}
+
+                {isAdmin && (
+                  <div className="pt-2.5 border-t border-white/5 flex items-center justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleUncancelSession(session.date, selectedModule.code)}
+                      className="px-2.5 py-1 rounded bg-secondary/15 text-secondary border border-secondary/30 text-xs font-label-bold hover:bg-secondary/25 cursor-pointer flex items-center gap-1"
+                    >
+                      <span className="material-symbols-outlined text-xs">undo</span> Un-cancel / Restore
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleRecancelSession(session.date, selectedModule.code, session.reason)}
+                      className="px-2.5 py-1 rounded bg-error/15 text-error border border-error/30 text-xs font-label-bold hover:bg-error/25 cursor-pointer flex items-center gap-1"
+                    >
+                      <span className="material-symbols-outlined text-xs">edit_note</span> Re-cancel
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Canceled Sessions Panel */}
+      <div className="glass-card rounded-2xl p-4 sm:p-5 space-y-3.5 border-error/20 bg-error/5">
+        <div className="flex justify-between items-center pb-3 border-b border-error/10">
+          <div>
+            <h3 className="font-headline-md text-base sm:text-lg font-bold text-error flex items-center gap-2">
+              <span className="material-symbols-outlined text-error text-xl">event_busy</span>
+              Canceled Sessions
+            </h3>
+            <p className="text-xs text-error/80 mt-0.5">Recorded cancellations for {selectedModule.code}</p>
+          </div>
+          <span className="font-label-bold text-xs text-error bg-error/10 px-3 py-1 rounded-full border border-error/20">
+            {canceledSessions.length} Canceled
           </span>
         </div>
 
         {canceledSessions.length === 0 ? (
-          <div className="p-6 text-center text-on-surface-variant text-xs glass-card rounded-xl border border-white/5">
-            <span className="material-symbols-outlined text-3xl text-secondary mb-1">check_circle</span>
-            <p className="font-bold text-on-surface">No Schedule Modifications</p>
-            <p className="text-xs text-on-surface-variant mt-0.5">All regular weekly sessions for {selectedModule.code} follow the standard timetable.</p>
+          <div className="p-4 text-center text-on-surface-variant text-xs">
+            No canceled sessions recorded for {selectedModule.code}.
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {canceledSessions.map((session, index) => {
-              const isCanceled = session.status === 'Canceled';
-
-              return (
-                <div
-                  key={index}
-                  className={`bg-surface-container/70 border rounded-xl p-4 flex flex-col justify-between gap-2.5 transition-all shadow-md ${
-                    isCanceled ? 'border-error/20 hover:border-error/40 bg-error/5' : 'border-primary/20 hover:border-primary/40 bg-primary/5'
-                  }`}
-                >
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <span className={`material-symbols-outlined text-base ${isCanceled ? 'text-error' : 'text-primary'}`}>
-                        {isCanceled ? 'event_busy' : 'update'}
-                      </span>
-                      <h4 className="font-headline-md font-bold text-on-surface text-sm">{session.date}</h4>
-                    </div>
-                    <span className={`font-label-bold text-xs px-2.5 py-0.5 rounded-full border ${
-                      isCanceled
-                        ? 'bg-error/10 text-error border-error/20'
-                        : 'bg-primary/15 text-primary border-primary/30'
-                    }`}>
-                      {session.status}
-                    </span>
+            {canceledSessions.map((session, index) => (
+              <div
+                key={index}
+                className="bg-surface-container/70 border border-error/20 hover:border-error/40 bg-error/5 rounded-xl p-4 flex flex-col justify-between gap-2.5 transition-all shadow-md"
+              >
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-error text-base">event_busy</span>
+                    <h4 className="font-headline-md font-bold text-on-surface text-sm">{session.date}</h4>
                   </div>
-
-                  {/* Rescheduled Slot Details */}
-                  {!isCanceled && (
-                    <div className="flex flex-wrap gap-3 text-xs pt-2 border-t border-white/5">
-                      {session.time && (
-                        <span className="flex items-center gap-1 text-primary font-label-bold">
-                          <span className="material-symbols-outlined text-xs">schedule</span>
-                          {session.time}
-                        </span>
-                      )}
-                      {session.venue && (
-                        <span className="flex items-center gap-1 text-on-surface-variant font-label-bold">
-                          <span className="material-symbols-outlined text-xs">location_on</span>
-                          Venue: <strong className="text-on-surface">{session.venue}</strong>
-                        </span>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Reason / Remarks */}
-                  {session.reason && (
-                    <div className="pt-2 border-t border-white/5 text-xs">
-                      <p className="text-on-surface-variant italic font-body-md">"{session.reason}"</p>
-                    </div>
-                  )}
-
-                  {/* Admin Controls */}
-                  {isAdmin && (
-                    <div className="pt-2.5 border-t border-white/5 flex items-center justify-end gap-2">
-                      <button
-                        type="button"
-                        onClick={() => handleUncancelSession(session.date, selectedModule.code)}
-                        className="px-2.5 py-1 rounded bg-secondary/15 text-secondary border border-secondary/30 text-xs font-label-bold hover:bg-secondary/25 cursor-pointer flex items-center gap-1"
-                      >
-                        <span className="material-symbols-outlined text-xs">undo</span> Un-cancel / Restore
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleRecancelSession(session.date, selectedModule.code, session.reason)}
-                        className="px-2.5 py-1 rounded bg-error/15 text-error border border-error/30 text-xs font-label-bold hover:bg-error/25 cursor-pointer flex items-center gap-1"
-                      >
-                        <span className="material-symbols-outlined text-xs">edit_note</span> Re-cancel
-                      </button>
-                    </div>
-                  )}
+                  <span className="font-label-bold text-xs px-2.5 py-0.5 rounded-full bg-error/10 text-error border border-error/20">
+                    Canceled
+                  </span>
                 </div>
-              );
-            })}
+
+                {session.reason && (
+                  <div className="pt-2 border-t border-white/5 text-xs">
+                    <p className="text-on-surface-variant italic font-body-md">"{session.reason}"</p>
+                  </div>
+                )}
+
+                {isAdmin && (
+                  <div className="pt-2.5 border-t border-white/5 flex items-center justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleUncancelSession(session.date, selectedModule.code)}
+                      className="px-2.5 py-1 rounded bg-secondary/15 text-secondary border border-secondary/30 text-xs font-label-bold hover:bg-secondary/25 cursor-pointer flex items-center gap-1"
+                    >
+                      <span className="material-symbols-outlined text-xs">undo</span> Un-cancel / Restore
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleRecancelSession(session.date, selectedModule.code, session.reason)}
+                      className="px-2.5 py-1 rounded bg-error/15 text-error border border-error/30 text-xs font-label-bold hover:bg-error/25 cursor-pointer flex items-center gap-1"
+                    >
+                      <span className="material-symbols-outlined text-xs">edit_note</span> Re-cancel
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         )}
       </div>
