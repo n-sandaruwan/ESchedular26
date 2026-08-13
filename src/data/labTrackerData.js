@@ -1,4 +1,4 @@
-import { pushLabAttendanceToCloud } from './firebaseSync';
+import { pushLabAttendanceToCloud, clearCloudLabAttendance } from './firebaseSync';
 import { getSriLankaDateStr, getSriLankaTimestampStr } from '../utils/dateUtils';
 
 // EE01 to EE12 Group Codes Mapping
@@ -204,7 +204,41 @@ const LOCAL_STORAGE_KEY = 'eschedular26_lab_attendance';
 export function getStoredAttendance() {
   try {
     const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : {};
+    if (!raw) return {};
+
+    const parsed = JSON.parse(raw);
+    const normalized = {};
+    let needsMigration = false;
+
+    Object.keys(parsed).forEach((key) => {
+      const entry = parsed[key];
+      // Try to generate safe key using entry.lab_name, otherwise fallback to old key
+      const safeLabName = entry.lab_name ? entry.lab_name.replace(/[^a-zA-Z0-9_-]/g, '_') : key;
+      const safeKey = entry.date ? `${entry.date}_${safeLabName}` : key;
+
+      if (key !== safeKey) {
+        needsMigration = true;
+      }
+
+      if (!normalized[safeKey]) {
+        normalized[safeKey] = { ...entry };
+      } else {
+        // Merge records if both safe and unsafe keys exist for the same date & lab
+        normalized[safeKey].records = {
+          ...(normalized[safeKey].records || {}),
+          ...(entry.records || {})
+        };
+        if (entry.updated_at > normalized[safeKey].updated_at) {
+          normalized[safeKey].updated_at = entry.updated_at;
+        }
+      }
+    });
+
+    if (needsMigration) {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(normalized));
+    }
+
+    return normalized;
   } catch (e) {
     console.error('Failed to load attendance from LocalStorage', e);
     return {};
@@ -215,21 +249,36 @@ export function getStoredAttendance() {
 export function clearAllStoredAttendance() {
   localStorage.removeItem(LOCAL_STORAGE_KEY);
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify({}));
+  clearCloudLabAttendance();
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('lab_attendance_updated'));
+  }
   return {};
 }
 
 // Helper to save attendance records for a date and lab name
 export function saveStoredAttendance(dateStr, labName, attendanceMap) {
   const current = getStoredAttendance();
-  const key = `${dateStr}_${labName}`;
+  const safeLabName = labName.replace(/[^a-zA-Z0-9_-]/g, '_');
+  const key = `${dateStr}_${safeLabName}`;
+  
+  // Merge with existing records if they exist
+  const existingRecords = current[key] && current[key].records ? current[key].records : {};
+  const mergedRecords = { ...existingRecords, ...attendanceMap };
+
   current[key] = {
     date: dateStr,
-    lab_name: labName,
+    lab_name: labName, // keep original for display
     updated_at: getSriLankaTimestampStr(),
-    records: attendanceMap, // { reg_no: true/false }
+    records: mergedRecords, // { reg_no: true/false }
   };
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(current));
-  pushLabAttendanceToCloud(dateStr, labName, attendanceMap);
+  pushLabAttendanceToCloud(dateStr, labName, mergedRecords);
+  
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('lab_attendance_updated'));
+  }
+  
   return current;
 }
 

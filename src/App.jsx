@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import StudentDashboard from './pages/StudentDashboard';
 import AdminDashboard from './pages/AdminDashboard';
@@ -12,24 +12,9 @@ import LabTrackerPage from './pages/LabTrackerPage';
 import CancelledLecturesPage from './pages/CancelledLecturesPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import DashboardLayout from './components/DashboardLayout';
-import { clearCloudLectureLogsAndOverrides } from './data/firebaseSync';
 import './index.css';
 
 function App() {
-  useEffect(() => {
-    if (!localStorage.getItem('mis_clean_reset_v5')) {
-      localStorage.setItem('mis_daily_logs', JSON.stringify([]));
-      localStorage.setItem('mis_schedule_overrides', JSON.stringify([]));
-      localStorage.setItem('mis_clean_reset_v5', 'true');
-      
-      clearCloudLectureLogsAndOverrides();
-
-      window.dispatchEvent(new Event('daily_logs_updated'));
-      window.dispatchEvent(new Event('module_hours_updated'));
-      window.dispatchEvent(new Event('schedule_overrides_updated'));
-    }
-  }, []);
-
   return (
     <Router>
       <Routes>

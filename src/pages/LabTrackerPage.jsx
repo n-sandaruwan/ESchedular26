@@ -55,7 +55,19 @@ function LabTrackerPage() {
   });
 
   useEffect(() => {
+    // Initial load
     setStoredAttendance(getStoredAttendance());
+
+    // Listen for real-time updates from Firebase or other tabs
+    const handleAttendanceUpdate = () => {
+      setStoredAttendance(getStoredAttendance());
+    };
+
+    window.addEventListener('lab_attendance_updated', handleAttendanceUpdate);
+
+    return () => {
+      window.removeEventListener('lab_attendance_updated', handleAttendanceUpdate);
+    };
   }, []);
 
   // Date Navigation Steppers (Matching Dashboard style)
@@ -161,7 +173,8 @@ function LabTrackerPage() {
 
   // Helper: Check if a lab is completed for a student
   const isLabCompleted = (sch, studentRegNo) => {
-    const key = `${sch.date}_${sch.lab_name}`;
+    const safeLabName = sch.lab_name.replace(/[^a-zA-Z0-9_-]/g, '_');
+    const key = `${sch.date}_${safeLabName}`;
     const attendanceEntry = storedAttendance[key];
 
     if (attendanceEntry && attendanceEntry.records && attendanceEntry.records[studentRegNo] !== undefined) {
@@ -244,7 +257,8 @@ function LabTrackerPage() {
   // Sync attendance map for selected leader group
   useEffect(() => {
     if (currentLeaderSchedule) {
-      const key = `${selectedDate}_${currentLeaderSchedule.lab_name}`;
+      const safeLabName = currentLeaderSchedule.lab_name.replace(/[^a-zA-Z0-9_-]/g, '_');
+      const key = `${selectedDate}_${safeLabName}`;
       const entry = storedAttendance[key];
       const initialMap = {};
       groupStudents.forEach((s) => {
@@ -344,7 +358,8 @@ function LabTrackerPage() {
     INITIAL_SCHEDULE.forEach((sch) => {
       // Alert ONLY if session date has passed OR is today
       if (sch.date <= realTodayStr) {
-        const key = `${sch.date}_${sch.lab_name}`;
+        const safeLabName = sch.lab_name.replace(/[^a-zA-Z0-9_-]/g, '_');
+        const key = `${sch.date}_${safeLabName}`;
         const entry = storedAttendance[key];
         const groupStudents = INITIAL_STUDENTS.filter(
           (s) => s.group_code === sch.group_code || s.group_id === sch.group_id
@@ -353,6 +368,10 @@ function LabTrackerPage() {
           entry &&
           entry.records &&
           groupStudents.some((s) => entry.records[s.reg_no] !== undefined);
+
+        if (sch.group_code === 'EE01' && sch.date === '2026-08-05') {
+            console.log('DEBUG EE01', { key, entry, hasRecords });
+        }
 
         if (!hasRecords) {
           const sessionKey = `${sch.date}_${sch.group_code}_${sch.lab_name}`;
@@ -394,7 +413,8 @@ function LabTrackerPage() {
         );
         let isDone = false;
         schEntries.forEach((sch) => {
-          const key = `${sch.date}_${sch.lab_name}`;
+          const safeLabName = sch.lab_name.replace(/[^a-zA-Z0-9_-]/g, '_');
+          const key = `${sch.date}_${safeLabName}`;
           const entry = storedAttendance[key];
           const groupStudents = INITIAL_STUDENTS.filter(
             (s) => s.group_code === gCode || s.group_id === (LAB_GROUPS.find((g) => g.code === gCode) || {}).id
@@ -919,7 +939,8 @@ function LabTrackerPage() {
               </div>
             ) : (
               categorizedDailyLabs.map((lab) => {
-                const key = `${selectedDate}_${lab.lab_name}`;
+                const safeLabName = lab.lab_name.replace(/[^a-zA-Z0-9_-]/g, '_');
+                const key = `${selectedDate}_${safeLabName}`;
                 const entry = storedAttendance[key];
                 const isLabMarked = entry && entry.records && Object.keys(entry.records).length > 0;
                 const isAllGroups = lab.groups.length >= 12;
@@ -1048,26 +1069,6 @@ function LabTrackerPage() {
                     <p className="text-xs text-on-surface-variant">Select group code (EE01–EE12) and session date below.</p>
                   </div>
                 </div>
-
-                {canMarkAttendance && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (window.confirm('Are you sure you want to RESET all lab attendance records? This will clear test entries.')) {
-                        clearAllStoredAttendance();
-                        setStoredAttendance({});
-                        setLeaderAttendance({});
-                        setSaveSuccess('All lab attendance records have been reset successfully!');
-                        setTimeout(() => setSaveSuccess(''), 4000);
-                      }
-                    }}
-                    className="px-3 py-1.5 rounded-xl bg-error/10 hover:bg-error/20 border border-error/30 text-error text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
-                    title="Reset all test attendance records"
-                  >
-                    <span className="material-symbols-outlined text-sm">restart_alt</span>
-                    <span>Reset All Attendance</span>
-                  </button>
-                )}
               </div>
 
               {/* 2-Column Large Interactive Selectors */}
@@ -1693,6 +1694,44 @@ function LabTrackerPage() {
               </div>
             </div>
           </div>
+
+          {/* 5. System Admin Control: Clear Lab Attendance Logs Only */}
+          {isAdmin && (
+            <div className="bg-error/10 border border-error/30 rounded-2xl p-5 shadow-xl space-y-3 backdrop-blur-xl">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-error/20 border border-error/40 flex items-center justify-center text-error shrink-0">
+                    <span className="material-symbols-outlined text-xl">restart_alt</span>
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-sm uppercase tracking-wider text-error">
+                      Reset All Lab Attendance Records (Admin Access Only)
+                    </h3>
+                    <p className="text-xs text-on-surface-variant">
+                      Clear all stored lab attendance records across EE01–EE12. This action removes lab attendance logs only and does NOT affect lecture logs.
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (window.confirm('Are you sure you want to RESET all lab attendance records? This will clear all lab attendance logs locally and in the cloud. Lecture logs will NOT be affected.')) {
+                      clearAllStoredAttendance();
+                      setStoredAttendance({});
+                      setLeaderAttendance({});
+                      setSaveSuccessMsg('All lab attendance records have been reset successfully!');
+                      setTimeout(() => setSaveSuccessMsg(''), 4000);
+                    }
+                  }}
+                  className="px-4 py-2 rounded-xl bg-error hover:bg-error/90 text-on-error font-mono font-bold text-xs flex items-center justify-center gap-2 shadow-lg transition-all cursor-pointer shrink-0"
+                >
+                  <span className="material-symbols-outlined text-sm">delete_forever</span>
+                  <span>Clear Lab Attendance Logs</span>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

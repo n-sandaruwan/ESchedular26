@@ -416,6 +416,23 @@ export const clearCloudLectureLogsAndOverrides = async () => {
   window.dispatchEvent(new Event('module_hours_updated'));
 };
 
+// Wipe all Lab Attendance records in Cloud Firestore
+export const clearCloudLabAttendance = async () => {
+  if (!isFirebaseConfigured() || !db) return;
+  try {
+    const attendanceRef = collection(db, 'lab_attendance');
+    const snap = await getDocs(attendanceRef);
+    const deletePromises = [];
+    snap.forEach((docSnap) => {
+      deletePromises.push(withRetry(() => deleteDoc(doc(db, 'lab_attendance', docSnap.id))));
+    });
+    await Promise.all(deletePromises);
+    console.log("✅ Successfully cleared all lab attendance records in Cloud Firestore!");
+  } catch (err) {
+    console.error("Failed to clear cloud lab attendance:", err);
+  }
+};
+
 // Delete Schedule Override document from Cloud Firestore
 export const deleteOverrideFromCloud = async (docId) => {
   if (!isFirebaseConfigured() || !db || !docId) return;
