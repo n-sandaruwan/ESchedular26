@@ -113,16 +113,6 @@ function DashboardLayout({ children }) {
                 <span className="xs:hidden">Local</span>
               </span>
             )}
-            {/* Theme Toggle */}
-            <button
-              onClick={toggleTheme}
-              className="flex items-center justify-center w-8 h-8 rounded-full border border-primary/30 hover:border-primary text-primary transition-colors"
-              title={theme === 'dark' ? "Switch to Light Mode" : "Switch to Dark Mode"}
-            >
-              <span className="material-symbols-outlined text-lg">
-                {theme === 'dark' ? 'light_mode' : 'dark_mode'}
-              </span>
-            </button>
 
             {isAdmin || isLabAdmin ? (
               <button
@@ -184,7 +174,16 @@ function DashboardLayout({ children }) {
               })}
             </div>
 
-            <div className="pt-4 border-t border-white/10">
+            <div className="pt-4 border-t border-white/10 flex flex-col gap-2">
+              <button
+                onClick={toggleTheme}
+                className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-surface-dim border border-white/5 hover:bg-white/5 transition-all text-sm font-label-bold text-on-surface cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-xl">
+                  {theme === 'dark' ? 'light_mode' : 'dark_mode'}
+                </span>
+                <span>{theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}</span>
+              </button>
               {(isAdmin || isLabAdmin) && (
                 <button
                   onClick={() => {
@@ -236,7 +235,16 @@ function DashboardLayout({ children }) {
           })}
         </div>
 
-        <div className="mt-auto border-t border-white/10 pt-4 px-2">
+        <div className="mt-auto border-t border-white/10 pt-4 px-2 flex flex-col gap-2">
+          <button
+            onClick={toggleTheme}
+            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl bg-surface-dim border border-white/5 hover:bg-white/5 transition-all text-sm font-label-bold text-on-surface cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-xl">
+              {theme === 'dark' ? 'light_mode' : 'dark_mode'}
+            </span>
+            <span>{theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}</span>
+          </button>
           {(isAdmin || isLabAdmin) && (
             <button
               onClick={handleExitAdmin}
