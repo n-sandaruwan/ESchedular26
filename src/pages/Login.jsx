@@ -9,8 +9,24 @@ import { auth } from '../firebase';
 // Replace these with the actual User UIDs from your Firebase Console > Authentication
 // =========================================================================
 export const AUTHORIZED_UIDS = {
-  ADMIN: 'qgGyu7Qwy6QeV9apAiz3E2NL0zE2',       
-  LAB_ADMIN: 'j4MpEMaYyqRZmuxXvgI5Mjwn0zi1' 
+  ADMINS: [
+    'qgGyu7Qwy6QeV9apAiz3E2NL0zE2'
+  ],       
+  LAB_ADMINS: [
+    'j4MpEMaYyqRZmuxXvgI5Mjwn0zi1',
+    'dzL5yCg697PJWXWXTgT7X0jbfgQ2',
+    'F4oJx4xH9OU66S3spgmrUJqilya2',
+    'FW5hgHty1wbuPkGuHZB5MEtUrwx1',
+    '1cfPgmhFEPeFycOG2uw5PNBTEzw2',
+    'gWvfBdA1JEdUPCMsw2miMnqzmeQ2',
+    'rfGcnZkOBuNP1FIsGNPgtHLL0kg1',
+    'NlYz9zHd2zclCqWI7A2dGqjWpIS2',
+    'bEJB23Ws7iSGi7L5J3eywyhNLci1',
+    'oScneRpncRXgeAZL0cW5PhBZg222',
+    'mYSY84JejeTaVQKJ7OVp5dQYiFJ2',
+    'BOsDkGYNBvM9gEUsiuC2gZW5Hh73',
+    'ej65wKnIQngvw5ca4n4UiUqTe2b2'
+  ]
 };
 
 function Login() {
@@ -21,12 +37,12 @@ function Login() {
   const navigate = useNavigate();
 
   const handleRoleVerification = (uid) => {
-    if (uid === AUTHORIZED_UIDS.ADMIN) {
+    if (AUTHORIZED_UIDS.ADMINS.includes(uid)) {
       localStorage.setItem('mis_role', 'admin');
       localStorage.setItem('mis_user', 'Department Administrator');
       navigate('/admin');
     } 
-    else if (uid === AUTHORIZED_UIDS.LAB_ADMIN) {
+    else if (AUTHORIZED_UIDS.LAB_ADMINS.includes(uid)) {
       localStorage.setItem('mis_role', 'lab_admin');
       localStorage.setItem('mis_user', 'Lab Administrator');
       localStorage.removeItem('mis_lab_admin_group'); 
