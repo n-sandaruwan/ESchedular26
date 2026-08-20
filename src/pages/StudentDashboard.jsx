@@ -478,7 +478,13 @@ function StudentDashboard() {
               {/* Vertical Glowing Line */}
               <div className="absolute left-[15px] top-4 bottom-4 w-[2px] timeline-line rounded-full"></div>
 
-              {selectedDate < SEMESTER_START_DATE ? (
+              {selectedDate >= '2026-08-17' && selectedDate <= '2026-08-30' ? (
+                <div className="p-8 text-center glass-card rounded-xl border border-primary/30 bg-primary/5 my-4">
+                  <span className="material-symbols-outlined text-4xl text-primary mb-2">beach_access</span>
+                  <p className="text-on-surface font-headline-md text-base font-bold">Special Vacation Period</p>
+                  <p className="text-xs text-on-surface-variant mt-1">All regular lectures and labs are suspended from August 17 to August 30 due to examinations for other batches.</p>
+                </div>
+              ) : selectedDate < SEMESTER_START_DATE ? (
                 <div className="p-8 text-center glass-card rounded-xl border border-primary/30 bg-primary/5 my-4">
                   <span className="material-symbols-outlined text-4xl text-primary mb-2">event_upcoming</span>
                   <p className="text-on-surface font-headline-md text-base font-bold">Semester Has Not Started Yet</p>

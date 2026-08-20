@@ -165,38 +165,38 @@ export const INITIAL_SCHEDULE = [
   ...expandScheduleEntries('Week 3', '2026-08-13', '01:30 PM - 04:30 PM', 'EE3301 Analog Electronics (Lab 1: Diodes & Practical Applications)', 'Communication Laboratory', GROUPS_11_TO_12, 'Rescheduled', 'Rescheduled from Friday, Aug 7th'),
   ...expandScheduleEntries('Week 3', '2026-08-14', '01:30 PM - 04:30 PM', 'EE3306 Signals & Systems (Lab 1: Continuous-Time Signal Analysis)', 'Communication Laboratory', GROUPS_9_TO_12),
 
-  // Week 4
-  ...expandScheduleEntries('Week 4', '2026-08-19', '08:30 AM - 11:30 AM', 'EE3301 Analog Electronics (Lab 2: Basic Amplifiers & Biasing)', 'Communication Laboratory', GROUPS_9_TO_12),
-  ...expandScheduleEntries('Week 4', '2026-08-19', '08:30 AM - 11:30 AM', 'EE3203 Measurements (Lab 1: DC & AC Bridges)', 'Electronic and Measurement Laboratory', GROUPS_1_TO_8),
-  ...expandScheduleEntries('Week 4', '2026-08-21', '01:30 PM - 04:30 PM', 'EE3301 Analog Electronics (Lab 2: Basic Amplifiers & Biasing)', 'Communication Laboratory', GROUPS_1_TO_8),
-  ...expandScheduleEntries('Week 4', '2026-08-21', '01:30 PM - 04:30 PM', 'EE3203 Measurements (Lab 1: DC & AC Bridges)', 'Electronic and Measurement Laboratory', GROUPS_9_TO_12),
+  // Week 4 (Postponed by 2 weeks)
+  ...expandScheduleEntries('Week 4', '2026-09-02', '08:30 AM - 11:30 AM', 'EE3301 Analog Electronics (Lab 2: Basic Amplifiers & Biasing)', 'Communication Laboratory', GROUPS_9_TO_12),
+  ...expandScheduleEntries('Week 4', '2026-09-02', '08:30 AM - 11:30 AM', 'EE3203 Measurements (Lab 1: DC & AC Bridges)', 'Electronic and Measurement Laboratory', GROUPS_1_TO_8),
+  ...expandScheduleEntries('Week 4', '2026-09-04', '01:30 PM - 04:30 PM', 'EE3301 Analog Electronics (Lab 2: Basic Amplifiers & Biasing)', 'Communication Laboratory', GROUPS_1_TO_8),
+  ...expandScheduleEntries('Week 4', '2026-09-04', '01:30 PM - 04:30 PM', 'EE3203 Measurements (Lab 1: DC & AC Bridges)', 'Electronic and Measurement Laboratory', GROUPS_9_TO_12),
 
-  // Week 6
-  ...expandScheduleEntries('Week 6', '2026-09-02', '08:30 AM - 11:30 AM', 'EE3306 Signals & Systems (Lab 2: MATLAB Continuous Signals)', 'Communication Laboratory', ALL_GROUPS),
-  ...expandScheduleEntries('Week 6', '2026-09-04', '01:30 PM - 04:30 PM', 'EE3203 Measurements (Lab 2: Oscilloscope Probe Testing)', 'Electronic and Measurement Laboratory', GROUPS_1_TO_8),
+  // Week 6 (Postponed by 2 weeks)
+  ...expandScheduleEntries('Week 6', '2026-09-16', '08:30 AM - 11:30 AM', 'EE3306 Signals & Systems (Lab 2: MATLAB Continuous Signals)', 'Communication Laboratory', ALL_GROUPS),
+  ...expandScheduleEntries('Week 6', '2026-09-18', '01:30 PM - 04:30 PM', 'EE3203 Measurements (Lab 2: Oscilloscope Probe Testing)', 'Electronic and Measurement Laboratory', GROUPS_1_TO_8),
 
-  // Week 7
-  ...expandScheduleEntries('Week 7', '2026-09-09', '08:30 AM - 11:30 AM', 'EE3203 Measurements (Lab 2: Oscilloscope Probe Testing)', 'Electronic and Measurement Laboratory', GROUPS_9_TO_12),
-  ...expandScheduleEntries('Week 7', '2026-09-11', '01:30 PM - 04:30 PM', 'EE3306 Signals & Systems (Lab 3: Analog/Digital Conversion)', 'Communication Laboratory', GROUPS_1_TO_8),
+  // Week 7 (Postponed by 2 weeks)
+  ...expandScheduleEntries('Week 7', '2026-09-23', '08:30 AM - 11:30 AM', 'EE3203 Measurements (Lab 2: Oscilloscope Probe Testing)', 'Electronic and Measurement Laboratory', GROUPS_9_TO_12),
+  ...expandScheduleEntries('Week 7', '2026-09-25', '01:30 PM - 04:30 PM', 'EE3306 Signals & Systems (Lab 3: Analog/Digital Conversion)', 'Communication Laboratory', GROUPS_1_TO_8),
 
-  // Week 9
-  ...expandScheduleEntries('Week 9', '2026-09-23', '08:30 AM - 11:30 AM', 'EE3301 Analog Electronics (Lab 3: Op-Amps & Applications)', 'Communication Laboratory', GROUPS_1_TO_10),
-  ...expandScheduleEntries('Week 9', '2026-09-25', '01:30 PM - 04:30 PM', 'EE3301 Analog Electronics (Lab 3: Op-Amps & Applications)', 'Communication Laboratory', GROUPS_11_TO_12),
+  // Week 9 (Postponed by 2 weeks)
+  ...expandScheduleEntries('Week 9', '2026-10-07', '08:30 AM - 11:30 AM', 'EE3301 Analog Electronics (Lab 3: Op-Amps & Applications)', 'Communication Laboratory', GROUPS_1_TO_10),
+  ...expandScheduleEntries('Week 9', '2026-10-09', '01:30 PM - 04:30 PM', 'EE3301 Analog Electronics (Lab 3: Op-Amps & Applications)', 'Communication Laboratory', GROUPS_11_TO_12),
 
-  // Week 10
-  ...expandScheduleEntries('Week 10', '2026-09-30', '08:30 AM - 11:30 AM', 'EE3306 Signals & Systems (Lab 3: Analog/Digital Conversion)', 'Communication Laboratory', GROUPS_9_TO_12),
-  ...expandScheduleEntries('Week 10', '2026-10-02', '01:30 PM - 04:30 PM', 'EE3304 Engineering Electromagnetism (Lab 2: Basic Principles)', 'Communication Laboratory', ALL_GROUPS),
+  // Week 10 (Postponed by 2 weeks)
+  ...expandScheduleEntries('Week 10', '2026-10-14', '08:30 AM - 11:30 AM', 'EE3306 Signals & Systems (Lab 3: Analog/Digital Conversion)', 'Communication Laboratory', GROUPS_9_TO_12),
+  ...expandScheduleEntries('Week 10', '2026-10-16', '01:30 PM - 04:30 PM', 'EE3304 Engineering Electromagnetism (Lab 2: Basic Principles)', 'Communication Laboratory', ALL_GROUPS),
 
-  // Week 11
-  ...expandScheduleEntries('Week 11', '2026-10-07', '08:30 AM - 11:30 AM', 'EE3306 Signals & Systems (Lab 4: MATLAB Discrete Signals)', 'Communication Laboratory', ALL_GROUPS),
-  ...expandScheduleEntries('Week 11', '2026-10-09', '01:30 PM - 04:30 PM', 'EE3301 Analog Electronics (Lab 4: Oscillators & Analog Filters)', 'Communication Laboratory', GROUPS_9_TO_12),
+  // Week 11 (Postponed by 2 weeks)
+  ...expandScheduleEntries('Week 11', '2026-10-21', '08:30 AM - 11:30 AM', 'EE3306 Signals & Systems (Lab 4: MATLAB Discrete Signals)', 'Communication Laboratory', ALL_GROUPS),
+  ...expandScheduleEntries('Week 11', '2026-10-23', '01:30 PM - 04:30 PM', 'EE3301 Analog Electronics (Lab 4: Oscillators & Analog Filters)', 'Communication Laboratory', GROUPS_9_TO_12),
 
-  // Week 12
-  ...expandScheduleEntries('Week 12', '2026-10-14', '08:30 AM - 11:30 AM', 'EE3301 Analog Electronics (Lab 4: Oscillators & Analog Filters)', 'Communication Laboratory', GROUPS_1_TO_8),
-  ...expandScheduleEntries('Week 12', '2026-10-16', '01:30 PM - 04:30 PM', 'EE3203 Measurements (Lab 3: Spectrum Analyzer)', 'Electronic and Measurement Laboratory', GROUPS_1_TO_8),
+  // Week 12 (Postponed by 2 weeks)
+  ...expandScheduleEntries('Week 12', '2026-10-28', '08:30 AM - 11:30 AM', 'EE3301 Analog Electronics (Lab 4: Oscillators & Analog Filters)', 'Communication Laboratory', GROUPS_1_TO_8),
+  ...expandScheduleEntries('Week 12', '2026-10-30', '01:30 PM - 04:30 PM', 'EE3203 Measurements (Lab 3: Spectrum Analyzer)', 'Electronic and Measurement Laboratory', GROUPS_1_TO_8),
 
-  // Week 13
-  ...expandScheduleEntries('Week 13', '2026-10-21', '08:30 AM - 11:30 AM', 'EE3203 Measurements (Lab 3: Spectrum Analyzer)', 'Electronic and Measurement Laboratory', GROUPS_9_TO_12),
+  // Week 13 (Postponed by 2 weeks)
+  ...expandScheduleEntries('Week 13', '2026-11-04', '08:30 AM - 11:30 AM', 'EE3203 Measurements (Lab 3: Spectrum Analyzer)', 'Electronic and Measurement Laboratory', GROUPS_9_TO_12),
 ];
 
 const LOCAL_STORAGE_KEY = 'eschedular26_lab_attendance';

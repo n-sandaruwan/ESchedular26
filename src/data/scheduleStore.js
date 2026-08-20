@@ -37,7 +37,8 @@ export const saveStoredOverrides = (overrides) => {
 // Initial Notices Feed
 export const initialNotices = [
   { id: 1, title: 'Department Holiday Notice', date: '2026-07-29', type: 'Holiday', content: 'Wednesday July 29 is Esala Full Moon Poya Day. Regular physical lectures resume Thursday July 30.' },
-  { id: 2, title: 'Semester Started 27th July', date: '2026-07-27', type: 'Announcement', content: 'Semester 3 academic lectures are officially in progress.' }
+  { id: 2, title: 'Semester Started 27th July', date: '2026-07-27', type: 'Announcement', content: 'Semester 3 academic lectures are officially in progress.' },
+  { id: 4, title: 'Special Vacation (Exams)', date: '2026-08-17', type: 'Announcement', content: 'A 2-week special vacation due to examinations for other batches is in effect from August 17 to August 30. Regular lectures are suspended during this period.' }
 ];
 
 export const getStoredNotices = () => {
