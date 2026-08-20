@@ -30,6 +30,7 @@ export const LAB_ADMIN_GROUP_MAP = {
   'bEJB23Ws7iSGi7L5J3eywyhNLci1': 'EE08',
   'oScneRpncRXgeAZL0cW5PhBZg222': 'EE09',
   'mYSY84JejeTaVQKJ7OVp5dQYiFJ2': 'EE10',
+  'xMaDjWwffKYylC5nFTKPqYes5Pz1': 'EE10',
   'BOsDkGYNBvM9gEUsiuC2gZW5Hh73': 'EE11',
   'ej65wKnIQngvw5ca4n4UiUqTe2b2': 'EE12'
 };
