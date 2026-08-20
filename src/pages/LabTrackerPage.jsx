@@ -632,8 +632,8 @@ function LabTrackerPage() {
         <div className="space-y-4">
           <div className="bg-surface-container/60 backdrop-blur-xl border border-transparent rounded-2xl p-4 shadow-[0_0_20px_rgba(56,189,248,0.12)] max-w-xl mx-auto space-y-2">
             <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-2">
-              <div className="relative flex-1 flex items-center rounded-xl overflow-hidden bg-surface-container-highest dark:bg-black/60">
-                <span className="px-3 py-2.5 bg-primary/10 text-primary font-mono text-sm font-extrabold select-none">
+              <div className="relative flex-1 flex items-center rounded-xl overflow-hidden border border-primary/30 bg-surface-container-highest dark:bg-black/60">
+                <span className="px-3 py-2.5 bg-primary/10 text-primary font-mono text-sm font-extrabold select-none border-r border-primary/20">
                   EG/2024/
                 </span>
                 <input
@@ -642,7 +642,7 @@ function LabTrackerPage() {
                   onChange={(e) => setSearchDigits(e.target.value)}
                   placeholder="6458"
                   required
-                  className="w-full px-3 py-2.5 bg-surface-container-highest dark:bg-black/60 text-on-surface placeholder-on-surface-variant/40 text-sm font-mono focus:outline-none focus:bg-surface-dim dark:bg-black/80 transition-all"
+                  className="w-full px-3 py-2.5 bg-transparent text-on-surface placeholder-on-surface-variant/40 text-sm font-mono outline-none border-none focus:outline-none focus:ring-0 transition-all"
                 />
               </div>
 
