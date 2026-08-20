@@ -101,16 +101,14 @@ function DashboardLayout({ children }) {
           <div className="flex items-center gap-3 md:gap-4">
             {/* Cloud Sync Status Indicator */}
             {isCloudSynced ? (
-              <span className="flex items-center gap-1 sm:gap-1.5 px-2 py-0.5 sm:px-2.5 rounded-full bg-secondary/10 border border-secondary/30 text-secondary text-[10px] sm:text-[11px] font-label-bold" title="Connected to Firebase Realtime Cloud Database. Changes sync live across all batch mates.">
+              <span className="flex items-center gap-1 sm:gap-1.5 px-1.5 py-0.5 sm:px-2.5 rounded-full bg-secondary/10 border border-secondary/30 text-secondary text-[10px] sm:text-[11px] font-label-bold" title="Connected to Firebase Realtime Cloud Database. Changes sync live across all batch mates.">
                 <span className="material-symbols-outlined text-sm text-secondary animate-pulse">cloud_done</span>
-                <span className="hidden xs:inline">Cloud Synced</span>
-                <span className="xs:hidden">Synced</span>
+                <span className="hidden sm:inline">Synced</span>
               </span>
             ) : (
-              <span className="flex items-center gap-1 sm:gap-1.5 px-2 py-0.5 sm:px-2.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[10px] sm:text-[11px] font-label-bold" title="Operating in local mode. Add Firebase keys to src/firebase.js for instant multi-device batch sync.">
+              <span className="flex items-center gap-1 sm:gap-1.5 px-1.5 py-0.5 sm:px-2.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[10px] sm:text-[11px] font-label-bold" title="Operating in local mode. Add Firebase keys to src/firebase.js for instant multi-device batch sync.">
                 <span className="material-symbols-outlined text-sm text-amber-400">cloud_off</span>
-                <span className="hidden xs:inline">Local Mode</span>
-                <span className="xs:hidden">Local</span>
+                <span className="hidden sm:inline">Local</span>
               </span>
             )}
 
