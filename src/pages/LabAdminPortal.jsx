@@ -71,32 +71,36 @@ function LabAdminPortal() {
     localStorage.removeItem('mis_lab_admin_group');
   };
 
-  // Date Navigation
   const handlePreviousDay = () => {
-    try {
-      const parts = selectedDate.split('-');
-      const year = parseInt(parts[0], 10);
-      const month = parseInt(parts[1], 10) - 1;
-      const day = parseInt(parts[2], 10);
-      const d = new Date(year, month, day - 1);
-      const prevDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-      if (prevDate < SEMESTER_START_DATE) return;
-      setSelectedDate(prevDate);
-    } catch (e) {
-      console.error('Error going to previous day', e);
+    const currentGroupObj = LAB_GROUPS.find((g) => g.code === labGroup) || LAB_GROUPS[0];
+    const groupDates = [...new Set(INITIAL_SCHEDULE
+      .filter(sch => sch.group_code === labGroup || (currentGroupObj && sch.group_id === currentGroupObj.id))
+      .map(sch => sch.date)
+    )].sort();
+    
+    if (groupDates.length === 0) return;
+    
+    const currentIndex = groupDates.findIndex(d => d >= selectedDate);
+    if (currentIndex > 0) {
+      const newIndex = groupDates[currentIndex] === selectedDate ? currentIndex - 1 : currentIndex - 1;
+      setSelectedDate(groupDates[Math.max(0, newIndex)]);
+    } else if (currentIndex === -1) {
+      setSelectedDate(groupDates[groupDates.length - 1]);
     }
   };
 
   const handleNextDay = () => {
-    try {
-      const parts = selectedDate.split('-');
-      const year = parseInt(parts[0], 10);
-      const month = parseInt(parts[1], 10) - 1;
-      const day = parseInt(parts[2], 10);
-      const d = new Date(year, month, day + 1);
-      setSelectedDate(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`);
-    } catch (e) {
-      console.error('Error going to next day', e);
+    const currentGroupObj = LAB_GROUPS.find((g) => g.code === labGroup) || LAB_GROUPS[0];
+    const groupDates = [...new Set(INITIAL_SCHEDULE
+      .filter(sch => sch.group_code === labGroup || (currentGroupObj && sch.group_id === currentGroupObj.id))
+      .map(sch => sch.date)
+    )].sort();
+    
+    if (groupDates.length === 0) return;
+    
+    const currentIndex = groupDates.findIndex(d => d > selectedDate);
+    if (currentIndex !== -1) {
+      setSelectedDate(groupDates[currentIndex]);
     }
   };
 
@@ -131,6 +135,11 @@ function LabAdminPortal() {
   const currentLeaderSchedule = INITIAL_SCHEDULE.find(
     (sch) => sch.date === selectedDate && (sch.group_code === labGroup || sch.group_id === currentGroupObj.id)
   );
+  
+  const allGroupScheduleDates = [...new Set(INITIAL_SCHEDULE
+    .filter(sch => sch.group_code === labGroup || sch.group_id === currentGroupObj.id)
+    .map(sch => sch.date)
+  )].sort();
 
   // Group Progress Calculation
   const calculateGroupProgress = () => {
@@ -352,12 +361,19 @@ function LabAdminPortal() {
                     {getDayNameFromDateString(selectedDate)}
                   </span>
 
-                  <input
-                    type="date"
+                  <select
                     value={selectedDate}
                     onChange={(e) => setSelectedDate(e.target.value)}
                     className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10"
-                  />
+                    title="Select a scheduled lab date"
+                  >
+                    {!allGroupScheduleDates.includes(selectedDate) && (
+                      <option value={selectedDate}>{selectedDate} (Custom Date)</option>
+                    )}
+                    {allGroupScheduleDates.map(d => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
                 </div>
 
                 <button
