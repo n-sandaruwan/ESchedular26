@@ -115,10 +115,12 @@ function DashboardLayout({ children }) {
             {isAdmin || isLabAdmin ? (
               <button
                 onClick={handleExitAdmin}
-                className="flex items-center gap-1.5 bg-error/10 border border-error/30 hover:bg-error/20 px-2.5 py-1 rounded-full text-xs font-label-bold text-error transition-colors cursor-pointer"
+                className="flex items-center gap-1.5 bg-error/10 border border-error/30 hover:bg-error/20 px-2 sm:px-2.5 py-1 rounded-full text-[11px] sm:text-xs font-label-bold text-error transition-colors cursor-pointer whitespace-nowrap"
                 title="Exit Admin / Lab Admin Mode"
               >
-                <span className="material-symbols-outlined text-sm">logout</span> Leave {isLabAdmin ? 'Lab Admin' : 'Admin'}
+                <span className="material-symbols-outlined text-sm">logout</span> 
+                <span className="hidden sm:inline">Leave {isLabAdmin ? 'Lab Admin' : 'Admin'}</span>
+                <span className="sm:hidden">Exit</span>
               </button>
             ) : (
               <Link
