@@ -68,7 +68,7 @@ function Login() {
       navigate('/lab-admin-portal');
     } 
     else {
-      setError(`Access Denied: Your account (UID: ${uid}) does not have administrator privileges. Add this UID to AUTHORIZED_UIDS to grant access.`);
+      setError('Access Denied: Your account does not have administrator privileges.');
       auth.signOut();
     }
   };

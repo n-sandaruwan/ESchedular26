@@ -52,7 +52,11 @@ function App() {
         <Route path="/modules/:moduleId" element={<DashboardLayout><ModulePage /></DashboardLayout>} />
         <Route path="/module/:moduleId" element={<DashboardLayout><ModulePage /></DashboardLayout>} />
         <Route path="/lab-tracker" element={<DashboardLayout><LabTrackerPage /></DashboardLayout>} />
-        <Route path="/lab-admin-portal" element={<DashboardLayout><LabAdminPortal /></DashboardLayout>} />
+        <Route path="/lab-admin-portal" element={
+          <ProtectedRoute allowedRoles={['admin', 'lab_admin']}>
+            <DashboardLayout><LabAdminPortal /></DashboardLayout>
+          </ProtectedRoute>
+        } />
         <Route path="/cancellations" element={<DashboardLayout><CancelledLecturesPage /></DashboardLayout>} />
         <Route path="/logs" element={<DashboardLayout><DailyLogPage /></DashboardLayout>} />
         <Route path="/audit" element={<DashboardLayout><AuditLogPage /></DashboardLayout>} />
