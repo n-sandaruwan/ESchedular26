@@ -301,8 +301,15 @@ const getRawDailyLogs = () => {
   const local = localStorage.getItem('mis_daily_logs');
   if (local) {
     try {
-      const parsed = JSON.parse(local);
-      if (Array.isArray(parsed)) return parsed;
+      let parsed = JSON.parse(local);
+      if (Array.isArray(parsed)) {
+        if (!localStorage.getItem('mis_ee3304_cleared_v2')) {
+          parsed = parsed.filter(l => l.module !== 'EE3304');
+          localStorage.setItem('mis_daily_logs', JSON.stringify(parsed));
+          localStorage.setItem('mis_ee3304_cleared_v2', 'true');
+        }
+        return parsed;
+      }
     } catch (e) {}
   }
   return [];
