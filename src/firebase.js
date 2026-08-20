@@ -1,6 +1,6 @@
 import { initializeApp, getApps } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore, enableIndexedDbPersistence } from "firebase/firestore";
+import { getFirestore } from "firebase/firestore";
 
 // Paste your Firebase Web App credentials from https://console.firebase.google.com/
 const firebaseConfig = {
@@ -34,16 +34,11 @@ try {
   }
   auth = getAuth(app);
   db = getFirestore(app);
-
-  enableIndexedDbPersistence(db).catch((err) => {
-    if (err.code === 'failed-precondition') {
-      console.warn('Multiple tabs open, persistence enabled in primary tab.');
-    } else if (err.code === 'unimplemented') {
-      console.warn('Browser does not support offline persistence.');
-    }
-  });
+  // Note: In Firebase v10+, IndexedDB persistence is enabled by default.
+  // No need to call enableIndexedDbPersistence().
 } catch (error) {
   console.warn("Firebase initialization waiting for configuration keys. Falling back to local storage.", error);
 }
 
 export { auth, db };
+

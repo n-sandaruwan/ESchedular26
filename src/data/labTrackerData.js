@@ -261,7 +261,7 @@ export function saveStoredAttendance(dateStr, labName, attendanceMap, note = '')
   const current = getStoredAttendance();
   const safeLabName = labName.replace(/[^a-zA-Z0-9_-]/g, '_');
   const key = `${dateStr}_${safeLabName}`;
-  
+
   // Merge with existing records if they exist
   const existingRecords = current[key] && current[key].records ? current[key].records : {};
   const mergedRecords = { ...existingRecords, ...attendanceMap };
@@ -278,11 +278,11 @@ export function saveStoredAttendance(dateStr, labName, attendanceMap, note = '')
   };
   localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(current));
   pushLabAttendanceToCloud(dateStr, labName, mergedRecords, finalNote);
-  
+
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new Event('lab_attendance_updated'));
   }
-  
+
   return current;
 }
 
