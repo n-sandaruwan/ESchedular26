@@ -22,11 +22,13 @@ export const AUTHORIZED_UIDS = {
 export const LAB_ADMIN_GROUP_MAP = {
   'dzL5yCg697PJWXWXTgT7X0jbfgQ2': 'EE01',
   'F4oJx4xH9OU66S3spgmrUJqilya2': 'EE02',
+  '3qHUuqf8AGMmqdTy8fuwZhb3MQ12': 'EE02',
   'FW5hgHty1wbuPkGuHZB5MEtUrwx1': 'EE03',
   '1cfPgmhFEPeFycOG2uw5PNBTEzw2': 'EE04',
   'b87r7LcjnHRPqNVSximVm7ntUTh1': 'EE04',
   'gWvfBdA1JEdUPCMsw2miMnqzmeQ2': 'EE05',
   'rfGcnZkOBuNP1FIsGNPgtHLL0kg1': 'EE06',
+  'gOowUjgA7XgpC368KPJH1xtrZrY2': 'EE06',
   'NlYz9zHd2zclCqWI7A2dGqjWpIS2': 'EE07',
   'bEJB23Ws7iSGi7L5J3eywyhNLci1': 'EE08',
   'oScneRpncRXgeAZL0cW5PhBZg222': 'EE09',
