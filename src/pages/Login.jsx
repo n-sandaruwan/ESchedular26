@@ -64,7 +64,7 @@ function Login() {
 
     try {
       if (!auth) throw new Error("Firebase Authentication is not configured.");
-      
+
       const userCredential = await signInWithEmailAndPassword(auth, cleanEmail, cleanPass);
       handleRoleVerification(userCredential.user.uid);
     } catch (err) {
@@ -84,7 +84,7 @@ function Login() {
     setLoading(true);
     try {
       if (!auth) throw new Error("Firebase Authentication is not configured.");
-      
+
       const provider = new GoogleAuthProvider();
       const userCredential = await signInWithPopup(auth, provider);
       handleRoleVerification(userCredential.user.uid);
@@ -103,9 +103,9 @@ function Login() {
     <div className="relative min-h-screen flex items-center justify-center p-4 bg-background overflow-hidden">
       <InteractiveShaderBackground />
       <div className="bg-mesh"></div>
-      
+
       <div className="glass-card p-6 sm:p-8 rounded-2xl max-w-md w-full relative z-10 flex flex-col gap-6 border border-white/10 shadow-[0_0_30px_rgba(56,189,248,0.15)] mx-2">
-        
+
         {/* Header */}
         <div className="text-center">
           <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 mx-auto flex items-center justify-center text-primary mb-4">
