@@ -630,10 +630,10 @@ function LabTrackerPage() {
       {/* TAB 1: Student Schedule Lookup */}
       {activeTab === 'search' && (
         <div className="space-y-4">
-          <div className="bg-surface-container/60 backdrop-blur-xl border border-primary/30 rounded-2xl p-4 shadow-[0_0_20px_rgba(56,189,248,0.12)] max-w-xl mx-auto space-y-2">
+          <div className="bg-surface-container/60 backdrop-blur-xl border border-transparent rounded-2xl p-4 shadow-[0_0_20px_rgba(56,189,248,0.12)] max-w-xl mx-auto space-y-2">
             <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-2">
-              <div className="relative flex-1 flex items-center rounded-xl overflow-hidden border border-primary/30">
-                <span className="px-3 py-2.5 bg-primary/10 text-primary font-mono text-sm font-extrabold select-none border-r border-primary/20">
+              <div className="relative flex-1 flex items-center rounded-xl overflow-hidden bg-surface-container-highest dark:bg-black/60">
+                <span className="px-3 py-2.5 bg-primary/10 text-primary font-mono text-sm font-extrabold select-none">
                   EG/2024/
                 </span>
                 <input
