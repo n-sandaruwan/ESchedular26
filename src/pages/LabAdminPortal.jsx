@@ -250,7 +250,7 @@ function LabAdminPortal() {
             <button
               key={g.code}
               onClick={() => handleSelectGroup(g.code)}
-              className="group bg-surface-container/60 hover:bg-primary/10 border border-outline/30 dark:border-white/10 hover:border-primary/40 p-4 rounded-2xl transition-all duration-300 flex flex-col items-center justify-center gap-2 cursor-pointer shadow-md hover:shadow-xl hover:shadow-primary/20 hover:-translate-y-1"
+              className="group bg-surface-container/60 hover:bg-primary/10 border border-transparent hover:border-primary/40 p-4 rounded-2xl transition-all duration-300 flex flex-col items-center justify-center gap-2 cursor-pointer shadow-md hover:shadow-xl hover:shadow-primary/20 hover:-translate-y-1"
             >
               <span className="font-mono text-xl font-bold text-on-surface group-hover:text-primary transition-colors">{g.code}</span>
               <span className="text-[10px] text-on-surface-variant group-hover:text-primary/70 uppercase tracking-widest font-label-bold">Select</span>
@@ -277,7 +277,7 @@ function LabAdminPortal() {
               <button
                 type="button"
                 onClick={() => setConfirmModal({ isOpen: false, title: '', message: '', onConfirm: null })}
-                className="px-5 py-2.5 rounded-xl border border-outline/30 dark:border-white/10 text-on-surface hover:bg-surface-dim dark:bg-white/5 text-xs font-label-bold cursor-pointer"
+                className="px-5 py-2.5 rounded-xl border border-transparent text-on-surface hover:bg-surface-dim dark:bg-white/5 text-xs font-label-bold cursor-pointer"
               >
                 Cancel
               </button>
@@ -294,7 +294,7 @@ function LabAdminPortal() {
       )}
 
       {/* Header Profile Card */}
-      <div className="bg-surface-container/60 backdrop-blur-xl border border-outline/30 dark:border-white/10 rounded-2xl p-5 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-surface-container/60 backdrop-blur-xl border border-transparent rounded-2xl p-5 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 rounded-2xl bg-primary/20 border border-primary/40 flex items-center justify-center text-primary shrink-0 shadow-[0_0_15px_rgba(56,189,248,0.2)]">
             <span className="font-mono text-xl font-black">{labGroup}</span>
@@ -309,7 +309,7 @@ function LabAdminPortal() {
         <div className="flex items-center gap-3">
           <button
             onClick={handleSwitchGroup}
-            className="px-4 py-2 rounded-xl bg-surface-dim dark:bg-white/5 border border-outline/30 dark:border-white/10 hover:bg-surface-container-high dark:bg-white/10 hover:border-outline/50 dark:border-white/20 text-on-surface-variant text-xs font-label-bold flex items-center gap-2 transition-all cursor-pointer shadow-sm"
+            className="px-4 py-2 rounded-xl bg-surface-dim dark:bg-white/5 border border-transparent hover:bg-surface-container-high dark:bg-white/10 hover:border-transparent text-on-surface-variant text-xs font-label-bold flex items-center gap-2 transition-all cursor-pointer shadow-sm"
           >
             <span className="material-symbols-outlined text-sm">swap_horiz</span> Switch Group
           </button>
@@ -321,7 +321,7 @@ function LabAdminPortal() {
         {/* Main Left Column - Attendance Marker */}
         <div className="lg:col-span-8 space-y-6">
           <div className="bg-surface-container dark:bg-black/40 border border-primary/30 rounded-2xl p-4 sm:p-5 shadow-xl">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-outline/30 dark:border-white/10 pb-3 mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-transparent pb-3 mb-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-secondary/20 border border-secondary/40 flex items-center justify-center text-secondary shrink-0">
                   <span className="material-symbols-outlined text-xl">how_to_reg</span>
@@ -344,7 +344,7 @@ function LabAdminPortal() {
                 <button
                   type="button"
                   onClick={handlePreviousDay}
-                  className="w-12 h-12 flex items-center justify-center bg-surface-dim dark:bg-black/80 border-2 border-outline/40 dark:border-white/15 hover:border-secondary hover:text-secondary rounded-2xl text-on-surface active:scale-95 transition-all cursor-pointer shrink-0 shadow-md"
+                  className="w-12 h-12 flex items-center justify-center bg-surface-dim dark:bg-black/80 border-2 border-transparent hover:border-secondary hover:text-secondary rounded-2xl text-on-surface active:scale-95 transition-all cursor-pointer shrink-0 shadow-md"
                 >
                   <span className="material-symbols-outlined text-xl">chevron_left</span>
                 </button>
@@ -379,7 +379,7 @@ function LabAdminPortal() {
                 <button
                   type="button"
                   onClick={handleNextDay}
-                  className="w-12 h-12 flex items-center justify-center bg-surface-dim dark:bg-black/80 border-2 border-outline/40 dark:border-white/15 hover:border-secondary hover:text-secondary rounded-2xl text-on-surface active:scale-95 transition-all cursor-pointer shrink-0 shadow-md"
+                  className="w-12 h-12 flex items-center justify-center bg-surface-dim dark:bg-black/80 border-2 border-transparent hover:border-secondary hover:text-secondary rounded-2xl text-on-surface active:scale-95 transition-all cursor-pointer shrink-0 shadow-md"
                 >
                   <span className="material-symbols-outlined text-xl">chevron_right</span>
                 </button>
@@ -408,8 +408,8 @@ function LabAdminPortal() {
 
             {currentLeaderSchedule ? (
               <form onSubmit={handleSaveAttendance} className="space-y-4">
-                <div className="bg-surface-container dark:bg-black/40 border border-outline/30 dark:border-white/10 rounded-2xl p-4 space-y-3 shadow-lg">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-outline-variant/50 dark:border-white/5 pb-3">
+                <div className="bg-surface-container dark:bg-black/40 border border-transparent rounded-2xl p-4 space-y-3 shadow-lg">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-transparent pb-3">
                     <div>
                       <span className="text-[10px] text-secondary font-bold uppercase tracking-wider block mb-0.5">{currentLeaderSchedule.week} Session • {labGroup}</span>
                       <h3 className="font-extrabold text-on-surface text-base">{currentLeaderSchedule.lab_name}</h3>
@@ -435,7 +435,7 @@ function LabAdminPortal() {
                         <button
                           type="button"
                           onClick={() => handleToggleAll(null)}
-                          className="px-2 py-1.5 rounded-xl bg-surface-dim dark:bg-white/5 hover:bg-surface-container-high dark:bg-white/10 text-on-surface-variant text-[11px] font-label-bold border border-outline/30 dark:border-white/10 transition-all cursor-pointer text-center flex items-center justify-center gap-1"
+                          className="px-2 py-1.5 rounded-xl bg-surface-dim dark:bg-white/5 hover:bg-surface-container-high dark:bg-white/10 text-on-surface-variant text-[11px] font-label-bold border border-transparent transition-all cursor-pointer text-center flex items-center justify-center gap-1"
                         >
                           <span>Clear</span>
                         </button>
@@ -463,7 +463,7 @@ function LabAdminPortal() {
                             ? 'bg-secondary/10 border-secondary/40 shadow-[0_0_12px_rgba(78,222,163,0.15)]' 
                             : status === false 
                             ? 'bg-error/10 border-error/40' 
-                            : 'bg-surface-container dark:bg-black/40 border-outline/30 dark:border-white/10'
+                            : 'bg-surface-container dark:bg-black/40 border-transparent'
                         }`}
                       >
                         <div className="flex items-center justify-between gap-2 mb-2.5">
@@ -473,7 +473,7 @@ function LabAdminPortal() {
                                 ? 'bg-secondary/20 text-secondary border-secondary/40' 
                                 : status === false 
                                 ? 'bg-error/20 text-error border-error/40' 
-                                : 'bg-surface-container-high dark:bg-white/10 text-on-surface border-outline/30 dark:border-white/10'
+                                : 'bg-surface-container-high dark:bg-white/10 text-on-surface border-transparent'
                             }`}>
                               {student.name[0]}
                             </div>
@@ -485,7 +485,7 @@ function LabAdminPortal() {
                         </div>
 
                         {canMarkAttendance ? (
-                          <div className="grid grid-cols-2 gap-2 pt-1 border-t border-outline-variant/50 dark:border-white/5">
+                          <div className="grid grid-cols-2 gap-2 pt-1 border-t border-transparent">
                             <button
                               type="button"
                               onClick={() =>
@@ -497,7 +497,7 @@ function LabAdminPortal() {
                               className={`py-2 px-3 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all cursor-pointer border ${
                                 status === true
                                   ? 'bg-secondary text-on-secondary border-secondary shadow-lg shadow-secondary/30 scale-[1.02]'
-                                  : 'bg-surface-dim dark:bg-white/5 text-on-surface-variant border-outline/30 dark:border-white/10 hover:bg-secondary/20 hover:text-secondary'
+                                  : 'bg-surface-dim dark:bg-white/5 text-on-surface-variant border-transparent hover:bg-secondary/20 hover:text-secondary'
                               }`}
                             >
                               <span className="text-sm">✓</span>
@@ -514,7 +514,7 @@ function LabAdminPortal() {
                               className={`py-2 px-3 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all cursor-pointer border ${
                                 status === false
                                   ? 'bg-error text-on-error border-error shadow-lg shadow-error/30 scale-[1.02]'
-                                  : 'bg-surface-dim dark:bg-white/5 text-on-surface-variant border-outline/30 dark:border-white/10 hover:bg-error/20 hover:text-error'
+                                  : 'bg-surface-dim dark:bg-white/5 text-on-surface-variant border-transparent hover:bg-error/20 hover:text-error'
                               }`}
                             >
                               <span className="text-sm">✗</span>
@@ -522,13 +522,13 @@ function LabAdminPortal() {
                             </button>
                           </div>
                         ) : (
-                          <div className="pt-2 border-t border-outline-variant/50 dark:border-white/5 text-right">
+                          <div className="pt-2 border-t border-transparent text-right">
                             <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-xl text-xs font-bold border ${
                               status === true
                                 ? 'bg-secondary/20 text-secondary border-secondary/40'
                                 : status === false
                                 ? 'bg-error/20 text-error border-error/40'
-                                : 'bg-surface-dim dark:bg-white/5 text-on-surface-variant/60 border-outline/30 dark:border-white/10'
+                                : 'bg-surface-dim dark:bg-white/5 text-on-surface-variant/60 border-transparent'
                             }`}>
                               {status === true ? '✓ Present' : status === false ? '✗ Absent' : 'Not Marked'}
                             </span>
@@ -539,9 +539,9 @@ function LabAdminPortal() {
                   })}
                 </div>
 
-                <div className="hidden sm:block overflow-x-auto border border-outline/30 dark:border-white/10 rounded-2xl">
+                <div className="hidden sm:block overflow-x-auto border border-transparent rounded-2xl">
                   <table className="w-full text-left text-sm text-on-surface-variant">
-                    <thead className="bg-surface-container-high dark:bg-black/50 text-on-surface uppercase text-[10px] font-label-bold border-b border-outline/30 dark:border-white/10">
+                    <thead className="bg-surface-container-high dark:bg-black/50 text-on-surface uppercase text-[10px] font-label-bold border-b border-transparent">
                       <tr>
                         <th className="py-3 px-4">Reg No</th>
                         <th className="py-3 px-4">Student Name</th>
@@ -569,7 +569,7 @@ function LabAdminPortal() {
                                     className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer border ${
                                       status === true
                                         ? 'bg-secondary text-on-secondary border-secondary shadow-md shadow-secondary/20'
-                                        : 'bg-surface-dim dark:bg-white/5 text-on-surface-variant/70 border-outline/30 dark:border-white/10 hover:bg-secondary/15 hover:text-secondary'
+                                        : 'bg-surface-dim dark:bg-white/5 text-on-surface-variant/70 border-transparent hover:bg-secondary/15 hover:text-secondary'
                                     }`}
                                   >
                                     ✓ Present
@@ -585,7 +585,7 @@ function LabAdminPortal() {
                                     className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer border ${
                                       status === false
                                         ? 'bg-error text-on-error border-error shadow-md shadow-error/20'
-                                        : 'bg-surface-dim dark:bg-white/5 text-on-surface-variant/70 border-outline/30 dark:border-white/10 hover:bg-error/15 hover:text-error'
+                                        : 'bg-surface-dim dark:bg-white/5 text-on-surface-variant/70 border-transparent hover:bg-error/15 hover:text-error'
                                     }`}
                                   >
                                     ✗ Absent
@@ -597,7 +597,7 @@ function LabAdminPortal() {
                                     ? 'bg-secondary/20 text-secondary border-secondary/40'
                                     : status === false
                                     ? 'bg-error/20 text-error border-error/40'
-                                    : 'bg-surface-dim dark:bg-white/5 text-on-surface-variant/60 border-outline/30 dark:border-white/10'
+                                    : 'bg-surface-dim dark:bg-white/5 text-on-surface-variant/60 border-transparent'
                                 }`}>
                                   {status === true ? '✓ Present' : status === false ? '✗ Absent' : 'Not Marked'}
                                 </span>
@@ -611,7 +611,7 @@ function LabAdminPortal() {
                 </div>
 
                 {canMarkAttendance && (
-                  <div className="bg-surface-variant/50 dark:bg-black/30 border border-outline/30 dark:border-white/10 rounded-2xl p-3.5 space-y-1.5 shadow-md">
+                  <div className="bg-surface-variant/50 dark:bg-black/30 border border-transparent rounded-2xl p-3.5 space-y-1.5 shadow-md">
                     <label className="text-xs font-label-bold uppercase text-secondary tracking-wider flex items-center gap-1.5">
                       <span className="material-symbols-outlined text-sm">edit_note</span>
                       <span>Lab Session Note / Remarks (Optional):</span>
@@ -621,12 +621,12 @@ function LabAdminPortal() {
                       value={sessionNote}
                       onChange={(e) => setSessionNote(e.target.value)}
                       placeholder="e.g. Completed Experiment 3, Bench 4 multimeter calibrated, all hardware tested..."
-                      className="w-full px-3.5 py-2.5 bg-surface-container-highest dark:bg-black/60 border border-outline/40 dark:border-white/15 rounded-xl text-xs sm:text-sm text-on-surface placeholder-on-surface-variant/40 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all"
+                      className="w-full px-3.5 py-2.5 bg-surface-container-highest dark:bg-black/60 border border-transparent rounded-xl text-xs sm:text-sm text-on-surface placeholder-on-surface-variant/40 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all"
                     />
                   </div>
                 )}
 
-                <div className="flex justify-end pt-3 border-t border-outline/30 dark:border-white/10">
+                <div className="flex justify-end pt-3 border-t border-transparent">
                   <button
                     type="submit"
                     className="btn-electric w-full sm:w-auto px-6 py-3 rounded-2xl text-xs font-label-bold flex items-center justify-center gap-2 shadow-xl cursor-pointer text-center"
@@ -649,7 +649,7 @@ function LabAdminPortal() {
         <div className="lg:col-span-4 space-y-6">
           
           {/* Progress Card */}
-          <div className="bg-surface-container/60 border border-outline/30 dark:border-white/10 rounded-2xl p-5 shadow-xl backdrop-blur-xl">
+          <div className="bg-surface-container/60 border border-transparent rounded-2xl p-5 shadow-xl backdrop-blur-xl">
             <h3 className="text-sm font-bold text-on-surface flex items-center gap-2 mb-4">
               <span className="material-symbols-outlined text-primary text-lg">data_usage</span>
               Lab Progress Overview
@@ -667,7 +667,7 @@ function LabAdminPortal() {
                 </div>
               </div>
 
-              <div className="w-full bg-surface-container-high dark:bg-white/10 rounded-full h-2.5 overflow-hidden border border-outline-variant/50 dark:border-white/5">
+              <div className="w-full bg-surface-container-high dark:bg-white/10 rounded-full h-2.5 overflow-hidden border border-transparent">
                 <div
                   className="bg-primary h-full transition-all duration-1000 shadow-[0_0_10px_rgba(56,189,248,0.5)]"
                   style={{ width: `${groupProgress.percentage}%` }}
@@ -677,8 +677,8 @@ function LabAdminPortal() {
           </div>
 
           {/* Upcoming Schedule Card */}
-          <div className="bg-surface-container/60 border border-outline/30 dark:border-white/10 rounded-2xl p-5 shadow-xl backdrop-blur-xl">
-            <div className="flex items-center justify-between mb-4 border-b border-outline/30 dark:border-white/10 pb-2">
+          <div className="bg-surface-container/60 border border-transparent rounded-2xl p-5 shadow-xl backdrop-blur-xl">
+            <div className="flex items-center justify-between mb-4 border-b border-transparent pb-2">
               <h3 className="text-sm font-bold text-on-surface flex items-center gap-2">
                 <span className="material-symbols-outlined text-secondary text-lg">event_upcoming</span>
                 Upcoming Lab Sessions
@@ -688,7 +688,7 @@ function LabAdminPortal() {
             <div className="space-y-3">
               {upcomingSchedule.length > 0 ? (
                 upcomingSchedule.map((sch, idx) => (
-                  <div key={idx} className="bg-surface-variant/50 dark:bg-black/30 border border-outline-variant/50 dark:border-white/5 rounded-xl p-3 flex gap-3 hover:border-secondary/30 transition-colors">
+                  <div key={idx} className="bg-surface-variant/50 dark:bg-black/30 border border-transparent rounded-xl p-3 flex gap-3 hover:border-secondary/30 transition-colors">
                     <div className="flex flex-col items-center justify-center bg-secondary/10 text-secondary rounded-lg px-2 py-1 min-w-[50px] border border-secondary/20">
                       <span className="text-[10px] font-label-bold uppercase">{getDayNameFromDateString(sch.date)}</span>
                       <span className="text-sm font-bold font-mono">{sch.date.split('-')[2]}</span>
