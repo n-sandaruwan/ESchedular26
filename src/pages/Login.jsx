@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import InteractiveShaderBackground from '../components/InteractiveShaderBackground';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '../firebase';
 
 // =========================================================================
@@ -20,6 +20,24 @@ function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const handleRoleVerification = (uid) => {
+    if (uid === AUTHORIZED_UIDS.ADMIN) {
+      localStorage.setItem('mis_role', 'admin');
+      localStorage.setItem('mis_user', 'Department Administrator');
+      navigate('/admin');
+    } 
+    else if (uid === AUTHORIZED_UIDS.LAB_ADMIN) {
+      localStorage.setItem('mis_role', 'lab_admin');
+      localStorage.setItem('mis_user', 'Lab Administrator');
+      localStorage.removeItem('mis_lab_admin_group'); 
+      navigate('/lab-admin-portal');
+    } 
+    else {
+      setError(`Access Denied: Your account (UID: ${uid}) does not have administrator privileges. Add this UID to AUTHORIZED_UIDS to grant access.`);
+      auth.signOut();
+    }
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
@@ -29,38 +47,36 @@ function Login() {
     const cleanPass = password.trim();
 
     try {
-      if (!auth) {
-        throw new Error("Firebase Authentication is not configured.");
-      }
-
-      // 1. Authenticate with Firebase
+      if (!auth) throw new Error("Firebase Authentication is not configured.");
+      
       const userCredential = await signInWithEmailAndPassword(auth, cleanEmail, cleanPass);
-      const uid = userCredential.user.uid;
-
-      // 2. Role Verification
-      if (uid === AUTHORIZED_UIDS.ADMIN) {
-        localStorage.setItem('mis_role', 'admin');
-        localStorage.setItem('mis_user', 'Department Administrator');
-        navigate('/admin');
-      } 
-      else if (uid === AUTHORIZED_UIDS.LAB_ADMIN) {
-        localStorage.setItem('mis_role', 'lab_admin');
-        localStorage.setItem('mis_user', 'Lab Administrator');
-        localStorage.removeItem('mis_lab_admin_group'); // Force group selection on new login
-        navigate('/lab-admin-portal');
-      } 
-      else {
-        // Logged in but UID is not authorized as Admin or Lab Admin
-        setError("Access Denied: Your account does not have administrator privileges.");
-        // We should log them back out
-        auth.signOut();
-      }
+      handleRoleVerification(userCredential.user.uid);
     } catch (err) {
       console.error(err);
       if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
         setError('Invalid email or password. Please check your credentials.');
       } else {
         setError(err.message || 'An error occurred during sign in.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      if (!auth) throw new Error("Firebase Authentication is not configured.");
+      
+      const provider = new GoogleAuthProvider();
+      const userCredential = await signInWithPopup(auth, provider);
+      handleRoleVerification(userCredential.user.uid);
+    } catch (err) {
+      console.error(err);
+      // Ignore if user just closed the popup
+      if (err.code !== 'auth/popup-closed-by-user' && err.code !== 'auth/cancelled-popup-request') {
+        setError(err.message || 'An error occurred during Google Sign-In.');
       }
     } finally {
       setLoading(false);
@@ -83,7 +99,7 @@ function Login() {
         </div>
 
         {error && (
-          <div className="p-3 rounded-lg bg-error/20 border border-error text-error text-xs text-center font-bold">
+          <div className="p-3 rounded-lg bg-error/20 border border-error text-error text-xs text-center font-bold break-all">
             {error}
           </div>
         )}
@@ -99,6 +115,7 @@ function Login() {
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="Email Address"
+              disabled={loading}
             />
           </div>
 
@@ -111,18 +128,36 @@ function Login() {
               value={password}
               onChange={e => setPassword(e.target.value)}
               placeholder="••••••••"
+              disabled={loading}
             />
           </div>
 
           <button
             type="submit"
-            className="btn-electric py-3 rounded-lg font-label-bold uppercase tracking-wider text-xs mt-1 cursor-pointer shadow-[0_0_15px_rgba(56,189,248,0.3)]"
+            disabled={loading}
+            className="btn-electric py-3 rounded-lg font-label-bold uppercase tracking-wider text-xs mt-1 cursor-pointer shadow-[0_0_15px_rgba(56,189,248,0.3)] disabled:opacity-50"
           >
-            Sign In to Portal
+            {loading ? 'Signing in...' : 'Sign In to Portal'}
           </button>
         </form>
 
-        <div className="pt-2 border-t border-white/5 flex flex-col gap-2">
+        <div className="flex items-center gap-3 my-1">
+          <div className="h-px bg-white/10 flex-1"></div>
+          <span className="text-[10px] uppercase font-label-bold text-on-surface-variant/50">or continue with</span>
+          <div className="h-px bg-white/10 flex-1"></div>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleGoogleLogin}
+          disabled={loading}
+          className="flex items-center justify-center gap-3 w-full py-3 rounded-lg bg-surface-dim dark:bg-white/5 border border-white/10 hover:bg-surface-container-high hover:border-white/20 transition-all text-sm font-label-bold text-on-surface cursor-pointer disabled:opacity-50 shadow-sm"
+        >
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
+          Sign in with Google
+        </button>
+
+        <div className="pt-2 border-t border-white/5 flex flex-col gap-2 mt-2">
           <div className="text-center">
             <Link
               to="/"
