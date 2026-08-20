@@ -87,20 +87,10 @@ export const getStoredDailyLogs = () => {
   const local = localStorage.getItem('mis_daily_logs');
   if (local) {
     try {
-      let parsed = JSON.parse(local);
+      const parsed = JSON.parse(local);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        // One-time cleanup for EE3304 progress
-        if (!localStorage.getItem('mis_ee3304_cleared_v1')) {
-          const originalLength = parsed.length;
-          parsed = parsed.filter(l => l.module !== 'EE3304');
-          if (parsed.length < originalLength) {
-            localStorage.setItem('mis_daily_logs', JSON.stringify(parsed));
-          }
-          localStorage.setItem('mis_ee3304_cleared_v1', 'true');
-          // Force recalculation since we modified logs directly
-          setTimeout(() => window.dispatchEvent(new Event('daily_logs_updated')), 100);
-        }
-        return parsed;
+        // PERMANENT FILTER: Clear all EE3304 progress up to today
+        return parsed.filter(l => !(l.module === 'EE3304' && l.date < '2026-08-22'));
       }
     } catch (e) { /* fallback */ }
   }

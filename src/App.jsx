@@ -1,6 +1,5 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { getStoredDailyLogs, deleteDailyLogByModuleAndDate } from './data/dailyLogsData';
 import StudentDashboard from './pages/StudentDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import Login from './pages/Login';
@@ -17,19 +16,6 @@ import DashboardLayout from './components/DashboardLayout';
 import './index.css';
 
 function App() {
-  useEffect(() => {
-    if (!localStorage.getItem('mis_ee3304_deep_clean_v2')) {
-      const logs = getStoredDailyLogs();
-      if (Array.isArray(logs)) {
-        const eeLogs = logs.filter(l => l.module === 'EE3304');
-        eeLogs.forEach(l => {
-          deleteDailyLogByModuleAndDate(l.date, l.module);
-        });
-      }
-      localStorage.setItem('mis_ee3304_deep_clean_v2', 'true');
-    }
-  }, []);
-
   return (
     <Router>
       <Routes>

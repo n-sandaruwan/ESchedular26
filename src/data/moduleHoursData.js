@@ -301,14 +301,10 @@ const getRawDailyLogs = () => {
   const local = localStorage.getItem('mis_daily_logs');
   if (local) {
     try {
-      let parsed = JSON.parse(local);
+      const parsed = JSON.parse(local);
       if (Array.isArray(parsed)) {
-        if (!localStorage.getItem('mis_ee3304_cleared_v2')) {
-          parsed = parsed.filter(l => l.module !== 'EE3304');
-          localStorage.setItem('mis_daily_logs', JSON.stringify(parsed));
-          localStorage.setItem('mis_ee3304_cleared_v2', 'true');
-        }
-        return parsed;
+        // PERMANENT FILTER: Clear all EE3304 progress up to today
+        return parsed.filter(l => !(l.module === 'EE3304' && l.date < '2026-08-22'));
       }
     } catch (e) {}
   }
