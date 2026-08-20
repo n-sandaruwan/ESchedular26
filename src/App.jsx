@@ -9,6 +9,7 @@ import TimetablePage from './pages/TimetablePage';
 import DailyLogPage from './pages/DailyLogPage';
 import AuditLogPage from './pages/AuditLogPage';
 import LabTrackerPage from './pages/LabTrackerPage';
+import LabAdminPortal from './pages/LabAdminPortal';
 import CancelledLecturesPage from './pages/CancelledLecturesPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import DashboardLayout from './components/DashboardLayout';
@@ -26,6 +27,7 @@ function App() {
         <Route path="/modules/:moduleId" element={<DashboardLayout><ModulePage /></DashboardLayout>} />
         <Route path="/module/:moduleId" element={<DashboardLayout><ModulePage /></DashboardLayout>} />
         <Route path="/lab-tracker" element={<DashboardLayout><LabTrackerPage /></DashboardLayout>} />
+        <Route path="/lab-admin-portal" element={<DashboardLayout><LabAdminPortal /></DashboardLayout>} />
         <Route path="/cancellations" element={<DashboardLayout><CancelledLecturesPage /></DashboardLayout>} />
         <Route path="/logs" element={<DashboardLayout><DailyLogPage /></DashboardLayout>} />
         <Route path="/audit" element={<DashboardLayout><AuditLogPage /></DashboardLayout>} />

@@ -33,7 +33,7 @@ function Login() {
     ) {
       localStorage.setItem('mis_role', 'lab_admin');
       localStorage.setItem('mis_user', 'Lab Administrator');
-      navigate('/lab-tracker?tab=leader');
+      navigate('/lab-admin-portal');
       return;
     }
 

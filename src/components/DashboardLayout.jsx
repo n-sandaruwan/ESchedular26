@@ -21,10 +21,13 @@ function DashboardLayout({ children }) {
     { name: 'Cancellations', icon: 'event_busy', path: '/cancellations' },
     { name: 'Daily Lecture Logs', icon: 'history_edu', path: '/logs', adminOnly: true },
     { name: 'Audit Trail', icon: 'history', path: '/audit', adminOnly: true },
-    { name: 'Admin Portal', icon: 'admin_panel_settings', path: '/admin' }
+    { name: 'Admin Portal', icon: 'admin_panel_settings', path: '/admin', adminOnly: true },
+    { name: 'Lab Admin Portal', icon: 'how_to_reg', path: '/lab-admin-portal', labAdminOnly: true }
   ];
 
-  const navItems = allNavItems.filter(item => !item.adminOnly || isAdmin);
+  const navItems = allNavItems.filter(item => 
+    (!item.adminOnly || isAdmin) && (!item.labAdminOnly || isLabAdmin)
+  );
 
   const handleLeaveAdmin = () => {
     localStorage.setItem('mis_role', 'student');
@@ -106,7 +109,7 @@ function DashboardLayout({ children }) {
 
             {/* Avatar */}
             <div 
-              onClick={() => navigate(isAdmin ? '/admin' : isLabAdmin ? '/lab-tracker?tab=leader' : '/login')}
+              onClick={() => navigate(isAdmin ? '/admin' : isLabAdmin ? '/lab-admin-portal' : '/login')}
               className="w-8 h-8 rounded-full overflow-hidden border border-primary/30 cursor-pointer hover:border-primary transition-colors shrink-0"
               title={isAdmin ? "Logged in as Admin" : isLabAdmin ? "Logged in as Lab Admin" : "Click to Login"}
             >
@@ -312,12 +315,12 @@ function DashboardLayout({ children }) {
 
         {isLabAdmin && (
           <Link
-            to="/lab-tracker?tab=leader"
+            to="/lab-admin-portal"
             className={`flex flex-col items-center justify-center transition-all duration-200 active:scale-90 ${
-              location.search.includes('tab=leader') ? 'text-primary drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]' : 'text-on-surface-variant/60 hover:text-primary/80'
+              location.pathname === '/lab-admin-portal' ? 'text-primary drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]' : 'text-on-surface-variant/60 hover:text-primary/80'
             }`}
           >
-            <span className="material-symbols-outlined text-xl">biotech</span>
+            <span className="material-symbols-outlined text-xl">how_to_reg</span>
             <span className="font-label-sm text-[11px]">Lab Portal</span>
           </Link>
         )}
