@@ -89,8 +89,7 @@ export const getStoredDailyLogs = () => {
     try {
       const parsed = JSON.parse(local);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        // PERMANENT FILTER: Clear all EE3304 progress up to today
-        return parsed.filter(l => !(l.module === 'EE3304' && l.date < '2026-08-22'));
+        return parsed;
       }
     } catch (e) { /* fallback */ }
   }
