@@ -126,7 +126,7 @@ function DashboardLayout({ children }) {
 
             {isAdmin || isLabAdmin ? (
               <button
-                onClick={handleLeaveAdmin}
+                onClick={handleExitAdmin}
                 className="flex items-center gap-1.5 bg-error/10 border border-error/30 hover:bg-error/20 px-2.5 py-1 rounded-full text-xs font-label-bold text-error transition-colors cursor-pointer"
                 title="Exit Admin / Lab Admin Mode"
               >
@@ -189,7 +189,7 @@ function DashboardLayout({ children }) {
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
-                    handleLeaveAdmin();
+                    handleExitAdmin();
                   }}
                   className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-error/10 border border-error/20 text-error hover:bg-error/20 transition-all text-sm font-label-bold cursor-pointer"
                 >
@@ -239,7 +239,7 @@ function DashboardLayout({ children }) {
         <div className="mt-auto border-t border-white/10 pt-4 px-2">
           {(isAdmin || isLabAdmin) && (
             <button
-              onClick={handleLeaveAdmin}
+              onClick={handleExitAdmin}
               className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl bg-error/10 border border-error/20 text-error hover:bg-error/20 transition-all text-sm font-label-bold cursor-pointer"
             >
               <span className="material-symbols-outlined text-xl">logout</span>

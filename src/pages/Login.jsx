@@ -9,8 +9,8 @@ import { auth } from '../firebase';
 // Replace these with the actual User UIDs from your Firebase Console > Authentication
 // =========================================================================
 export const AUTHORIZED_UIDS = {
-  ADMIN: 'ADMIN_UID_GOES_HERE',       // Replace with UID for admin@eschedular26.com
-  LAB_ADMIN: 'LAB_ADMIN_UID_GOES_HERE' // Replace with UID for labadmin@eschedular26.com
+  ADMIN: 'qgGyu7Qwy6QeV9apAiz3E2NL0zE2',       
+  LAB_ADMIN: 'j4MpEMaYyqRZmuxXvgI5Mjwn0zi1' 
 };
 
 function Login() {
@@ -91,14 +91,14 @@ function Login() {
         {/* Secure Form */}
         <form onSubmit={handleLogin} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-label-bold uppercase text-on-surface-variant">Username / ID</label>
+            <label className="text-xs font-label-bold uppercase text-on-surface-variant">Email</label>
             <input
               className="input-glass p-3 rounded-lg text-on-surface text-xs font-body-md focus:border-primary outline-none"
-              type="text"
+              type="email"
               required
-              value={username}
-              onChange={e => setUsername(e.target.value)}
-              placeholder="Username / ID"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              placeholder="Email Address"
             />
           </div>
 
