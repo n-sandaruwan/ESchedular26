@@ -4,60 +4,61 @@
 
 @layer base {
   :root {
-    --color-inverse-surface: 222 227 232;
-    --color-on-tertiary-fixed: 64 0 13;
-    --color-primary: 0 102 138;
-    --color-secondary-container: 111 251 190;
-    --color-tertiary: 146 0 42;
-    --color-surface-container: 233 236 239;
-    --color-on-secondary-fixed-variant: 0 82 54;
-    --color-surface-container-highest: 206 212 218;
-    --color-on-tertiary-fixed-variant: 146 0 42;
-    --color-on-tertiary-container: 64 0 13;
-    --color-error-container: 255 218 214;
-    --color-on-surface: 26 28 30;
-    --color-primary-fixed-dim: 123 208 255;
-    --color-secondary-fixed: 111 251 190;
-    --color-secondary: 0 109 75;
+    /* Vibrant Light Mode Palette */
+    --color-inverse-surface: 30 41 59;
+    --color-on-tertiary-fixed: 255 255 255;
+    --color-primary: 2 132 199;
+    --color-secondary-container: 209 250 229;
+    --color-tertiary: 225 29 72;
+    --color-surface-container: 241 245 249;
+    --color-on-secondary-fixed-variant: 4 120 87;
+    --color-surface-container-highest: 226 232 240;
+    --color-on-tertiary-fixed-variant: 190 18 60;
+    --color-on-tertiary-container: 159 18 57;
+    --color-error-container: 254 226 226;
+    --color-on-surface: 30 41 59;
+    --color-primary-fixed-dim: 14 165 233;
+    --color-secondary-fixed: 52 211 153;
+    --color-secondary: 5 150 105;
     --color-on-secondary: 255 255 255;
-    --color-inverse-on-surface: 222 227 232;
-    --color-primary-container: 196 231 255;
+    --color-inverse-on-surface: 248 250 252;
+    --color-primary-container: 224 242 254;
     --color-surface-container-lowest: 255 255 255;
-    --color-on-primary-container: 0 30 44;
-    --color-on-primary-fixed: 0 30 44;
-    --color-outline-variant: 195 199 207;
-    --color-surface-container-low: 241 243 245;
-    --color-surface-bright: 248 249 250;
-    --color-on-background: 26 28 30;
-    --color-on-secondary-fixed: 0 33 19;
+    --color-on-primary-container: 3 105 161;
+    --color-on-primary-fixed: 7 89 133;
+    --color-outline-variant: 203 213 225;
+    --color-surface-container-low: 248 250 252;
+    --color-surface-bright: 255 255 255;
+    --color-on-background: 15 23 42;
+    --color-on-secondary-fixed: 6 78 59;
     --color-on-tertiary: 255 255 255;
     --color-on-primary: 255 255 255;
-    --color-on-primary-fixed-variant: 0 76 105;
-    --color-surface: 248 249 250;
-    --color-outline: 115 119 127;
+    --color-on-primary-fixed-variant: 3 105 161;
+    --color-surface: 255 255 255;
+    --color-outline: 148 163 184;
     --color-on-error: 255 255 255;
-    --color-primary-fixed: 196 231 255;
-    --color-background: 248 249 250;
-    --color-tertiary-fixed: 255 218 219;
-    --color-on-surface-variant: 67 71 78;
-    --color-error: 186 26 26;
-    --color-surface-dim: 217 219 222;
-    --color-on-error-container: 65 0 2;
-    --color-tertiary-fixed-dim: 255 178 183;
-    --color-secondary-fixed-dim: 78 222 163;
-    --color-on-secondary-container: 0 33 19;
-    --color-surface-container-high: 222 226 230;
-    --color-tertiary-container: 255 218 219;
-    --color-surface-tint: 0 102 138;
-    --color-surface-variant: 223 226 235;
-    --color-inverse-primary: 142 213 255;
+    --color-primary-fixed: 186 230 253;
+    --color-background: 240 244 248;
+    --color-tertiary-fixed: 255 228 230;
+    --color-on-surface-variant: 71 85 105;
+    --color-error: 220 38 38;
+    --color-surface-dim: 226 232 240;
+    --color-on-error-container: 153 27 27;
+    --color-tertiary-fixed-dim: 253 164 175;
+    --color-secondary-fixed-dim: 16 185 129;
+    --color-on-secondary-container: 4 120 87;
+    --color-surface-container-high: 226 232 240;
+    --color-tertiary-container: 254 205 211;
+    --color-surface-tint: 2 132 199;
+    --color-surface-variant: 241 245 249;
+    --color-inverse-primary: 125 211 252;
 
     /* Glass Effects Light */
-    --glass-bg: rgba(255, 255, 255, 0.7);
-    --glass-bg-solid: rgba(255, 255, 255, 0.9);
-    --glass-border: rgba(0, 0, 0, 0.1);
-    --glass-border-hover: rgba(0, 102, 138, 0.5);
-    --glass-shadow: rgba(0, 102, 138, 0.1);
+    --glass-bg: rgba(255, 255, 255, 0.85);
+    --glass-bg-solid: rgba(255, 255, 255, 1);
+    --glass-border: rgba(2, 132, 199, 0.15);
+    --glass-border-hover: rgba(2, 132, 199, 0.4);
+    --glass-shadow: rgba(2, 132, 199, 0.15);
   }
 
   .dark {
