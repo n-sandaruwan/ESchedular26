@@ -1,0 +1,1 @@
+{"name":"ESchedular26","short_name":"ESchedular","description":"University Scheduling and Lab Tracker App","start_url":"./","display":"standalone","background_color":"#202124","theme_color":"#202124","lang":"en","scope":"./","icons":[{"src":"pwa-icon.svg","sizes":"192x192 512x512","type":"image/svg+xml","purpose":"any maskable"}]}
