@@ -105,22 +105,9 @@ function DashboardLayout({ children }) {
                 to="/login"
                 className="flex items-center gap-1.5 btn-electric px-3 py-1 rounded-full text-xs font-label-bold"
               >
-                <span className="material-symbols-outlined text-sm">login</span> Login / Modes
+                <span className="material-symbols-outlined text-sm">login</span> Login
               </Link>
             )}
-
-            {/* Avatar */}
-            <div 
-              onClick={() => navigate(isAdmin ? '/admin' : isLabAdmin ? '/lab-admin-portal' : '/login')}
-              className="w-8 h-8 rounded-full overflow-hidden border border-primary/30 cursor-pointer hover:border-primary transition-colors shrink-0"
-              title={isAdmin ? "Logged in as Admin" : isLabAdmin ? "Logged in as Lab Admin" : "Click to Login"}
-            >
-              <img
-                className="w-full h-full object-cover"
-                alt="User Avatar"
-                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80"
-              />
-            </div>
           </div>
         </div>
       </header>
@@ -166,7 +153,7 @@ function DashboardLayout({ children }) {
             </div>
 
             <div className="pt-4 border-t border-white/10">
-              {isAdmin || isLabAdmin ? (
+              {(isAdmin || isLabAdmin) && (
                 <button
                   onClick={() => {
                     setMobileMenuOpen(false);
@@ -176,17 +163,6 @@ function DashboardLayout({ children }) {
                 >
                   <span className="material-symbols-outlined text-xl">logout</span>
                   <span>Leave {isLabAdmin ? 'Lab Admin' : 'Admin'} Mode</span>
-                </button>
-              ) : (
-                <button
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    handleLogout();
-                  }}
-                  className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all text-sm font-label-bold cursor-pointer"
-                >
-                  <span className="material-symbols-outlined text-xl">login</span>
-                  <span>Admin Login</span>
                 </button>
               )}
             </div>
@@ -229,21 +205,13 @@ function DashboardLayout({ children }) {
         </div>
 
         <div className="mt-auto border-t border-white/10 pt-4 px-2">
-          {isAdmin || isLabAdmin ? (
+          {(isAdmin || isLabAdmin) && (
             <button
               onClick={handleLeaveAdmin}
               className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl bg-error/10 border border-error/20 text-error hover:bg-error/20 transition-all text-sm font-label-bold cursor-pointer"
             >
               <span className="material-symbols-outlined text-xl">logout</span>
               <span>Leave {isLabAdmin ? 'Lab Admin' : 'Admin'} Mode</span>
-            </button>
-          ) : (
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-white/5 transition-all text-sm font-label-bold cursor-pointer"
-            >
-              <span className="material-symbols-outlined text-xl">login</span>
-              <span>Admin Login</span>
             </button>
           )}
         </div>
@@ -328,16 +296,6 @@ function DashboardLayout({ children }) {
           >
             <span className="material-symbols-outlined text-xl">how_to_reg</span>
             <span className="font-label-sm text-[11px]">Lab Portal</span>
-          </Link>
-        )}
-
-        {!isAdmin && !isLabAdmin && (
-          <Link
-            to="/login"
-            className="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-primary/80 transition-all duration-200 active:scale-90"
-          >
-            <span className="material-symbols-outlined text-xl">login</span>
-            <span className="font-label-sm text-[11px]">Login</span>
           </Link>
         )}
       </nav>
