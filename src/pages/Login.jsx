@@ -24,6 +24,7 @@ export const LAB_ADMIN_GROUP_MAP = {
   'F4oJx4xH9OU66S3spgmrUJqilya2': 'EE02',
   'FW5hgHty1wbuPkGuHZB5MEtUrwx1': 'EE03',
   '1cfPgmhFEPeFycOG2uw5PNBTEzw2': 'EE04',
+  'b87r7LcjnHRPqNVSximVm7ntUTh1': 'EE04',
   'gWvfBdA1JEdUPCMsw2miMnqzmeQ2': 'EE05',
   'rfGcnZkOBuNP1FIsGNPgtHLL0kg1': 'EE06',
   'NlYz9zHd2zclCqWI7A2dGqjWpIS2': 'EE07',
