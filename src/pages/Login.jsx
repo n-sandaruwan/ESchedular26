@@ -1,44 +1,70 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import InteractiveShaderBackground from '../components/InteractiveShaderBackground';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../firebase';
+
+// =========================================================================
+// 🛑 IMPORTANT SECURITY CONFIGURATION 🛑
+// Replace these with the actual User UIDs from your Firebase Console > Authentication
+// =========================================================================
+export const AUTHORIZED_UIDS = {
+  ADMIN: 'ADMIN_UID_GOES_HERE',       // Replace with UID for admin@eschedular26.com
+  LAB_ADMIN: 'LAB_ADMIN_UID_GOES_HERE' // Replace with UID for labadmin@eschedular26.com
+};
 
 function Login() {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
-    const cleanUser = username.trim().toLowerCase();
+    const cleanEmail = email.trim().toLowerCase();
     const cleanPass = password.trim();
 
-    // 1. Strict Full Department Admin Verification (Username + Password)
-    if (
-      (cleanUser === 'admin' || cleanUser === 'admin@mis.com') &&
-      (cleanPass === '987321' || cleanPass === '987')
-    ) {
-      localStorage.setItem('mis_role', 'admin');
-      localStorage.setItem('mis_user', 'Department Administrator');
-      navigate('/admin');
-      return;
-    }
+    try {
+      if (!auth) {
+        throw new Error("Firebase Authentication is not configured.");
+      }
 
-    // 2. Strict Lab Admin Verification (Username + Password)
-    if (
-      (cleanUser === 'labadmin' || cleanUser === 'lab' || cleanUser === 'labadmin@mis.com') &&
-      cleanPass === '654'
-    ) {
-      localStorage.setItem('mis_role', 'lab_admin');
-      localStorage.setItem('mis_user', 'Lab Administrator');
-      localStorage.removeItem('mis_lab_admin_group'); // Force group selection on new login
-      navigate('/lab-admin-portal');
-      return;
-    }
+      // 1. Authenticate with Firebase
+      const userCredential = await signInWithEmailAndPassword(auth, cleanEmail, cleanPass);
+      const uid = userCredential.user.uid;
 
-    setError('Invalid username or password. Please check your credentials.');
+      // 2. Role Verification
+      if (uid === AUTHORIZED_UIDS.ADMIN) {
+        localStorage.setItem('mis_role', 'admin');
+        localStorage.setItem('mis_user', 'Department Administrator');
+        navigate('/admin');
+      } 
+      else if (uid === AUTHORIZED_UIDS.LAB_ADMIN) {
+        localStorage.setItem('mis_role', 'lab_admin');
+        localStorage.setItem('mis_user', 'Lab Administrator');
+        localStorage.removeItem('mis_lab_admin_group'); // Force group selection on new login
+        navigate('/lab-admin-portal');
+      } 
+      else {
+        // Logged in but UID is not authorized as Admin or Lab Admin
+        setError("Access Denied: Your account does not have administrator privileges.");
+        // We should log them back out
+        auth.signOut();
+      }
+    } catch (err) {
+      console.error(err);
+      if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
+        setError('Invalid email or password. Please check your credentials.');
+      } else {
+        setError(err.message || 'An error occurred during sign in.');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

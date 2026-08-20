@@ -220,7 +220,14 @@ function AdminDashboard() {
     });
   };
 
-  const handleExitAdmin = () => {
+  const handleExitAdmin = async () => {
+    try {
+      const { auth } = await import('../firebase');
+      const { signOut } = await import('firebase/auth');
+      if (auth) await signOut(auth);
+    } catch (e) {
+      console.error(e);
+    }
     localStorage.setItem('mis_role', 'student');
     localStorage.removeItem('mis_user');
     window.location.href = '#/';

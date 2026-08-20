@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import InteractiveShaderBackground from './InteractiveShaderBackground';
-import { isFirebaseConfigured } from '../firebase';
+import { signOut } from 'firebase/auth';
+import { auth, isFirebaseConfigured } from '../firebase';
 
 function DashboardLayout({ children }) {
   const location = useLocation();
@@ -45,14 +46,20 @@ function DashboardLayout({ children }) {
     return !item.adminOnly || isAdmin;
   });
 
-  const handleLeaveAdmin = () => {
+  const handleExitAdmin = async () => {
+    if (auth) {
+      try { await signOut(auth); } catch (e) { console.error(e); }
+    }
     localStorage.setItem('mis_role', 'student');
     localStorage.removeItem('mis_user');
     navigate('/');
     window.location.reload();
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    if (auth) {
+      try { await signOut(auth); } catch (e) { console.error(e); }
+    }
     localStorage.removeItem('mis_role');
     localStorage.removeItem('mis_user');
     navigate('/login');

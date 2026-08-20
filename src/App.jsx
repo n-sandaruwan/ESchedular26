@@ -15,10 +15,30 @@ import ProtectedRoute from './components/ProtectedRoute';
 import DashboardLayout from './components/DashboardLayout';
 import './index.css';
 
+import { auth } from './firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+
 function App() {
   useEffect(() => {
-    // The legacy EE3304 cloud cleanup has successfully run and permanently removed legacy data.
-    // We no longer need to execute the wipe script to prevent it from accidentally deleting new valid logs.
+    // Listen for Firebase auth state changes to maintain session security
+    let unsubscribe = () => {};
+    if (auth) {
+      unsubscribe = onAuthStateChanged(auth, (user) => {
+        if (!user) {
+          // If the Firebase session is null, clear any local admin privileges
+          const role = localStorage.getItem('mis_role');
+          if (role === 'admin' || role === 'lab_admin') {
+            localStorage.removeItem('mis_role');
+            localStorage.removeItem('mis_user');
+            window.location.reload();
+          }
+        }
+      });
+    }
+
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   return (
