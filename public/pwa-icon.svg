@@ -1,4 +1,30 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" fill="#202124" rx="100"/>
-  <path d="M150 250 L200 300 L350 150" stroke="#8ab4f8" stroke-width="40" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <defs>
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1e293b" />
+    </linearGradient>
+    <linearGradient id="accent-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#818cf8" />
+    </linearGradient>
+  </defs>
+  
+  <rect width="512" height="512" fill="url(#bg-grad)" rx="112"/>
+  
+  <!-- Circuit Nodes -->
+  <circle cx="128" cy="128" r="16" fill="url(#accent-grad)"/>
+  <circle cx="384" cy="128" r="16" fill="url(#accent-grad)"/>
+  <circle cx="128" cy="384" r="16" fill="url(#accent-grad)"/>
+  <circle cx="384" cy="384" r="16" fill="url(#accent-grad)"/>
+  
+  <!-- Outer Circuit traces -->
+  <path d="M128 144 L128 200 M128 368 L128 312 M384 144 L384 200 M384 368 L384 312" stroke="url(#accent-grad)" stroke-width="16" stroke-linecap="round"/>
+  <path d="M144 128 L200 128 M368 128 L312 128 M144 384 L200 384 M368 384 L312 384" stroke="url(#accent-grad)" stroke-width="16" stroke-linecap="round"/>
+
+  <!-- Microchip outline -->
+  <rect x="176" y="176" width="160" height="160" rx="32" fill="none" stroke="url(#accent-grad)" stroke-width="20"/>
+  
+  <!-- Inner Lightning/Energy -->
+  <path d="M265 200 L215 265 H255 L245 315 L295 245 H255 Z" fill="url(#accent-grad)"/>
 </svg>
