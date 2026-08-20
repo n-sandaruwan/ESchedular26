@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { wipeLegacyEE3304FromCloud } from './data/firebaseSync';
 import StudentDashboard from './pages/StudentDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import Login from './pages/Login';
@@ -18,22 +17,8 @@ import './index.css';
 
 function App() {
   useEffect(() => {
-    if (!localStorage.getItem('mis_ee3304_cloud_clean_final')) {
-      wipeLegacyEE3304FromCloud().then(() => {
-        // Also surgically remove from local storage
-        try {
-          let daily = JSON.parse(localStorage.getItem('mis_daily_logs') || '[]');
-          daily = daily.filter(l => l.module !== 'EE3304');
-          localStorage.setItem('mis_daily_logs', JSON.stringify(daily));
-
-          let hours = JSON.parse(localStorage.getItem('mis_module_hours') || '[]');
-          hours = hours.map(h => h.code === 'EE3304' ? { ...h, conductedHours: 0 } : h);
-          localStorage.setItem('mis_module_hours', JSON.stringify(hours));
-        } catch (e) {}
-        localStorage.setItem('mis_ee3304_cloud_clean_final', 'true');
-        setTimeout(() => window.dispatchEvent(new Event('module_hours_updated')), 100);
-      });
-    }
+    // The legacy EE3304 cloud cleanup has successfully run and permanently removed legacy data.
+    // We no longer need to execute the wipe script to prevent it from accidentally deleting new valid logs.
   }, []);
 
   return (

@@ -373,29 +373,7 @@ export const clearCloudDailyLogsAndHours = async () => {
   }
 };
 
-// Wipe legacy EE3304 daily logs from Cloud Firestore (one-time scrub)
-export const wipeLegacyEE3304FromCloud = async () => {
-  if (!isFirebaseConfigured() || !db) return;
-  try {
-    const dailyLogsRef = collection(db, 'daily_logs');
-    const logsSnap = await getDocs(dailyLogsRef);
-    const deletePromises = [];
-    logsSnap.forEach((docSnap) => {
-      const data = docSnap.data();
-      if (data.module === 'EE3304') {
-        deletePromises.push(withRetry(() => deleteDoc(doc(db, 'daily_logs', docSnap.id))));
-      }
-    });
-    if (deletePromises.length > 0) {
-      await Promise.all(deletePromises);
-      console.log(`✅ Successfully wiped ${deletePromises.length} legacy EE3304 logs from Cloud Firestore!`);
-      window.dispatchEvent(new Event('daily_logs_updated'));
-      window.dispatchEvent(new Event('module_hours_updated'));
-    }
-  } catch (err) {
-    console.error("Failed to wipe legacy EE3304 logs from cloud:", err);
-  }
-};
+
 
 // Wipe all Daily Logs, Schedule Overrides & reset Module Conducted Hours to 0 in Cloud Firestore & LocalStorage (Preserving Lab Logs)
 export const clearCloudLectureLogsAndOverrides = async () => {
