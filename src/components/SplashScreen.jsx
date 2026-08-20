@@ -1,25 +1,22 @@
 import React, { useState, useEffect } from 'react';
 
 const SplashScreen = ({ onComplete }) => {
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(1);
 
   useEffect(() => {
-    // Step 0: Hidden
-    // Step 1: Logo fades in (0.3s)
-    const t1 = setTimeout(() => setStep(1), 300);
-    // Step 2: DEIE 26 fades in (1.2s)
-    const t2 = setTimeout(() => setStep(2), 1200);
-    // Step 3: EShedullar fades in (2.0s)
-    const t3 = setTimeout(() => setStep(3), 2000);
-    // Step 4: Fade everything out (3.5s)
-    const t4 = setTimeout(() => setStep(4), 3500);
-    // Step 5: Unmount and load app (4.0s)
+    // Step 1: Logo is already visible from index.html preloader
+    // Step 2: DEIE 26 fades in (0.7s)
+    const t2 = setTimeout(() => setStep(2), 700);
+    // Step 3: EShedullar fades in (1.5s)
+    const t3 = setTimeout(() => setStep(3), 1500);
+    // Step 4: Fade everything out (3.0s)
+    const t4 = setTimeout(() => setStep(4), 3000);
+    // Step 5: Unmount and load app (3.5s)
     const t5 = setTimeout(() => {
       onComplete();
-    }, 4000);
+    }, 3500);
 
     return () => {
-      clearTimeout(t1);
       clearTimeout(t2);
       clearTimeout(t3);
       clearTimeout(t4);
