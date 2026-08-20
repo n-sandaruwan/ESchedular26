@@ -509,7 +509,7 @@ function LabTrackerPage() {
     <div className="space-y-4">
       {/* Sleek Confirmation Modal Dialog */}
       {confirmModal.isOpen && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-fadeIn">
+        <div className="fixed inset-0 bg-surface-dim dark:bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-fadeIn">
           <div className="bg-surface-container border border-primary/40 rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4 text-center border-t-4 border-t-secondary">
             <div className="w-12 h-12 rounded-full bg-secondary/20 border border-secondary/40 text-secondary flex items-center justify-center mx-auto">
               <span className="material-symbols-outlined text-2xl">help_outline</span>
@@ -520,7 +520,7 @@ function LabTrackerPage() {
               <button
                 type="button"
                 onClick={() => setConfirmModal({ isOpen: false, title: '', message: '', onConfirm: null })}
-                className="px-5 py-2.5 rounded-xl border border-white/10 text-on-surface hover:bg-white/5 text-xs font-label-bold cursor-pointer"
+                className="px-5 py-2.5 rounded-xl border border-outline/30 dark:border-white/10 text-on-surface hover:bg-surface-dim dark:bg-white/5 text-xs font-label-bold cursor-pointer"
               >
                 Cancel
               </button>
@@ -537,7 +537,7 @@ function LabTrackerPage() {
       )}
 
       {/* Sleek Top Banner Header with Tile Navigation */}
-      <div className="bg-surface-container/60 backdrop-blur-xl border border-white/10 rounded-2xl p-4 sm:p-5 shadow-xl space-y-4">
+      <div className="bg-surface-container/60 backdrop-blur-xl border border-outline/30 dark:border-white/10 rounded-2xl p-4 sm:p-5 shadow-xl space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center text-primary shrink-0">
@@ -568,7 +568,7 @@ function LabTrackerPage() {
             className={`p-3 rounded-xl border flex flex-col items-center justify-center gap-1.5 transition-all cursor-pointer ${
               activeTab === 'daily'
                 ? 'bg-primary/20 border-primary text-primary font-bold shadow-lg shadow-primary/10'
-                : 'bg-black/30 border-white/5 text-on-surface-variant hover:text-on-surface hover:bg-white/5'
+                : 'bg-surface-variant/50 dark:bg-black/30 border-outline-variant/50 dark:border-white/5 text-on-surface-variant hover:text-on-surface hover:bg-surface-dim dark:bg-white/5'
             }`}
           >
             <span className="material-symbols-outlined text-xl">calendar_today</span>
@@ -580,7 +580,7 @@ function LabTrackerPage() {
             className={`p-3 rounded-xl border flex flex-col items-center justify-center gap-1.5 transition-all cursor-pointer ${
               activeTab === 'search'
                 ? 'bg-primary/20 border-primary text-primary font-bold shadow-lg shadow-primary/10'
-                : 'bg-black/30 border-white/5 text-on-surface-variant hover:text-on-surface hover:bg-white/5'
+                : 'bg-surface-variant/50 dark:bg-black/30 border-outline-variant/50 dark:border-white/5 text-on-surface-variant hover:text-on-surface hover:bg-surface-dim dark:bg-white/5'
             }`}
           >
             <span className="material-symbols-outlined text-xl">person_search</span>
@@ -592,7 +592,7 @@ function LabTrackerPage() {
             className={`p-3 rounded-xl border flex flex-col items-center justify-center gap-1.5 transition-all cursor-pointer ${
               activeTab === 'group'
                 ? 'bg-primary/20 border-primary text-primary font-bold shadow-lg shadow-primary/10'
-                : 'bg-black/30 border-white/5 text-on-surface-variant hover:text-on-surface hover:bg-white/5'
+                : 'bg-surface-variant/50 dark:bg-black/30 border-outline-variant/50 dark:border-white/5 text-on-surface-variant hover:text-on-surface hover:bg-surface-dim dark:bg-white/5'
             }`}
           >
             <span className="material-symbols-outlined text-xl">groups</span>
@@ -604,7 +604,7 @@ function LabTrackerPage() {
             className={`p-3 rounded-xl border flex flex-col items-center justify-center gap-1.5 transition-all cursor-pointer ${
               activeTab === 'leader'
                 ? 'bg-secondary/20 border-secondary text-secondary font-bold shadow-lg shadow-secondary/10'
-                : 'bg-black/30 border-white/5 text-on-surface-variant hover:text-on-surface hover:bg-white/5'
+                : 'bg-surface-variant/50 dark:bg-black/30 border-outline-variant/50 dark:border-white/5 text-on-surface-variant hover:text-on-surface hover:bg-surface-dim dark:bg-white/5'
             }`}
           >
             <span className="material-symbols-outlined text-xl">how_to_reg</span>
@@ -617,7 +617,7 @@ function LabTrackerPage() {
               className={`p-3 rounded-xl border flex flex-col items-center justify-center gap-1.5 transition-all cursor-pointer col-span-2 sm:col-span-1 ${
                 activeTab === 'admin'
                   ? 'bg-tertiary/20 border-tertiary text-tertiary font-bold shadow-lg shadow-tertiary/10'
-                  : 'bg-black/30 border-white/5 text-on-surface-variant hover:text-on-surface hover:bg-white/5'
+                  : 'bg-surface-variant/50 dark:bg-black/30 border-outline-variant/50 dark:border-white/5 text-on-surface-variant hover:text-on-surface hover:bg-surface-dim dark:bg-white/5'
               }`}
             >
               <span className="material-symbols-outlined text-xl">insights</span>
@@ -642,7 +642,7 @@ function LabTrackerPage() {
                   onChange={(e) => setSearchDigits(e.target.value)}
                   placeholder="6458"
                   required
-                  className="w-full px-3 py-2.5 bg-black/60 text-on-surface placeholder-on-surface-variant/40 text-sm font-mono focus:outline-none focus:bg-black/80 transition-all"
+                  className="w-full px-3 py-2.5 bg-surface-container-highest dark:bg-black/60 text-on-surface placeholder-on-surface-variant/40 text-sm font-mono focus:outline-none focus:bg-surface-dim dark:bg-black/80 transition-all"
                 />
               </div>
 
@@ -664,8 +664,8 @@ function LabTrackerPage() {
           </div>
 
           {searchedStudent ? (
-            <div className="bg-surface-container/60 border border-white/10 rounded-2xl p-4 sm:p-5 shadow-2xl space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+            <div className="bg-surface-container/60 border border-outline/30 dark:border-white/10 rounded-2xl p-4 sm:p-5 shadow-2xl space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-outline/30 dark:border-white/10 pb-4">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-primary/30 via-indigo-500/20 to-secondary/30 border border-primary/40 flex items-center justify-center text-primary font-bold text-xl shadow-lg shrink-0">
                     {searchedStudent.name[0]}
@@ -693,7 +693,7 @@ function LabTrackerPage() {
                       </span>
                       <span className="text-secondary font-mono font-bold">{studentProgress.completed}/{studentProgress.total} ({studentProgress.percent}%)</span>
                     </div>
-                    <div className="w-full h-1.5 bg-black/50 rounded-full overflow-hidden border border-secondary/20">
+                    <div className="w-full h-1.5 bg-surface-container-high dark:bg-black/50 rounded-full overflow-hidden border border-secondary/20">
                       <div
                         className="h-full bg-secondary transition-all duration-500 rounded-full shadow-[0_0_8px_rgba(78,222,163,0.6)]"
                         style={{ width: `${studentProgress.percent}%` }}
@@ -720,7 +720,7 @@ function LabTrackerPage() {
                         className={`p-3.5 rounded-xl border transition-all shadow-md relative overflow-hidden backdrop-blur-md ${
                           completed
                             ? 'bg-secondary/5 border-secondary/30 hover:border-secondary/50'
-                            : 'bg-black/30 border-white/10 hover:border-primary/40'
+                            : 'bg-surface-variant/50 dark:bg-black/30 border-outline/30 dark:border-white/10 hover:border-primary/40'
                         }`}
                       >
                         <div className={`absolute top-0 left-0 bottom-0 w-1 ${completed ? 'bg-secondary' : 'bg-primary/50'}`}></div>
@@ -745,7 +745,7 @@ function LabTrackerPage() {
                                 <span>Done</span>
                               </span>
                             ) : (
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium bg-white/5 text-on-surface-variant/70 border border-white/10 font-mono">
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium bg-surface-dim dark:bg-white/5 text-on-surface-variant/70 border border-outline/30 dark:border-white/10 font-mono">
                                 <span className="material-symbols-outlined text-xs text-amber-400">schedule</span>
                                 <span>Upcoming</span>
                               </span>
@@ -758,7 +758,7 @@ function LabTrackerPage() {
                           <span>{sch.lab_name}</span>
                         </h5>
 
-                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-on-surface-variant pt-1 border-t border-white/5">
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-on-surface-variant pt-1 border-t border-outline-variant/50 dark:border-white/5">
                           <span className="flex items-center gap-1 font-mono">
                             <span className="material-symbols-outlined text-xs text-primary/70">location_on</span>
                             <span>{sch.venue}</span>
@@ -782,7 +782,7 @@ function LabTrackerPage() {
               </div>
             </div>
           ) : (
-            <div className="bg-surface-container/30 border border-white/10 rounded-2xl p-6 text-center space-y-1.5 max-w-lg mx-auto">
+            <div className="bg-surface-container/30 border border-outline/30 dark:border-white/10 rounded-2xl p-6 text-center space-y-1.5 max-w-lg mx-auto">
               <span className="material-symbols-outlined text-3xl text-primary/40 block">find_in_page</span>
               <h3 className="font-bold text-on-surface text-sm">Enter Your 4-Digit Reg No Above</h3>
               <p className="text-xs text-on-surface-variant">
@@ -803,7 +803,7 @@ function LabTrackerPage() {
             <select
               value={selectedGroupLookupCode}
               onChange={(e) => setSelectedGroupLookupCode(e.target.value)}
-              className="w-full px-4 py-2.5 bg-black/80 border border-primary/40 rounded-xl text-on-surface text-base font-mono font-extrabold focus:outline-none focus:ring-2 focus:ring-primary shadow-lg cursor-pointer text-center"
+              className="w-full px-4 py-2.5 bg-surface-dim dark:bg-black/80 border border-primary/40 rounded-xl text-on-surface text-base font-mono font-extrabold focus:outline-none focus:ring-2 focus:ring-primary shadow-lg cursor-pointer text-center"
             >
               {LAB_GROUPS.map((g) => (
                 <option key={g.code} value={g.code} className="bg-surface text-on-surface font-mono">
@@ -813,8 +813,8 @@ function LabTrackerPage() {
             </select>
           </div>
 
-          <div className="bg-surface-container/60 border border-white/10 rounded-2xl p-4 sm:p-5 shadow-2xl space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-3">
+          <div className="bg-surface-container/60 border border-outline/30 dark:border-white/10 rounded-2xl p-4 sm:p-5 shadow-2xl space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-outline/30 dark:border-white/10 pb-3">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/40 flex items-center justify-center text-primary font-extrabold text-lg font-mono">
                   {selectedGroupLookupCode}
@@ -827,7 +827,7 @@ function LabTrackerPage() {
                 </div>
               </div>
 
-              <div className="px-3.5 py-1.5 rounded-xl bg-white/5 border border-white/10 text-primary text-xs font-mono font-bold w-fit">
+              <div className="px-3.5 py-1.5 rounded-xl bg-surface-dim dark:bg-white/5 border border-outline/30 dark:border-white/10 text-primary text-xs font-mono font-bold w-fit">
                 {groupLookupSchedule.length} Scheduled Lab Sessions
               </div>
             </div>
@@ -840,7 +840,7 @@ function LabTrackerPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
                 {groupLookupMembers.map((student) => (
-                  <div key={student.reg_no} className="p-2.5 bg-black/40 border border-white/10 rounded-xl flex items-center gap-2.5">
+                  <div key={student.reg_no} className="p-2.5 bg-surface-container dark:bg-black/40 border border-outline/30 dark:border-white/10 rounded-xl flex items-center gap-2.5">
                     <div className="w-7 h-7 rounded-lg bg-primary/20 border border-primary/30 flex items-center justify-center text-primary font-bold text-xs shrink-0">
                       {student.name[0]}
                     </div>
@@ -863,7 +863,7 @@ function LabTrackerPage() {
                 {groupLookupSchedule.map((sch) => (
                   <div
                     key={sch.id}
-                    className="p-3.5 rounded-xl bg-black/30 border border-white/10 shadow-md relative overflow-hidden backdrop-blur-md hover:border-primary/40 transition-all"
+                    className="p-3.5 rounded-xl bg-surface-variant/50 dark:bg-black/30 border border-outline/30 dark:border-white/10 shadow-md relative overflow-hidden backdrop-blur-md hover:border-primary/40 transition-all"
                   >
                     <div className="absolute top-0 left-0 bottom-0 w-1 bg-primary/50"></div>
 
@@ -881,7 +881,7 @@ function LabTrackerPage() {
                       <span>{sch.lab_name}</span>
                     </h5>
 
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-on-surface-variant pt-1 border-t border-white/5">
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-on-surface-variant pt-1 border-t border-outline-variant/50 dark:border-white/5">
                       <span className="flex items-center gap-1 font-mono">
                         <span className="material-symbols-outlined text-xs text-primary/70">location_on</span>
                         <span>{sch.venue}</span>
@@ -924,10 +924,10 @@ function LabTrackerPage() {
                 </button>
               )}
 
-              <div className="flex items-center justify-between bg-black/80 rounded-2xl p-1.5 border border-primary/40 shadow-2xl min-w-[280px] sm:min-w-[340px]">
+              <div className="flex items-center justify-between bg-surface-dim dark:bg-black/80 rounded-2xl p-1.5 border border-primary/40 shadow-2xl min-w-[280px] sm:min-w-[340px]">
                 <button
                   onClick={handlePreviousDay}
-                  className="w-11 h-11 flex items-center justify-center text-on-surface hover:text-primary hover:bg-white/10 rounded-xl active:scale-95 transition-all cursor-pointer border border-white/5"
+                  className="w-11 h-11 flex items-center justify-center text-on-surface hover:text-primary hover:bg-surface-container-high dark:bg-white/10 rounded-xl active:scale-95 transition-all cursor-pointer border border-outline-variant/50 dark:border-white/5"
                   title="Previous Day"
                 >
                   <span className="material-symbols-outlined text-2xl">chevron_left</span>
@@ -953,7 +953,7 @@ function LabTrackerPage() {
 
                 <button
                   onClick={handleNextDay}
-                  className="w-11 h-11 flex items-center justify-center text-on-surface hover:text-primary hover:bg-white/10 rounded-xl active:scale-95 transition-all cursor-pointer border border-white/5"
+                  className="w-11 h-11 flex items-center justify-center text-on-surface hover:text-primary hover:bg-surface-container-high dark:bg-white/10 rounded-xl active:scale-95 transition-all cursor-pointer border border-outline-variant/50 dark:border-white/5"
                   title="Next Day"
                 >
                   <span className="material-symbols-outlined text-2xl">chevron_right</span>
@@ -964,7 +964,7 @@ function LabTrackerPage() {
 
           <div className="space-y-3">
             {categorizedDailyLabs.length === 0 ? (
-              <div className="bg-surface-container/30 border border-white/10 rounded-2xl p-8 text-center space-y-1.5">
+              <div className="bg-surface-container/30 border border-outline/30 dark:border-white/10 rounded-2xl p-8 text-center space-y-1.5">
                 <span className="material-symbols-outlined text-3xl text-on-surface-variant/40 block">event_busy</span>
                 <p className="font-bold text-on-surface text-sm">No lab sessions scheduled for {selectedDate}.</p>
                 <p className="text-xs text-on-surface-variant">Use the date stepper arrows above to inspect another day's schedule.</p>
@@ -980,9 +980,9 @@ function LabTrackerPage() {
                 return (
                   <div
                     key={lab.lab_name}
-                    className="bg-surface-container/60 border border-white/10 rounded-2xl p-4 sm:p-5 shadow-xl space-y-3 relative overflow-hidden backdrop-blur-xl hover:border-primary/40 transition-all"
+                    className="bg-surface-container/60 border border-outline/30 dark:border-white/10 rounded-2xl p-4 sm:p-5 shadow-xl space-y-3 relative overflow-hidden backdrop-blur-xl hover:border-primary/40 transition-all"
                   >
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-3.5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-outline/30 dark:border-white/10 pb-3.5">
                       <div className="flex items-start sm:items-center gap-3">
                         <div className="w-11 h-11 rounded-xl bg-primary/20 border border-primary/40 flex items-center justify-center text-primary shrink-0 mt-0.5 sm:mt-0">
                           <span className="material-symbols-outlined text-xl">science</span>
@@ -1012,7 +1012,7 @@ function LabTrackerPage() {
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-sm sm:text-base text-on-surface-variant font-mono bg-black/40 p-3 sm:p-3.5 rounded-xl border border-white/10">
+                    <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-sm sm:text-base text-on-surface-variant font-mono bg-surface-container dark:bg-black/40 p-3 sm:p-3.5 rounded-xl border border-outline/30 dark:border-white/10">
                       <span className="flex items-center gap-2">
                         <span className="material-symbols-outlined text-base sm:text-lg text-primary">location_on</span>
                         <span className="font-bold text-on-surface">Venue: {lab.venue}</span>
@@ -1062,7 +1062,7 @@ function LabTrackerPage() {
                     </div>
 
                     {entry && entry.note && (
-                      <div className="mt-3 pt-2.5 border-t border-white/10 flex items-start gap-2">
+                      <div className="mt-3 pt-2.5 border-t border-outline/30 dark:border-white/10 flex items-start gap-2">
                         <span className="material-symbols-outlined text-sm text-secondary shrink-0 mt-0.5">sticky_note_2</span>
                         <p className="text-xs text-on-surface-variant font-medium italic">
                           <strong className="text-secondary font-bold not-italic">Lab Admin Note:</strong> {entry.note}
@@ -1099,8 +1099,8 @@ function LabTrackerPage() {
           )}
 
             {/* Large Prominent Control Card for EE Group & Date Selection */}
-            <div className="bg-black/40 border border-primary/30 rounded-2xl p-4 sm:p-5 space-y-4 shadow-xl">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
+            <div className="bg-surface-container dark:bg-black/40 border border-primary/30 rounded-2xl p-4 sm:p-5 space-y-4 shadow-xl">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-outline/30 dark:border-white/10 pb-3">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-secondary/20 border border-secondary/40 flex items-center justify-center text-secondary shrink-0">
                     <span className="material-symbols-outlined text-xl">how_to_reg</span>
@@ -1126,7 +1126,7 @@ function LabTrackerPage() {
                     <select
                       value={selectedGroupCode}
                       onChange={(e) => setSelectedGroupCode(e.target.value)}
-                      className="w-full h-12 px-4 py-2.5 bg-black/80 border-2 border-primary/40 hover:border-primary focus:border-primary rounded-2xl text-on-surface text-sm sm:text-base font-mono font-black focus:outline-none focus:ring-2 focus:ring-primary shadow-lg cursor-pointer appearance-none pr-10 transition-all"
+                      className="w-full h-12 px-4 py-2.5 bg-surface-dim dark:bg-black/80 border-2 border-primary/40 hover:border-primary focus:border-primary rounded-2xl text-on-surface text-sm sm:text-base font-mono font-black focus:outline-none focus:ring-2 focus:ring-primary shadow-lg cursor-pointer appearance-none pr-10 transition-all"
                     >
                       {LAB_GROUPS.map((g) => (
                         <option key={g.code} value={g.code} className="bg-surface text-on-surface font-mono py-2">
@@ -1149,7 +1149,7 @@ function LabTrackerPage() {
                         className={`px-3 py-1 rounded-xl text-xs font-mono font-extrabold shrink-0 transition-all cursor-pointer border ${
                           selectedGroupCode === g.code
                             ? 'bg-primary text-on-primary border-primary shadow-md shadow-primary/30 scale-105'
-                            : 'bg-white/5 text-on-surface-variant/80 border-white/10 hover:border-primary/40 hover:text-primary'
+                            : 'bg-surface-dim dark:bg-white/5 text-on-surface-variant/80 border-outline/30 dark:border-white/10 hover:border-primary/40 hover:text-primary'
                         }`}
                       >
                         {g.code}
@@ -1169,14 +1169,14 @@ function LabTrackerPage() {
                     <button
                       type="button"
                       onClick={handlePreviousDay}
-                      className="w-12 h-12 flex items-center justify-center bg-black/80 border-2 border-white/15 hover:border-secondary hover:text-secondary rounded-2xl text-on-surface active:scale-95 transition-all cursor-pointer shrink-0 shadow-md"
+                      className="w-12 h-12 flex items-center justify-center bg-surface-dim dark:bg-black/80 border-2 border-outline/40 dark:border-white/15 hover:border-secondary hover:text-secondary rounded-2xl text-on-surface active:scale-95 transition-all cursor-pointer shrink-0 shadow-md"
                       title="Previous Day"
                     >
                       <span className="material-symbols-outlined text-xl">chevron_left</span>
                     </button>
 
                     {/* Big Interactive Date Card Input */}
-                    <div className="relative flex-1 h-12 bg-black/80 border-2 border-secondary/40 hover:border-secondary rounded-2xl flex items-center justify-between px-3.5 cursor-pointer shadow-lg transition-all group">
+                    <div className="relative flex-1 h-12 bg-surface-dim dark:bg-black/80 border-2 border-secondary/40 hover:border-secondary rounded-2xl flex items-center justify-between px-3.5 cursor-pointer shadow-lg transition-all group">
                       <div className="flex items-center gap-2 min-w-0">
                         <span className="material-symbols-outlined text-secondary text-lg shrink-0">event</span>
                         <span className="text-xs sm:text-sm font-extrabold font-mono text-on-surface truncate">
@@ -1200,7 +1200,7 @@ function LabTrackerPage() {
                     <button
                       type="button"
                       onClick={handleNextDay}
-                      className="w-12 h-12 flex items-center justify-center bg-black/80 border-2 border-white/15 hover:border-secondary hover:text-secondary rounded-2xl text-on-surface active:scale-95 transition-all cursor-pointer shrink-0 shadow-md"
+                      className="w-12 h-12 flex items-center justify-center bg-surface-dim dark:bg-black/80 border-2 border-outline/40 dark:border-white/15 hover:border-secondary hover:text-secondary rounded-2xl text-on-surface active:scale-95 transition-all cursor-pointer shrink-0 shadow-md"
                       title="Next Day"
                     >
                       <span className="material-symbols-outlined text-xl">chevron_right</span>
@@ -1234,8 +1234,8 @@ function LabTrackerPage() {
             {currentLeaderSchedule ? (
               <form onSubmit={handleSaveAttendance} className="space-y-4">
                 {/* Session Header Card & Quick Action Steppers */}
-                <div className="bg-black/40 border border-white/10 rounded-2xl p-4 space-y-3 shadow-lg">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/5 pb-3">
+                <div className="bg-surface-container dark:bg-black/40 border border-outline/30 dark:border-white/10 rounded-2xl p-4 space-y-3 shadow-lg">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-outline-variant/50 dark:border-white/5 pb-3">
                     <div>
                       <span className="text-[10px] text-secondary font-bold uppercase tracking-wider block mb-0.5">{currentLeaderSchedule.week} Session • {selectedGroupCode}</span>
                       <h3 className="font-extrabold text-on-surface text-base">{currentLeaderSchedule.lab_name}</h3>
@@ -1261,7 +1261,7 @@ function LabTrackerPage() {
                         <button
                           type="button"
                           onClick={() => handleToggleAll(null)}
-                          className="px-2 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-on-surface-variant text-[11px] font-label-bold border border-white/10 transition-all cursor-pointer text-center flex items-center justify-center gap-1"
+                          className="px-2 py-1.5 rounded-xl bg-surface-dim dark:bg-white/5 hover:bg-surface-container-high dark:bg-white/10 text-on-surface-variant text-[11px] font-label-bold border border-outline/30 dark:border-white/10 transition-all cursor-pointer text-center flex items-center justify-center gap-1"
                         >
                           <span>Clear</span>
                         </button>
@@ -1291,7 +1291,7 @@ function LabTrackerPage() {
                             ? 'bg-secondary/10 border-secondary/40 shadow-[0_0_12px_rgba(78,222,163,0.15)]' 
                             : status === false 
                             ? 'bg-error/10 border-error/40' 
-                            : 'bg-black/40 border-white/10'
+                            : 'bg-surface-container dark:bg-black/40 border-outline/30 dark:border-white/10'
                         }`}
                       >
                         <div className="flex items-center justify-between gap-2 mb-2.5">
@@ -1301,7 +1301,7 @@ function LabTrackerPage() {
                                 ? 'bg-secondary/20 text-secondary border-secondary/40' 
                                 : status === false 
                                 ? 'bg-error/20 text-error border-error/40' 
-                                : 'bg-white/10 text-on-surface border-white/10'
+                                : 'bg-surface-container-high dark:bg-white/10 text-on-surface border-outline/30 dark:border-white/10'
                             }`}>
                               {student.name[0]}
                             </div>
@@ -1313,7 +1313,7 @@ function LabTrackerPage() {
                         </div>
 
                         {canMarkAttendance ? (
-                          <div className="grid grid-cols-2 gap-2 pt-1 border-t border-white/5">
+                          <div className="grid grid-cols-2 gap-2 pt-1 border-t border-outline-variant/50 dark:border-white/5">
                             <button
                               type="button"
                               onClick={() =>
@@ -1325,7 +1325,7 @@ function LabTrackerPage() {
                               className={`py-2 px-3 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all cursor-pointer border ${
                                 status === true
                                   ? 'bg-secondary text-on-secondary border-secondary shadow-lg shadow-secondary/30 scale-[1.02]'
-                                  : 'bg-white/5 text-on-surface-variant border-white/10 hover:bg-secondary/20 hover:text-secondary'
+                                  : 'bg-surface-dim dark:bg-white/5 text-on-surface-variant border-outline/30 dark:border-white/10 hover:bg-secondary/20 hover:text-secondary'
                               }`}
                             >
                               <span className="text-sm">✓</span>
@@ -1342,7 +1342,7 @@ function LabTrackerPage() {
                               className={`py-2 px-3 rounded-xl text-xs font-extrabold flex items-center justify-center gap-1.5 transition-all cursor-pointer border ${
                                 status === false
                                   ? 'bg-error text-on-error border-error shadow-lg shadow-error/30 scale-[1.02]'
-                                  : 'bg-white/5 text-on-surface-variant border-white/10 hover:bg-error/20 hover:text-error'
+                                  : 'bg-surface-dim dark:bg-white/5 text-on-surface-variant border-outline/30 dark:border-white/10 hover:bg-error/20 hover:text-error'
                               }`}
                             >
                               <span className="text-sm">✗</span>
@@ -1350,13 +1350,13 @@ function LabTrackerPage() {
                             </button>
                           </div>
                         ) : (
-                          <div className="pt-2 border-t border-white/5 text-right">
+                          <div className="pt-2 border-t border-outline-variant/50 dark:border-white/5 text-right">
                             <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-xl text-xs font-bold border ${
                               status === true
                                 ? 'bg-secondary/20 text-secondary border-secondary/40'
                                 : status === false
                                 ? 'bg-error/20 text-error border-error/40'
-                                : 'bg-white/5 text-on-surface-variant/60 border-white/10'
+                                : 'bg-surface-dim dark:bg-white/5 text-on-surface-variant/60 border-outline/30 dark:border-white/10'
                             }`}>
                               {status === true ? '✓ Present' : status === false ? '✗ Absent' : 'Not Marked'}
                             </span>
@@ -1368,9 +1368,9 @@ function LabTrackerPage() {
                 </div>
 
                 {/* DESKTOP VIEW: Sleek Table */}
-                <div className="hidden sm:block overflow-x-auto border border-white/10 rounded-2xl">
+                <div className="hidden sm:block overflow-x-auto border border-outline/30 dark:border-white/10 rounded-2xl">
                   <table className="w-full text-left text-sm text-on-surface-variant">
-                    <thead className="bg-black/50 text-on-surface uppercase text-[10px] font-label-bold border-b border-white/10">
+                    <thead className="bg-surface-container-high dark:bg-black/50 text-on-surface uppercase text-[10px] font-label-bold border-b border-outline/30 dark:border-white/10">
                       <tr>
                         <th className="py-3 px-4">Reg No</th>
                         <th className="py-3 px-4">Student Name</th>
@@ -1381,7 +1381,7 @@ function LabTrackerPage() {
                       {groupStudents.map((student) => {
                         const status = leaderAttendance[student.reg_no];
                         return (
-                          <tr key={student.reg_no} className="hover:bg-white/5 transition-colors">
+                          <tr key={student.reg_no} className="hover:bg-surface-dim dark:bg-white/5 transition-colors">
                             <td className="py-3 px-4 font-mono font-bold text-on-surface">{student.reg_no}</td>
                             <td className="py-3 px-4 font-bold text-on-surface">{student.name}</td>
                             <td className="py-3 px-4 text-center">
@@ -1398,7 +1398,7 @@ function LabTrackerPage() {
                                     className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer border ${
                                       status === true
                                         ? 'bg-secondary text-on-secondary border-secondary shadow-md shadow-secondary/20'
-                                        : 'bg-white/5 text-on-surface-variant/70 border-white/10 hover:bg-secondary/15 hover:text-secondary'
+                                        : 'bg-surface-dim dark:bg-white/5 text-on-surface-variant/70 border-outline/30 dark:border-white/10 hover:bg-secondary/15 hover:text-secondary'
                                     }`}
                                   >
                                     ✓ Present
@@ -1414,7 +1414,7 @@ function LabTrackerPage() {
                                     className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all cursor-pointer border ${
                                       status === false
                                         ? 'bg-error text-on-error border-error shadow-md shadow-error/20'
-                                        : 'bg-white/5 text-on-surface-variant/70 border-white/10 hover:bg-error/15 hover:text-error'
+                                        : 'bg-surface-dim dark:bg-white/5 text-on-surface-variant/70 border-outline/30 dark:border-white/10 hover:bg-error/15 hover:text-error'
                                     }`}
                                   >
                                     ✗ Absent
@@ -1426,7 +1426,7 @@ function LabTrackerPage() {
                                     ? 'bg-secondary/20 text-secondary border-secondary/40'
                                     : status === false
                                     ? 'bg-error/20 text-error border-error/40'
-                                    : 'bg-white/5 text-on-surface-variant/60 border-white/10'
+                                    : 'bg-surface-dim dark:bg-white/5 text-on-surface-variant/60 border-outline/30 dark:border-white/10'
                                 }`}>
                                   {status === true ? '✓ Present' : status === false ? '✗ Absent' : 'Not Marked'}
                                 </span>
@@ -1441,7 +1441,7 @@ function LabTrackerPage() {
 
                 {/* Optional Lab Session Note Field */}
                 {canMarkAttendance && (
-                  <div className="bg-black/30 border border-white/10 rounded-2xl p-3.5 space-y-1.5 shadow-md">
+                  <div className="bg-surface-variant/50 dark:bg-black/30 border border-outline/30 dark:border-white/10 rounded-2xl p-3.5 space-y-1.5 shadow-md">
                     <label className="text-xs font-label-bold uppercase text-secondary tracking-wider flex items-center gap-1.5">
                       <span className="material-symbols-outlined text-sm">edit_note</span>
                       <span>Lab Session Note / Remarks (Optional):</span>
@@ -1451,12 +1451,12 @@ function LabTrackerPage() {
                       value={sessionNote}
                       onChange={(e) => setSessionNote(e.target.value)}
                       placeholder="e.g. Completed Experiment 3, Bench 4 multimeter calibrated, all hardware tested..."
-                      className="w-full px-3.5 py-2.5 bg-black/60 border border-white/15 rounded-xl text-xs sm:text-sm text-on-surface placeholder-on-surface-variant/40 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all"
+                      className="w-full px-3.5 py-2.5 bg-surface-container-highest dark:bg-black/60 border border-outline/40 dark:border-white/15 rounded-xl text-xs sm:text-sm text-on-surface placeholder-on-surface-variant/40 focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary transition-all"
                     />
                   </div>
                 )}
 
-                <div className="flex justify-end pt-3 border-t border-white/10">
+                <div className="flex justify-end pt-3 border-t border-outline/30 dark:border-white/10">
                   {canMarkAttendance ? (
                     <button
                       type="submit"
@@ -1508,21 +1508,21 @@ function LabTrackerPage() {
           {/* Top KPI Metrics Tile Grid (Matching Navigation Tile Style) */}
           <div className="grid grid-cols-3 gap-2 sm:gap-3">
             {/* Tile 1: Absent Records */}
-            <div className="p-3.5 rounded-xl border bg-black/40 border-white/10 flex flex-col items-center justify-center gap-1.5 transition-all hover:bg-white/5 shadow-md">
+            <div className="p-3.5 rounded-xl border bg-surface-container dark:bg-black/40 border-outline/30 dark:border-white/10 flex flex-col items-center justify-center gap-1.5 transition-all hover:bg-surface-dim dark:bg-white/5 shadow-md">
               <span className="material-symbols-outlined text-xl sm:text-2xl text-error">person_off</span>
               <span className="text-base sm:text-xl font-extrabold font-mono text-error leading-none">{adminStats.totalAbsent}</span>
               <span className="text-xs font-label-bold text-center text-on-surface">Absent Records</span>
             </div>
 
             {/* Tile 2: Attendance Rate */}
-            <div className="p-3.5 rounded-xl border bg-black/40 border-white/10 flex flex-col items-center justify-center gap-1.5 transition-all hover:bg-white/5 shadow-md">
+            <div className="p-3.5 rounded-xl border bg-surface-container dark:bg-black/40 border-outline/30 dark:border-white/10 flex flex-col items-center justify-center gap-1.5 transition-all hover:bg-surface-dim dark:bg-white/5 shadow-md">
               <span className="material-symbols-outlined text-xl sm:text-2xl text-primary">analytics</span>
               <span className="text-base sm:text-xl font-extrabold font-mono text-primary leading-none">{adminStats.attendanceRate}%</span>
               <span className="text-xs font-label-bold text-center text-on-surface">Attendance Rate</span>
             </div>
 
             {/* Tile 3: Unmarked Alerts */}
-            <div className="p-3.5 rounded-xl border bg-black/40 border-amber-500/30 bg-amber-500/5 flex flex-col items-center justify-center gap-1.5 transition-all hover:bg-amber-500/10 shadow-md">
+            <div className="p-3.5 rounded-xl border bg-surface-container dark:bg-black/40 border-amber-500/30 bg-amber-500/5 flex flex-col items-center justify-center gap-1.5 transition-all hover:bg-amber-500/10 shadow-md">
               <span className="material-symbols-outlined text-xl sm:text-2xl text-amber-400">warning</span>
               <span className="text-base sm:text-xl font-extrabold font-mono text-amber-400 leading-none">{unmarkedSessions.length}</span>
               <span className="text-xs font-label-bold text-center text-amber-400">Unmarked Alerts</span>
@@ -1555,7 +1555,7 @@ function LabTrackerPage() {
                       : 'bg-error/10 border-error/30'
                   }`}>
                     <div className="flex items-center justify-between">
-                      <span className="px-2 py-0.5 rounded font-mono font-bold bg-black/40 text-on-surface border border-white/10">
+                      <span className="px-2 py-0.5 rounded font-mono font-bold bg-surface-container dark:bg-black/40 text-on-surface border border-outline/30 dark:border-white/10">
                         Group {session.group_code}
                       </span>
                       {session.isToday ? (
@@ -1569,7 +1569,7 @@ function LabTrackerPage() {
                       )}
                     </div>
                     <p className="font-bold text-on-surface line-clamp-1">{session.lab_name}</p>
-                    <div className="flex items-center justify-between text-[11px] text-on-surface-variant pt-2 border-t border-white/5">
+                    <div className="flex items-center justify-between text-[11px] text-on-surface-variant pt-2 border-t border-outline-variant/50 dark:border-white/5">
                       <span>{session.venue} • {session.time}</span>
                       <button
                         type="button"
@@ -1578,7 +1578,7 @@ function LabTrackerPage() {
                           setSelectedGroupCode(session.group_code);
                           setActiveTab('leader');
                         }}
-                        className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-on-surface border border-white/20 text-[11px] font-label-bold cursor-pointer transition-colors flex items-center gap-1"
+                        className="px-2.5 py-1 rounded-lg bg-surface-container-high dark:bg-white/10 hover:bg-white/20 text-on-surface border border-outline/50 dark:border-white/20 text-[11px] font-label-bold cursor-pointer transition-colors flex items-center gap-1"
                       >
                         <span>Mark Now</span>
                         <span className="material-symbols-outlined text-xs">arrow_forward</span>
@@ -1596,8 +1596,8 @@ function LabTrackerPage() {
           )}
 
           {/* 2. Lab Summaries: Group Completion Status per Lab */}
-          <div className="bg-surface-container/60 border border-white/10 rounded-2xl p-5 shadow-xl space-y-4 backdrop-blur-xl">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
+          <div className="bg-surface-container/60 border border-outline/30 dark:border-white/10 rounded-2xl p-5 shadow-xl space-y-4 backdrop-blur-xl">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-outline/30 dark:border-white/10 pb-3">
               <div>
                 <h3 className="font-bold text-on-surface text-base flex items-center gap-2">
                   <span className="material-symbols-outlined text-primary text-lg">biotech</span>
@@ -1612,7 +1612,7 @@ function LabTrackerPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {labProgressSummaries.map((labSum) => (
-                <div key={labSum.lab_name} className="bg-black/30 border border-white/10 rounded-xl p-4 space-y-3 hover:border-primary/30 transition-all">
+                <div key={labSum.lab_name} className="bg-surface-variant/50 dark:bg-black/30 border border-outline/30 dark:border-white/10 rounded-xl p-4 space-y-3 hover:border-primary/30 transition-all">
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <span className="text-[10px] font-mono text-primary font-bold uppercase block">EE Lab Course</span>
@@ -1628,7 +1628,7 @@ function LabTrackerPage() {
                   </div>
 
                   {/* Progress Bar */}
-                  <div className="w-full bg-white/5 rounded-full h-2 overflow-hidden border border-white/10">
+                  <div className="w-full bg-surface-dim dark:bg-white/5 rounded-full h-2 overflow-hidden border border-outline/30 dark:border-white/10">
                     <div
                       className="bg-gradient-to-r from-primary via-secondary to-tertiary h-full transition-all duration-500"
                       style={{ width: `${labSum.percentage}%` }}
@@ -1677,8 +1677,8 @@ function LabTrackerPage() {
           </div>
 
           {/* 3. Absentee Records Tracker */}
-          <div className="bg-surface-container/60 border border-white/10 rounded-2xl p-5 shadow-xl space-y-4 backdrop-blur-xl">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-3">
+          <div className="bg-surface-container/60 border border-outline/30 dark:border-white/10 rounded-2xl p-5 shadow-xl space-y-4 backdrop-blur-xl">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-outline/30 dark:border-white/10 pb-3">
               <div>
                 <h3 className="font-bold text-on-surface text-base flex items-center gap-2">
                   <span className="material-symbols-outlined text-error text-lg">person_off</span>
@@ -1694,7 +1694,7 @@ function LabTrackerPage() {
                   placeholder="Filter by name, reg no, or group..."
                   value={absentSearch}
                   onChange={(e) => setAbsentSearch(e.target.value)}
-                  className="pl-9 pr-3 py-1.5 bg-black/40 border border-white/10 rounded-xl text-xs text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:border-error/50 w-full"
+                  className="pl-9 pr-3 py-1.5 bg-surface-container dark:bg-black/40 border border-outline/30 dark:border-white/10 rounded-xl text-xs text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:border-error/50 w-full"
                 />
               </div>
             </div>
@@ -1702,7 +1702,7 @@ function LabTrackerPage() {
             {filteredAbsentees.length > 0 ? (
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm text-on-surface-variant">
-                  <thead className="bg-black/40 text-on-surface uppercase text-[10px] font-label-bold border-b border-white/10">
+                  <thead className="bg-surface-container dark:bg-black/40 text-on-surface uppercase text-[10px] font-label-bold border-b border-outline/30 dark:border-white/10">
                     <tr>
                       <th className="py-2.5 px-3">Date</th>
                       <th className="py-2.5 px-3">Reg No</th>
@@ -1714,7 +1714,7 @@ function LabTrackerPage() {
                   </thead>
                   <tbody className="divide-y divide-white/5 text-xs">
                     {filteredAbsentees.map((record, idx) => (
-                      <tr key={idx} className="hover:bg-white/5 transition-colors">
+                      <tr key={idx} className="hover:bg-surface-dim dark:bg-white/5 transition-colors">
                         <td className="py-2.5 px-3 font-mono font-semibold text-on-surface">{record.date}</td>
                         <td className="py-2.5 px-3 font-mono text-on-surface">{record.reg_no}</td>
                         <td className="py-2.5 px-3 font-bold text-on-surface">{record.name}</td>
@@ -1741,8 +1741,8 @@ function LabTrackerPage() {
           </div>
 
           {/* 4. CSV Reports & Group Directory */}
-          <div className="bg-surface-container/60 border border-white/10 rounded-2xl p-5 shadow-xl space-y-3">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-white/10 pb-3">
+          <div className="bg-surface-container/60 border border-outline/30 dark:border-white/10 rounded-2xl p-5 shadow-xl space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-outline/30 dark:border-white/10 pb-3">
               <div>
                 <h3 className="font-bold text-on-surface text-base">Attendance Reports & Exports</h3>
                 <p className="text-xs text-on-surface-variant">Download formatted CSV reports for EE01–EE12 academic records.</p>
@@ -1757,13 +1757,13 @@ function LabTrackerPage() {
               </button>
             </div>
 
-            <div className="p-3 bg-black/30 rounded-xl border border-white/5 text-xs text-on-surface-variant space-y-1.5">
+            <div className="p-3 bg-surface-variant/50 dark:bg-black/30 rounded-xl border border-outline-variant/50 dark:border-white/5 text-xs text-on-surface-variant space-y-1.5">
               <p className="font-bold text-on-surface">Official Electrical Engineering Group Directory (EE01 - EE12):</p>
               <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2 pt-1 font-mono text-[10px]">
                 {LAB_GROUPS.map((g) => {
                   const count = INITIAL_STUDENTS.filter((s) => s.group_code === g.code).length;
                   return (
-                    <div key={g.code} className="p-1.5 rounded bg-white/5 border border-white/5 text-center">
+                    <div key={g.code} className="p-1.5 rounded bg-surface-dim dark:bg-white/5 border border-outline-variant/50 dark:border-white/5 text-center">
                       <span className="font-bold text-primary block">{g.code}</span>
                       <span className="text-on-surface-variant text-[9px]">{count} Students</span>
                     </div>
