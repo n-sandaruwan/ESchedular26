@@ -306,14 +306,16 @@ function LabAdminPortal() {
             </h1>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={handleSwitchGroup}
-            className="px-4 py-2 rounded-xl bg-surface-dim dark:bg-white/5 border border-transparent hover:bg-surface-container-high dark:bg-white/10 hover:border-transparent text-on-surface-variant text-xs font-label-bold flex items-center gap-2 transition-all cursor-pointer shadow-sm"
-          >
-            <span className="material-symbols-outlined text-sm">swap_horiz</span> Switch Group
-          </button>
-        </div>
+        {localStorage.getItem('mis_lab_admin_strict') !== 'true' && (
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleSwitchGroup}
+              className="px-4 py-2 rounded-xl bg-surface-dim dark:bg-white/5 border border-transparent hover:bg-surface-container-high dark:bg-white/10 hover:border-transparent text-on-surface-variant text-xs font-label-bold flex items-center gap-2 transition-all cursor-pointer shadow-sm"
+            >
+              <span className="material-symbols-outlined text-sm">swap_horiz</span> Switch Group
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

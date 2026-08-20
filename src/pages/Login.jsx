@@ -13,20 +13,24 @@ export const AUTHORIZED_UIDS = {
     'qgGyu7Qwy6QeV9apAiz3E2NL0zE2'
   ],       
   LAB_ADMINS: [
-    'j4MpEMaYyqRZmuxXvgI5Mjwn0zi1',
-    'dzL5yCg697PJWXWXTgT7X0jbfgQ2',
-    'F4oJx4xH9OU66S3spgmrUJqilya2',
-    'FW5hgHty1wbuPkGuHZB5MEtUrwx1',
-    '1cfPgmhFEPeFycOG2uw5PNBTEzw2',
-    'gWvfBdA1JEdUPCMsw2miMnqzmeQ2',
-    'rfGcnZkOBuNP1FIsGNPgtHLL0kg1',
-    'NlYz9zHd2zclCqWI7A2dGqjWpIS2',
-    'bEJB23Ws7iSGi7L5J3eywyhNLci1',
-    'oScneRpncRXgeAZL0cW5PhBZg222',
-    'mYSY84JejeTaVQKJ7OVp5dQYiFJ2',
-    'BOsDkGYNBvM9gEUsiuC2gZW5Hh73',
-    'ej65wKnIQngvw5ca4n4UiUqTe2b2'
+    'j4MpEMaYyqRZmuxXvgI5Mjwn0zi1' // Generic Lab Admin (can switch groups)
   ]
+};
+
+// Map specific UIDs to strict Lab Groups (EE01 to EE12)
+export const LAB_ADMIN_GROUP_MAP = {
+  'dzL5yCg697PJWXWXTgT7X0jbfgQ2': 'EE01',
+  'F4oJx4xH9OU66S3spgmrUJqilya2': 'EE02',
+  'FW5hgHty1wbuPkGuHZB5MEtUrwx1': 'EE03',
+  '1cfPgmhFEPeFycOG2uw5PNBTEzw2': 'EE04',
+  'gWvfBdA1JEdUPCMsw2miMnqzmeQ2': 'EE05',
+  'rfGcnZkOBuNP1FIsGNPgtHLL0kg1': 'EE06',
+  'NlYz9zHd2zclCqWI7A2dGqjWpIS2': 'EE07',
+  'bEJB23Ws7iSGi7L5J3eywyhNLci1': 'EE08',
+  'oScneRpncRXgeAZL0cW5PhBZg222': 'EE09',
+  'mYSY84JejeTaVQKJ7OVp5dQYiFJ2': 'EE10',
+  'BOsDkGYNBvM9gEUsiuC2gZW5Hh73': 'EE11',
+  'ej65wKnIQngvw5ca4n4UiUqTe2b2': 'EE12'
 };
 
 function Login() {
@@ -40,12 +44,22 @@ function Login() {
     if (AUTHORIZED_UIDS.ADMINS.includes(uid)) {
       localStorage.setItem('mis_role', 'admin');
       localStorage.setItem('mis_user', 'Department Administrator');
+      localStorage.removeItem('mis_lab_admin_strict');
       navigate('/admin');
     } 
-    else if (AUTHORIZED_UIDS.LAB_ADMINS.includes(uid)) {
+    else if (AUTHORIZED_UIDS.LAB_ADMINS.includes(uid) || Object.keys(LAB_ADMIN_GROUP_MAP).includes(uid)) {
       localStorage.setItem('mis_role', 'lab_admin');
       localStorage.setItem('mis_user', 'Lab Administrator');
-      localStorage.removeItem('mis_lab_admin_group'); 
+      
+      const assignedGroup = LAB_ADMIN_GROUP_MAP[uid];
+      if (assignedGroup) {
+        localStorage.setItem('mis_lab_admin_group', assignedGroup);
+        localStorage.setItem('mis_lab_admin_strict', 'true');
+      } else {
+        localStorage.removeItem('mis_lab_admin_group'); 
+        localStorage.removeItem('mis_lab_admin_strict');
+      }
+      
       navigate('/lab-admin-portal');
     } 
     else {
