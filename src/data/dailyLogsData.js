@@ -3,7 +3,6 @@ export const initialDailyLogs = [
   // Week 1: Mon July 27
   { id: 1, date: '2026-07-27', module: 'EE3203', hours: 2, topic: 'Introduction & Measurement Errors', venue: 'NCC', instructor: 'Dr. Geeth Priyankara' },
   { id: 2, date: '2026-07-27', module: 'EE3202', hours: 1, topic: 'Array & Linked List Fundamentals', venue: 'LT1', instructor: 'Dr. Kushan Sudheera' },
-  { id: 3, date: '2026-07-27', module: 'EE3304', hours: 3, topic: 'Electrostatics & Coulomb\'s Law', venue: 'NLH2', instructor: 'Mr. D. S. De Silva' },
   { id: 4, date: '2026-07-27', module: 'IS3301', hours: 2, topic: 'Complex Numbers & Functions', venue: 'AUD', instructor: 'Dr. Kumudu Seneviratna' },
 
   // Week 1: Tue July 28
@@ -25,7 +24,6 @@ export const initialDailyLogs = [
   // Week 2: Mon Aug 3
   { id: 15, date: '2026-08-03', module: 'EE3203', hours: 2, topic: 'Analog Transducers & Bridges', venue: 'NCC', instructor: 'Dr. Geeth Priyankara' },
   { id: 16, date: '2026-08-03', module: 'EE3202', hours: 1, topic: 'Tree Data Structures & Traversal', venue: 'LT1', instructor: 'Dr. Kushan Sudheera' },
-  { id: 17, date: '2026-08-03', module: 'EE3304', hours: 3, topic: 'Gauss\'s Law & Electric Potential', venue: 'NLH2', instructor: 'Mr. D. S. De Silva' },
   { id: 18, date: '2026-08-03', module: 'IS3301', hours: 2, topic: 'Analytic Functions & Cauchy-Riemann', venue: 'AUD', instructor: 'Dr. Kumudu Seneviratna' },
 
   // Week 2: Tue Aug 4
@@ -51,7 +49,6 @@ export const initialDailyLogs = [
   // Week 3: Mon Aug 10
   { id: 31, date: '2026-08-10', module: 'EE3203', hours: 2, topic: 'Digital Oscilloscopes & Signal Generators', venue: 'NCC', instructor: 'Dr. Geeth Priyankara' },
   { id: 32, date: '2026-08-10', module: 'EE3202', hours: 1, topic: 'Graph Algorithms & Shortest Path', venue: 'LT1', instructor: 'Dr. Kushan Sudheera' },
-  { id: 33, date: '2026-08-10', module: 'EE3304', hours: 3, topic: 'Magnetostatics & Biot-Savart Law', venue: 'NLH2', instructor: 'Mr. D. S. De Silva' },
   { id: 34, date: '2026-08-10', module: 'IS3301', hours: 2, topic: 'Cauchy Integral Formula & Applications', venue: 'AUD', instructor: 'Dr. Kumudu Seneviratna' },
 
   // Week 3: Tue Aug 11
@@ -90,8 +87,21 @@ export const getStoredDailyLogs = () => {
   const local = localStorage.getItem('mis_daily_logs');
   if (local) {
     try {
-      const parsed = JSON.parse(local);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      let parsed = JSON.parse(local);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        // One-time cleanup for EE3304 progress
+        if (!localStorage.getItem('mis_ee3304_cleared_v1')) {
+          const originalLength = parsed.length;
+          parsed = parsed.filter(l => l.module !== 'EE3304');
+          if (parsed.length < originalLength) {
+            localStorage.setItem('mis_daily_logs', JSON.stringify(parsed));
+          }
+          localStorage.setItem('mis_ee3304_cleared_v1', 'true');
+          // Force recalculation since we modified logs directly
+          setTimeout(() => window.dispatchEvent(new Event('daily_logs_updated')), 100);
+        }
+        return parsed;
+      }
     } catch (e) { /* fallback */ }
   }
   // Auto-seed initial logs if missing or empty
