@@ -1,13 +1,53 @@
-/** @type {import('tailwindcss').Config} */
-export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
-  darkMode: "class",
-  theme: {
-    extend: {
-      colors: {
+--- CSS VARS ---
+    --color-inverse-surface: 222 227 232;
+    --color-on-tertiary-fixed: 64 0 13;
+    --color-primary: 142 213 255;
+    --color-secondary-container: 0 165 114;
+    --color-tertiary: 255 188 191;
+    --color-surface-container: 27 32 36;
+    --color-on-secondary-fixed-variant: 0 82 54;
+    --color-surface-container-highest: 48 53 57;
+    --color-on-tertiary-fixed-variant: 146 0 42;
+    --color-on-tertiary-container: 140 0 40;
+    --color-error-container: 147 0 10;
+    --color-on-surface: 222 227 232;
+    --color-primary-fixed-dim: 123 208 255;
+    --color-secondary-fixed: 111 251 190;
+    --color-secondary: 78 222 163;
+    --color-on-secondary: 0 56 36;
+    --color-inverse-on-surface: 44 49 53;
+    --color-primary-container: 56 189 248;
+    --color-surface-container-lowest: 10 15 18;
+    --color-on-primary-container: 0 73 101;
+    --color-on-primary-fixed: 0 30 44;
+    --color-outline-variant: 62 72 79;
+    --color-surface-container-low: 23 28 32;
+    --color-surface-bright: 52 58 62;
+    --color-on-background: 222 227 232;
+    --color-on-secondary-fixed: 0 33 19;
+    --color-on-tertiary: 103 0 27;
+    --color-on-primary: 0 53 74;
+    --color-on-primary-fixed-variant: 0 76 105;
+    --color-surface: 15 20 24;
+    --color-outline: 135 146 154;
+    --color-on-error: 105 0 5;
+    --color-primary-fixed: 196 231 255;
+    --color-background: 15 20 24;
+    --color-tertiary-fixed: 255 218 219;
+    --color-on-surface-variant: 189 200 209;
+    --color-error: 255 180 171;
+    --color-surface-dim: 15 20 24;
+    --color-on-error-container: 255 218 214;
+    --color-tertiary-fixed-dim: 255 178 183;
+    --color-secondary-fixed-dim: 78 222 163;
+    --color-on-secondary-container: 0 49 31;
+    --color-surface-container-high: 37 43 46;
+    --color-tertiary-container: 255 146 154;
+    --color-surface-tint: 123 208 255;
+    --color-surface-variant: 48 53 57;
+    --color-inverse-primary: 0 102 138;
+
+--- TW CONFIG ---
         "inverse-surface": "rgb(var(--color-inverse-surface) / <alpha-value>)",
         "on-tertiary-fixed": "rgb(var(--color-on-tertiary-fixed) / <alpha-value>)",
         "primary": "rgb(var(--color-primary) / <alpha-value>)",
@@ -54,48 +94,4 @@ export default {
         "tertiary-container": "rgb(var(--color-tertiary-container) / <alpha-value>)",
         "surface-tint": "rgb(var(--color-surface-tint) / <alpha-value>)",
         "surface-variant": "rgb(var(--color-surface-variant) / <alpha-value>)",
-        "inverse-primary": "rgb(var(--color-inverse-primary) / <alpha-value>)"
-      },
-      borderRadius: {
-        "DEFAULT": "0.25rem",
-        "lg": "0.5rem",
-        "xl": "0.75rem",
-        "full": "9999px"
-      },
-      spacing: {
-        "stack-sm": "8px",
-        "touch-target": "48px",
-        "margin-desktop": "64px",
-        "margin-mobile": "20px",
-        "stack-lg": "32px",
-        "stack-md": "16px",
-        "gutter": "16px"
-      },
-      fontFamily: {
-        "body-lg": ["Inter", "sans-serif"],
-        "headline-lg-mobile": ["Outfit", "sans-serif"],
-        "headline-md": ["Outfit", "sans-serif"],
-        "headline-lg": ["Outfit", "sans-serif"],
-        "label-bold": ["Inter", "sans-serif"],
-        "display-stat": ["Outfit", "sans-serif"],
-        "label-sm": ["Inter", "sans-serif"],
-        "body-md": ["Inter", "sans-serif"],
-        "label-mono": ["Inter", "monospace"]
-      },
-      fontSize: {
-        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
-        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
-        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
-        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
-        "label-bold": ["14px", { "lineHeight": "20px", "fontWeight": "700" }],
-        "display-stat": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
-        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
-        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
-      }
-    },
-  },
-  plugins: [
-    require('@tailwindcss/forms'),
-    require('@tailwindcss/container-queries')
-  ],
-}
+        "inverse-primary": "rgb(var(--color-inverse-primary) / <alpha-value>)",
