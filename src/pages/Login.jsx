@@ -33,6 +33,7 @@ function Login() {
     ) {
       localStorage.setItem('mis_role', 'lab_admin');
       localStorage.setItem('mis_user', 'Lab Administrator');
+      localStorage.removeItem('mis_lab_admin_group'); // Force group selection on new login
       navigate('/lab-admin-portal');
       return;
     }
