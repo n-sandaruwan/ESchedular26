@@ -7,25 +7,11 @@ function DashboardLayout({ children }) {
   const location = useLocation();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [theme, setTheme] = useState(localStorage.getItem('mis_theme') || 'dark');
   
   const role = localStorage.getItem('mis_role') || 'student';
   const isAdmin = role === 'admin';
   const isLabAdmin = role === 'lab_admin';
   const isCloudSynced = isFirebaseConfigured();
-
-  React.useEffect(() => {
-    if (theme === 'dark') {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-    localStorage.setItem('mis_theme', theme);
-  }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
-  };
 
   const allNavItems = [
     { name: 'Home Dashboard', icon: 'home', path: '/' },
@@ -60,9 +46,9 @@ function DashboardLayout({ children }) {
 
   return (
     <>
-      {theme === 'dark' && <InteractiveShaderBackground />}
+      <InteractiveShaderBackground />
       {/* Top Navigation Bar */}
-      <header className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/20 shadow-[0_0_15px_rgba(0,102,138,0.05)] dark:border-white/5 dark:shadow-[0_0_15px_rgba(56,189,248,0.1)]">
+      <header className="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl border-b border-white/5 shadow-[0_0_15px_rgba(56,189,248,0.1)]">
         <div className="flex items-center justify-between px-margin-mobile md:px-margin-desktop h-touch-target max-w-[1440px] mx-auto">
           {/* Left Logo & Menu Button */}
           <div className="flex items-center gap-3">
@@ -106,17 +92,6 @@ function DashboardLayout({ children }) {
                 <span className="xs:hidden">Local</span>
               </span>
             )}
-            {/* Theme Toggle */}
-            <button
-              onClick={toggleTheme}
-              className="flex items-center justify-center w-8 h-8 rounded-full border border-primary/30 hover:border-primary text-primary transition-colors"
-              title={theme === 'dark' ? "Switch to Light Mode" : "Switch to Dark Mode"}
-            >
-              <span className="material-symbols-outlined text-lg">
-                {theme === 'dark' ? 'light_mode' : 'dark_mode'}
-              </span>
-            </button>
-
             {isAdmin || isLabAdmin ? (
               <button
                 onClick={handleLeaveAdmin}
