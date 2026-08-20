@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getStoredModuleHours, saveStoredModuleHours } from '../data/moduleHoursData';
-import { getStoredDailyLogs, saveStoredDailyLogs, deleteDailyLogByModuleAndDate, addAuditLog } from '../data/dailyLogsData';
-import { getModulesForDate, modifyScheduleSlot, uncancelScheduleSlot, getStoredOverrides, addNotice } from '../data/scheduleStore';
-import { getSriLankaDateStr, getValidSemesterDateStr, SEMESTER_START_DATE } from '../utils/dateUtils';
+import { getStoredModuleHours } from '../data/moduleHoursData';
+import { addAuditLog } from '../data/dailyLogsData';
+import { getModulesForDate, modifyScheduleSlot, uncancelScheduleSlot, addNotice } from '../data/scheduleStore';
+import { getValidSemesterDateStr, SEMESTER_START_DATE } from '../utils/dateUtils';
 import { exportCompleteDatabaseJSON, restoreCompleteDatabaseJSON } from '../data/backupRestore';
 import {
   getStoredSheetCsvUrl,

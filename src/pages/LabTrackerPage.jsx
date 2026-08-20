@@ -214,7 +214,6 @@ function LabTrackerPage() {
   const studentProgress = calculateStudentProgress();
 
   // Group Lookup calculations
-  const groupLookupObj = LAB_GROUPS.find((g) => g.code === selectedGroupLookupCode) || LAB_GROUPS[0];
   const groupLookupMembers = INITIAL_STUDENTS.filter((s) => s.group_code === selectedGroupLookupCode);
   const groupLookupSchedule = INITIAL_SCHEDULE.filter((sch) => sch.group_code === selectedGroupLookupCode);
 
@@ -290,13 +289,6 @@ function LabTrackerPage() {
       setSessionNote(entry && entry.note ? entry.note : '');
     }
   }, [selectedGroupCode, selectedDate, storedAttendance]);
-
-  const handleToggleAttendance = (regNo) => {
-    setLeaderAttendance((prev) => ({
-      ...prev,
-      [regNo]: prev[regNo] === true ? false : prev[regNo] === false ? null : true,
-    }));
-  };
 
   const handleToggleAll = (status) => {
     const updated = {};

@@ -225,8 +225,8 @@ export function getStoredAttendance() {
       } else {
         // Merge records if both safe and unsafe keys exist for the same date & lab
         normalized[safeKey].records = {
-          ...(normalized[safeKey].records || {}),
-          ...(entry.records || {})
+          ...normalized[safeKey].records,
+          ...entry.records
         };
         if (entry.updated_at > normalized[safeKey].updated_at) {
           normalized[safeKey].updated_at = entry.updated_at;
