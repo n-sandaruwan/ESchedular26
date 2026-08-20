@@ -25,9 +25,11 @@ function DashboardLayout({ children }) {
     { name: 'Lab Admin Portal', icon: 'how_to_reg', path: '/lab-admin-portal', labAdminOnly: true }
   ];
 
-  const navItems = allNavItems.filter(item => 
-    (!item.adminOnly || isAdmin) && (!item.labAdminOnly || isLabAdmin)
-  );
+  const navItems = allNavItems.filter(item => {
+    if (isLabAdmin) return item.labAdminOnly;
+    if (item.labAdminOnly) return false;
+    return !item.adminOnly || isAdmin;
+  });
 
   const handleLeaveAdmin = () => {
     localStorage.setItem('mis_role', 'student');
@@ -249,45 +251,49 @@ function DashboardLayout({ children }) {
 
       {/* Mobile Bottom Navigation Shell */}
       <nav className="lg:hidden fixed bottom-0 w-full z-50 bg-surface/90 backdrop-blur-xl border-t border-white/5 shadow-[0_-4px_20px_rgba(0,0,0,0.5)] rounded-t-xl h-[72px] flex justify-around items-center px-2 pb-safe">
-        <Link
-          to="/"
-          className={`flex flex-col items-center justify-center transition-all duration-200 active:scale-90 ${
-            location.pathname === '/' || location.pathname === '/dashboard' ? 'text-primary drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]' : 'text-on-surface-variant/60 hover:text-primary/80'
-          }`}
-        >
-          <span className="material-symbols-outlined text-xl">home</span>
-          <span className="font-label-sm text-[11px]">Home</span>
-        </Link>
+        {!isLabAdmin && (
+          <>
+            <Link
+              to="/"
+              className={`flex flex-col items-center justify-center transition-all duration-200 active:scale-90 ${
+                location.pathname === '/' || location.pathname === '/dashboard' ? 'text-primary drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]' : 'text-on-surface-variant/60 hover:text-primary/80'
+              }`}
+            >
+              <span className="material-symbols-outlined text-xl">home</span>
+              <span className="font-label-sm text-[11px]">Home</span>
+            </Link>
 
-        <Link
-          to="/timetable"
-          className={`flex flex-col items-center justify-center transition-all duration-200 active:scale-90 ${
-            location.pathname === '/timetable' ? 'text-primary drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]' : 'text-on-surface-variant/60 hover:text-primary/80'
-          }`}
-        >
-          <span className="material-symbols-outlined text-xl">calendar_month</span>
-          <span className="font-label-sm text-[11px]">Schedule</span>
-        </Link>
+            <Link
+              to="/timetable"
+              className={`flex flex-col items-center justify-center transition-all duration-200 active:scale-90 ${
+                location.pathname === '/timetable' ? 'text-primary drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]' : 'text-on-surface-variant/60 hover:text-primary/80'
+              }`}
+            >
+              <span className="material-symbols-outlined text-xl">calendar_month</span>
+              <span className="font-label-sm text-[11px]">Schedule</span>
+            </Link>
 
-        <Link
-          to="/modules"
-          className={`flex flex-col items-center justify-center transition-all duration-200 active:scale-90 ${
-            location.pathname === '/modules' ? 'text-primary drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]' : 'text-on-surface-variant/60 hover:text-primary/80'
-          }`}
-        >
-          <span className="material-symbols-outlined text-xl">view_module</span>
-          <span className="font-label-sm text-[11px]">Modules</span>
-        </Link>
+            <Link
+              to="/modules"
+              className={`flex flex-col items-center justify-center transition-all duration-200 active:scale-90 ${
+                location.pathname === '/modules' ? 'text-primary drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]' : 'text-on-surface-variant/60 hover:text-primary/80'
+              }`}
+            >
+              <span className="material-symbols-outlined text-xl">view_module</span>
+              <span className="font-label-sm text-[11px]">Modules</span>
+            </Link>
 
-        <Link
-          to="/lab-tracker"
-          className={`flex flex-col items-center justify-center transition-all duration-200 active:scale-90 ${
-            location.pathname === '/lab-tracker' ? 'text-primary drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]' : 'text-on-surface-variant/60 hover:text-primary/80'
-          }`}
-        >
-          <span className="material-symbols-outlined text-xl">biotech</span>
-          <span className="font-label-sm text-[11px]">Labs</span>
-        </Link>
+            <Link
+              to="/lab-tracker"
+              className={`flex flex-col items-center justify-center transition-all duration-200 active:scale-90 ${
+                location.pathname === '/lab-tracker' ? 'text-primary drop-shadow-[0_0_8px_rgba(56,189,248,0.6)]' : 'text-on-surface-variant/60 hover:text-primary/80'
+              }`}
+            >
+              <span className="material-symbols-outlined text-xl">biotech</span>
+              <span className="font-label-sm text-[11px]">Labs</span>
+            </Link>
+          </>
+        )}
 
         {isAdmin && (
           <>
