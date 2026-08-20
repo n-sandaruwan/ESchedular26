@@ -88,28 +88,28 @@ function Login() {
       <InteractiveShaderBackground />
       <div className="bg-mesh"></div>
       
-      <div className="glass-card p-stack-md rounded-2xl max-w-md w-full relative z-10 flex flex-col gap-5 border border-white/10 shadow-[0_0_30px_rgba(56,189,248,0.15)]">
+      <div className="glass-card p-6 sm:p-8 rounded-2xl max-w-md w-full relative z-10 flex flex-col gap-6 border border-white/10 shadow-[0_0_30px_rgba(56,189,248,0.15)] mx-2">
         
         {/* Header */}
         <div className="text-center">
-          <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 mx-auto flex items-center justify-center text-primary mb-3">
-            <span className="material-symbols-outlined text-2xl">lock</span>
+          <div className="w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 mx-auto flex items-center justify-center text-primary mb-4">
+            <span className="material-symbols-outlined text-3xl">lock</span>
           </div>
-          <h1 className="font-headline-md text-2xl font-bold text-on-surface">Admin Login</h1>
+          <h1 className="font-headline-md text-2xl sm:text-3xl font-bold text-on-surface">Admin Login</h1>
         </div>
 
         {error && (
-          <div className="p-3 rounded-lg bg-error/20 border border-error text-error text-xs text-center font-bold break-all">
+          <div className="p-3.5 rounded-xl bg-error/10 border border-error/30 text-error text-xs sm:text-sm text-center font-bold break-all">
             {error}
           </div>
         )}
 
         {/* Secure Form */}
-        <form onSubmit={handleLogin} className="flex flex-col gap-4">
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-label-bold uppercase text-on-surface-variant">Email</label>
+        <form onSubmit={handleLogin} className="flex flex-col gap-5">
+          <div className="flex flex-col gap-2">
+            <label className="text-xs font-label-bold uppercase text-on-surface-variant tracking-wider">Email</label>
             <input
-              className="input-glass p-3 rounded-lg text-on-surface text-xs font-body-md focus:border-primary outline-none"
+              className="input-glass p-3.5 rounded-xl text-on-surface text-sm font-body-md focus:border-primary outline-none transition-all"
               type="email"
               required
               value={email}
@@ -119,10 +119,10 @@ function Login() {
             />
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-label-bold uppercase text-on-surface-variant">Password</label>
+          <div className="flex flex-col gap-2">
+            <label className="text-xs font-label-bold uppercase text-on-surface-variant tracking-wider">Password</label>
             <input
-              className="input-glass p-3 rounded-lg text-on-surface text-xs font-body-md focus:border-primary outline-none"
+              className="input-glass p-3.5 rounded-xl text-on-surface text-sm font-body-md focus:border-primary outline-none transition-all"
               type="password"
               required
               value={password}
@@ -135,15 +135,15 @@ function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="btn-electric py-3 rounded-lg font-label-bold uppercase tracking-wider text-xs mt-1 cursor-pointer shadow-[0_0_15px_rgba(56,189,248,0.3)] disabled:opacity-50"
+            className="btn-electric py-3.5 rounded-xl font-label-bold uppercase tracking-widest text-xs sm:text-sm mt-2 cursor-pointer shadow-lg disabled:opacity-50 transition-all hover:-translate-y-0.5 active:translate-y-0"
           >
             {loading ? 'Signing in...' : 'Sign In to Portal'}
           </button>
         </form>
 
-        <div className="flex items-center gap-3 my-1">
+        <div className="flex items-center gap-4 my-2">
           <div className="h-px bg-white/10 flex-1"></div>
-          <span className="text-[10px] uppercase font-label-bold text-on-surface-variant/50">or continue with</span>
+          <span className="text-[10px] uppercase font-label-bold text-on-surface-variant/60 tracking-wider">or continue with</span>
           <div className="h-px bg-white/10 flex-1"></div>
         </div>
 
@@ -151,19 +151,19 @@ function Login() {
           type="button"
           onClick={handleGoogleLogin}
           disabled={loading}
-          className="flex items-center justify-center gap-3 w-full py-3 rounded-lg bg-surface-dim dark:bg-white/5 border border-white/10 hover:bg-surface-container-high hover:border-white/20 transition-all text-sm font-label-bold text-on-surface cursor-pointer disabled:opacity-50 shadow-sm"
+          className="flex items-center justify-center gap-3 w-full py-3.5 rounded-xl bg-surface-dim dark:bg-white/5 border border-white/10 hover:bg-surface-container-high hover:border-white/20 transition-all text-sm font-label-bold text-on-surface cursor-pointer disabled:opacity-50 shadow-sm active:scale-[0.98]"
         >
           <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
           Sign in with Google
         </button>
 
-        <div className="pt-2 border-t border-white/5 flex flex-col gap-2 mt-2">
+        <div className="pt-4 border-t border-white/5 flex flex-col gap-3 mt-1">
           <div className="text-center">
             <Link
               to="/"
-              className="text-xs text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center gap-1 font-label-bold"
+              className="text-xs sm:text-sm text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center gap-1.5 font-label-bold group"
             >
-              <span className="material-symbols-outlined text-sm">arrow_back</span> Go with Basic Mode
+              <span className="material-symbols-outlined text-sm sm:text-base group-hover:-translate-x-1 transition-transform">arrow_back</span> Go with Basic Mode
             </Link>
           </div>
         </div>
