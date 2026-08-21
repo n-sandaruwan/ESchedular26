@@ -357,7 +357,7 @@ function StudentDashboard() {
         </div>
 
         {/* Date Stepper & Quick Return to Today */}
-        <div className="flex items-center justify-center md:justify-end gap-2 w-full md:w-auto">
+        <div className="flex flex-col sm:flex-row items-center justify-center md:justify-end gap-2 w-full md:w-auto mt-2 md:mt-0">
           
           {/* Quick Return to Today Button (Visible when viewing past/future dates) */}
           {!isViewingToday && (
