@@ -12,7 +12,7 @@ export const AUTHORIZED_UIDS = {
   ADMINS: [
     'qgGyu7Qwy6QeV9apAiz3E2NL0zE2',
     'TEwc06RhhlSYrvX5lxqj4oWqudw2'
-  ],       
+  ],
   LAB_ADMINS: [
     'j4MpEMaYyqRZmuxXvgI5Mjwn0zi1' // Generic Lab Admin (can switch groups)
   ]
@@ -25,7 +25,7 @@ export const LAB_ADMIN_GROUP_MAP = {
   '3qHUuqf8AGMmqdTy8fuwZhb3MQ12': 'EE02',
   'FW5hgHty1wbuPkGuHZB5MEtUrwx1': 'EE03',
   '1cfPgmhFEPeFycOG2uw5PNBTEzw2': 'EE04',
-  'b87r7LcjnHRPqNVSximVm7ntUTh1': 'EE04',
+  '97BQMKjoSGWk3nbFsW0KinKhlx22': 'EE04',
   'gWvfBdA1JEdUPCMsw2miMnqzmeQ2': 'EE05',
   'rfGcnZkOBuNP1FIsGNPgtHLL0kg1': 'EE06',
   'gOowUjgA7XgpC368KPJH1xtrZrY2': 'EE06',
@@ -51,22 +51,22 @@ function Login() {
       localStorage.setItem('mis_user', 'Department Administrator');
       localStorage.removeItem('mis_lab_admin_strict');
       navigate('/admin');
-    } 
+    }
     else if (AUTHORIZED_UIDS.LAB_ADMINS.includes(uid) || Object.keys(LAB_ADMIN_GROUP_MAP).includes(uid)) {
       localStorage.setItem('mis_role', 'lab_admin');
       localStorage.setItem('mis_user', 'Lab Administrator');
-      
+
       const assignedGroup = LAB_ADMIN_GROUP_MAP[uid];
       if (assignedGroup) {
         localStorage.setItem('mis_lab_admin_group', assignedGroup);
         localStorage.setItem('mis_lab_admin_strict', 'true');
       } else {
-        localStorage.removeItem('mis_lab_admin_group'); 
+        localStorage.removeItem('mis_lab_admin_group');
         localStorage.removeItem('mis_lab_admin_strict');
       }
-      
+
       navigate('/lab-admin-portal');
-    } 
+    }
     else {
       setError('Access Denied: Your account does not have administrator privileges.');
       auth.signOut();
