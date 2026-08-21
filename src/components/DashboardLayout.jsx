@@ -75,7 +75,7 @@ function DashboardLayout({ children }) {
           <div className="flex items-center gap-3">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="material-symbols-outlined text-primary hover:opacity-80 transition-opacity cursor-pointer p-1 rounded-lg hover:bg-white/5"
+              className="lg:hidden material-symbols-outlined text-primary hover:opacity-80 transition-opacity cursor-pointer p-1 rounded-lg hover:bg-white/5"
               aria-label="Toggle Mobile Menu"
             >
               {mobileMenuOpen ? 'close' : 'menu'}
