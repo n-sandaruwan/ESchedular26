@@ -293,3 +293,18 @@
   border: 1px solid var(--glass-border);
   transition: all 0.2s ease;
 }
+
+.btn-electric {
+  background-color: rgb(var(--color-primary));
+  color: rgb(var(--color-on-primary));
+  transition: transform 0.1s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.btn-electric:hover:not(:disabled) {
+  box-shadow: 0 0 15px rgba(var(--color-primary), 0.4);
+  opacity: 0.9;
+}
+
+.btn-electric:active:not(:disabled) {
+  transform: scale(0.98);
+}
