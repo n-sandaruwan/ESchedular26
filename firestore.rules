@@ -1,0 +1,68 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Check if the user is a full Admin
+    function isAdmin() {
+      return request.auth != null && request.auth.uid in [
+        'qgGyu7Qwy6QeV9apAiz3E2NL0zE2',
+        'TEwc06RhhlSYrvX5lxqj4oWqudw2',
+        'b87r7LcjnHRPqNVSximVm7ntUTh1'
+      ];
+    }
+    
+    // Check if the user is a Lab Admin (generic or specific group)
+    function isLabAdmin() {
+      return request.auth != null && request.auth.uid in [
+        'j4MpEMaYyqRZmuxXvgI5Mjwn0zi1',
+        'dzL5yCg697PJWXWXTgT7X0jbfgQ2',
+        'F4oJx4xH9OU66S3spgmrUJqilya2',
+        '3qHUuqf8AGMmqdTy8fuwZhb3MQ12',
+        'FW5hgHty1wbuPkGuHZB5MEtUrwx1',
+        '1cfPgmhFEPeFycOG2uw5PNBTEzw2',
+        '97BQMKjoSGWk3nbFsW0KinKhlx22',
+        'gWvfBdA1JEdUPCMsw2miMnqzmeQ2',
+        'rfGcnZkOBuNP1FIsGNPgtHLL0kg1',
+        'gOowUjgA7XgpC368KPJH1xtrZrY2',
+        'NlYz9zHd2zclCqWI7A2dGqjWpIS2',
+        'bEJB23Ws7iSGi7L5J3eywyhNLci1',
+        'oScneRpncRXgeAZL0cW5PhBZg222',
+        'mYSY84JejeTaVQKJ7OVp5dQYiFJ2',
+        'xMaDjWwffKYylC5nFTKPqYes5Pz1',
+        'BOsDkGYNBvM9gEUsiuC2gZW5Hh73',
+        'ej65wKnIQngvw5ca4n4UiUqTe2b2'
+      ];
+    }
+
+    // Default deny for unauthenticated, allow read for authenticated
+    match /{document=**} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    // Lab Attendance can be written by Admins and Lab Admins
+    match /lab_attendance/{docId} {
+      allow write: if isAdmin() || isLabAdmin();
+    }
+
+    // Other collections can only be written by Full Admins
+    match /schedule_overrides/{docId} {
+      allow write: if isAdmin();
+    }
+    match /notices/{docId} {
+      allow write: if isAdmin();
+    }
+    match /daily_logs/{docId} {
+      allow write: if isAdmin();
+    }
+    match /module_hours/{docId} {
+      allow write: if isAdmin();
+    }
+    match /assessments/{docId} {
+      allow write: if isAdmin();
+    }
+    match /audit_logs/{docId} {
+      allow write: if isAdmin();
+    }
+  }
+}

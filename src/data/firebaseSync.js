@@ -1,5 +1,5 @@
 import { db, isFirebaseConfigured } from '../firebase';
-import { doc, setDoc, onSnapshot, collection, deleteDoc, getDocs } from 'firebase/firestore';
+import { doc, setDoc, onSnapshot, collection, deleteDoc, getDocs, query, limit } from 'firebase/firestore';
 import { getSriLankaTimestampStr } from '../utils/dateUtils';
 
 // Callbacks registered by data stores to update UI on remote changes
@@ -26,6 +26,30 @@ const notifySubscribers = (event, data) => {
     });
   }
 };
+
+const debounce = (func, wait) => {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+};
+
+// Debounced event dispatchers to prevent UI thrashing
+const dispatchOverridesUpdated = debounce(() => window.dispatchEvent(new Event('schedule_overrides_updated')), 300);
+const dispatchNoticesUpdated = debounce(() => window.dispatchEvent(new Event('notices_updated')), 300);
+const dispatchLabAttendanceUpdated = debounce(() => window.dispatchEvent(new Event('lab_attendance_updated')), 300);
+const dispatchDailyLogsUpdated = debounce(() => {
+  window.dispatchEvent(new Event('daily_logs_updated'));
+  window.dispatchEvent(new Event('module_hours_updated'));
+  window.dispatchEvent(new Event('schedule_overrides_updated'));
+}, 300);
+const dispatchModuleHoursUpdated = debounce(() => window.dispatchEvent(new Event('module_hours_updated')), 300);
+
 
 // Reliable Retry Wrapper for Cloud Writes (Handles momentary network disconnects & blips)
 const withRetry = async (fn, maxRetries = 3, initialDelayMs = 500) => {
@@ -89,7 +113,7 @@ export const initRealtimeCloudSync = () => {
 
   // 1. Listen for Schedule Overrides changes (Cancellations, Reschedules, Swaps)
   try {
-    const overridesRef = collection(db, 'schedule_overrides');
+    const overridesRef = query(collection(db, 'schedule_overrides'), limit(1000));
     onSnapshot(overridesRef, (snapshot) => {
       const cloudData = [];
       snapshot.forEach((docSnap) => {
@@ -97,7 +121,7 @@ export const initRealtimeCloudSync = () => {
       });
       localStorage.setItem('mis_schedule_overrides', JSON.stringify(cloudData));
       notifySubscribers('overrides', cloudData);
-      window.dispatchEvent(new Event('schedule_overrides_updated'));
+      dispatchOverridesUpdated();
     }, (err) => {
       console.warn("Firestore overrides subscription notice:", err);
     });
@@ -107,7 +131,7 @@ export const initRealtimeCloudSync = () => {
 
   // 2. Listen for Department Notices & Announcements
   try {
-    const noticesRef = collection(db, 'notices');
+    const noticesRef = query(collection(db, 'notices'), limit(1000));
     onSnapshot(noticesRef, (snapshot) => {
       const cloudNotices = [];
       snapshot.forEach((docSnap) => {
@@ -116,7 +140,7 @@ export const initRealtimeCloudSync = () => {
       cloudNotices.sort((a, b) => b.id - a.id);
       localStorage.setItem('mis_notices', JSON.stringify(cloudNotices));
       notifySubscribers('notices', cloudNotices);
-      window.dispatchEvent(new Event('notices_updated'));
+      dispatchNoticesUpdated();
     }, (err) => {
       console.warn("Firestore notices subscription notice:", err);
     });
@@ -126,7 +150,7 @@ export const initRealtimeCloudSync = () => {
 
   // 3. Listen for EE01 - EE12 Lab Attendance records
   try {
-    const attendanceRef = collection(db, 'lab_attendance');
+    const attendanceRef = query(collection(db, 'lab_attendance'), limit(1000));
     onSnapshot(attendanceRef, (snapshot) => {
       const attendanceMap = {};
       snapshot.forEach((docSnap) => {
@@ -134,7 +158,7 @@ export const initRealtimeCloudSync = () => {
       });
       localStorage.setItem('eschedular26_lab_attendance', JSON.stringify(attendanceMap));
       notifySubscribers('lab_attendance', attendanceMap);
-      window.dispatchEvent(new Event('lab_attendance_updated'));
+      dispatchLabAttendanceUpdated();
     }, (err) => {
       console.warn("Firestore lab attendance subscription notice:", err);
     });
@@ -144,7 +168,7 @@ export const initRealtimeCloudSync = () => {
 
   // 4. Listen for Daily Evening Lecture Logs
   try {
-    const dailyLogsRef = collection(db, 'daily_logs');
+    const dailyLogsRef = query(collection(db, 'daily_logs'), limit(1000));
     onSnapshot(dailyLogsRef, (snapshot) => {
       const logsData = [];
       snapshot.forEach((docSnap) => {
@@ -153,9 +177,7 @@ export const initRealtimeCloudSync = () => {
       logsData.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
       localStorage.setItem('mis_daily_logs', JSON.stringify(logsData));
       notifySubscribers('daily_logs', logsData);
-      window.dispatchEvent(new Event('daily_logs_updated'));
-      window.dispatchEvent(new Event('module_hours_updated'));
-      window.dispatchEvent(new Event('schedule_overrides_updated'));
+      dispatchDailyLogsUpdated();
     }, (err) => {
       console.warn("Firestore daily_logs subscription notice:", err);
     });
@@ -165,7 +187,7 @@ export const initRealtimeCloudSync = () => {
 
   // 5. Listen for Module Hours & Course Progress
   try {
-    const moduleHoursRef = collection(db, 'module_hours');
+    const moduleHoursRef = query(collection(db, 'module_hours'), limit(1000));
     onSnapshot(moduleHoursRef, (snapshot) => {
       const hoursData = [];
       snapshot.forEach((docSnap) => {
@@ -173,7 +195,7 @@ export const initRealtimeCloudSync = () => {
       });
       localStorage.setItem('mis_module_hours', JSON.stringify(hoursData));
       notifySubscribers('module_hours', hoursData);
-      window.dispatchEvent(new Event('module_hours_updated'));
+      dispatchModuleHoursUpdated();
     }, (err) => {
       console.warn("Firestore module_hours subscription notice:", err);
     });
@@ -183,7 +205,7 @@ export const initRealtimeCloudSync = () => {
 
   // 6. Listen for Course Assessments
   try {
-    const assessmentsRef = collection(db, 'assessments');
+    const assessmentsRef = query(collection(db, 'assessments'), limit(1000));
     onSnapshot(assessmentsRef, (snapshot) => {
       const list = [];
       snapshot.forEach((docSnap) => {
@@ -202,7 +224,7 @@ export const initRealtimeCloudSync = () => {
 
   // 7. Listen for Audit Logs
   try {
-    const auditLogsRef = collection(db, 'audit_logs');
+    const auditLogsRef = query(collection(db, 'audit_logs'), limit(1000));
     onSnapshot(auditLogsRef, (snapshot) => {
       const auditList = [];
       snapshot.forEach((docSnap) => {
