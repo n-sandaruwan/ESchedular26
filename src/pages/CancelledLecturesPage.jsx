@@ -163,7 +163,7 @@ function CancelledLecturesPage() {
         </div>
 
         {/* Filter Toggle */}
-        <div className="flex bg-surface-container-low p-1 rounded-xl border border-white/5">
+        <div className="flex bg-surface-container-low p-1 rounded-xl border dark:border-white/5 border-black/5">
           {['ALL', 'PAST', 'FUTURE'].map(f => (
             <button
               key={f}
@@ -183,17 +183,17 @@ function CancelledLecturesPage() {
       {/* Cancellations List */}
       <div className="space-y-4">
         {filteredCancellations.length === 0 ? (
-          <div className="glass-card p-12 rounded-xl text-center border border-white/5">
+          <div className="glass-card p-12 rounded-xl text-center border dark:border-white/5 border-black/5">
             <span className="material-symbols-outlined text-5xl text-on-surface-variant/50 mb-3">check_circle</span>
             <h3 className="font-headline-md text-on-surface mb-1">No Cancellations Found</h3>
             <p className="text-sm text-on-surface-variant">There are no cancelled lectures matching your filter.</p>
           </div>
         ) : (
           filteredCancellations.map((item) => (
-            <div key={item.id} className="glass-card rounded-xl overflow-hidden border border-white/5 group transition-all hover:border-white/10">
+            <div key={item.id} className="glass-card rounded-xl overflow-hidden border dark:border-white/5 border-black/5 group transition-all hover:dark:border-white/10 border-black/10">
               
               {/* Card Header (Holiday/Admin Info) */}
-              <div className={`p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/5 ${
+              <div className={`p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b dark:border-white/5 border-black/5 ${
                 item.type === 'Holiday' 
                   ? (item.isPoya ? 'bg-yellow-500/5' : 'bg-pink-500/5') 
                   : 'bg-error/5'
@@ -240,7 +240,7 @@ function CancelledLecturesPage() {
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {item.modules.map((mod, idx) => (
-                      <div key={idx} className="relative overflow-hidden bg-gradient-to-br from-surface-container to-surface-container-low p-4 rounded-xl border border-white/10 hover:border-error/30 transition-all shadow-lg">
+                      <div key={idx} className="relative overflow-hidden bg-gradient-to-br from-surface-container to-surface-container-low p-4 rounded-xl border dark:border-white/10 border-black/10 hover:border-error/30 transition-all shadow-lg">
                         
                         {/* Diagonal warning stripes background */}
                         <div className="absolute inset-0 bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,rgba(244,63,94,0.02)_10px,rgba(244,63,94,0.02)_20px)] pointer-events-none"></div>
@@ -271,7 +271,7 @@ function CancelledLecturesPage() {
                             </div>
 
                             {isAdmin && item.type === 'Manual' && (
-                              <div className="flex items-center justify-end gap-1.5 pt-2 border-t border-white/5">
+                              <div className="flex items-center justify-end gap-1.5 pt-2 border-t dark:border-white/5 border-black/5">
                                 <button
                                   type="button"
                                   onClick={() => handleUncancelFromPage(item.date, mod.module)}

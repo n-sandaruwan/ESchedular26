@@ -89,7 +89,7 @@ function TimetablePage() {
 
         {/* Glass Card */}
         <div className={`rounded-2xl p-5 border transition-all ${
-          isOngoing ? 'glass-card ongoing-glow border-secondary/30' : 'glass-card border-white/5 hover:bg-white/5'
+          isOngoing ? 'glass-card ongoing-glow border-secondary/30' : 'glass-card dark:border-white/5 border-black/5 hover:dark:bg-white/5 bg-black/5'
         }`}>
           <div className="flex justify-between items-start mb-3">
             <div className="space-y-0.5">
@@ -104,7 +104,7 @@ function TimetablePage() {
                 ? 'bg-secondary-container/20 text-secondary border-secondary/30'
                 : isUpcoming
                 ? 'bg-primary-container/20 text-primary border-primary/20'
-                : 'bg-surface-container-high text-on-surface-variant border-white/5'
+                : 'bg-surface-container-high text-on-surface-variant dark:border-white/5 border-black/5'
             }`}>
               {status}
             </span>
@@ -235,7 +235,7 @@ function TimetablePage() {
         <div className="absolute left-4 top-0 bottom-0 w-[2px] timeline-line"></div>
 
         {daySlots.length === 0 ? (
-          <div className="p-8 text-center glass-card rounded-2xl border border-white/5">
+          <div className="p-8 text-center glass-card rounded-2xl border dark:border-white/5 border-black/5">
             <span className="material-symbols-outlined text-4xl text-on-surface-variant mb-2">event_busy</span>
             <p className="text-on-surface font-semibold">No Lectures Found</p>
             <p className="text-xs text-on-surface-variant mt-1">No sessions match your filter on this day.</p>

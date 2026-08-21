@@ -163,7 +163,7 @@ function ModulePage() {
   return (
     <div className="space-y-3 max-w-5xl mx-auto">
       {/* Top Banner Navigation */}
-      <div className="glass-card rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-white/5">
+      <div className="glass-card rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 dark:border-white/5 border-black/5">
         <div>
           <Link to="/modules" className="text-primary text-xs flex items-center gap-1 mb-2 hover:underline font-label-bold">
             <span className="material-symbols-outlined text-sm">arrow_back</span> Back to Module Tracker
@@ -188,7 +188,7 @@ function ModulePage() {
             </button>
             <button
               onClick={() => handleAddHour(-0.5)}
-              className="bg-surface-container border border-white/10 text-on-surface-variant hover:text-on-surface px-3 py-1.5 rounded-xl text-xs font-label-bold cursor-pointer"
+              className="bg-surface-container border dark:border-white/10 border-black/10 text-on-surface-variant hover:text-on-surface px-3 py-1.5 rounded-xl text-xs font-label-bold cursor-pointer"
             >
               -30 Mins
             </button>
@@ -197,8 +197,8 @@ function ModulePage() {
       </div>
 
       {/* Module Metadata Card */}
-      <div className="glass-card rounded-2xl p-4 sm:p-5 border-white/5 space-y-3.5">
-        <div className="flex items-center justify-between pb-3 border-b border-white/5">
+      <div className="glass-card rounded-2xl p-4 sm:p-5 dark:border-white/5 border-black/5 space-y-3.5">
+        <div className="flex items-center justify-between pb-3 border-b dark:border-white/5 border-black/5">
           <h3 className="font-headline-md text-base sm:text-lg font-bold text-on-surface flex items-center gap-2">
             <span className="material-symbols-outlined text-primary text-lg">badge</span> Module Information
           </h3>
@@ -208,7 +208,7 @@ function ModulePage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <div className="bg-surface-container/60 p-4 rounded-xl border border-white/5 space-y-1.5">
+          <div className="bg-surface-container/60 p-4 rounded-xl border dark:border-white/5 border-black/5 space-y-1.5">
             <span className="text-xs sm:text-sm font-label-bold text-on-surface-variant uppercase tracking-wider">Module Coordinator</span>
             <h4 className="font-headline-md font-bold text-on-surface text-base leading-snug">{selectedModule.coordinator || 'Department Faculty'}</h4>
             {selectedModule.email && (
@@ -218,7 +218,7 @@ function ModulePage() {
             )}
           </div>
 
-          <div className="bg-surface-container/60 p-4 rounded-xl border border-white/5 space-y-1.5">
+          <div className="bg-surface-container/60 p-4 rounded-xl border dark:border-white/5 border-black/5 space-y-1.5">
             <span className="text-xs sm:text-sm font-label-bold text-on-surface-variant uppercase tracking-wider">Teaching Team</span>
             <div className="space-y-1">
               {selectedModule.teachers && selectedModule.teachers.length > 0 ? (
@@ -231,7 +231,7 @@ function ModulePage() {
             </div>
           </div>
 
-          <div className="bg-surface-container/60 p-4 rounded-xl border border-white/5 space-y-1.5">
+          <div className="bg-surface-container/60 p-4 rounded-xl border dark:border-white/5 border-black/5 space-y-1.5">
             <span className="text-xs sm:text-sm font-label-bold text-on-surface-variant uppercase tracking-wider">Venue & Allocation</span>
             <h4 className="font-headline-md font-bold text-on-surface text-base">Venue: {selectedModule.venue}</h4>
             <p className="text-xs sm:text-sm text-on-surface-variant/80">Allocation: {selectedModule.weeklyHours} hrs / week</p>
@@ -241,8 +241,8 @@ function ModulePage() {
 
       {/* Assessment & Marks Evaluation Scheme Card */}
       {selectedModule.gradingScheme && (
-        <div className="glass-card rounded-2xl p-4 sm:p-5 border-white/5 space-y-3.5">
-          <div className="flex items-center justify-between pb-3 border-b border-white/5">
+        <div className="glass-card rounded-2xl p-4 sm:p-5 dark:border-white/5 border-black/5 space-y-3.5">
+          <div className="flex items-center justify-between pb-3 border-b dark:border-white/5 border-black/5">
             <h3 className="font-headline-md text-base sm:text-lg font-bold text-on-surface flex items-center gap-2">
               <span className="material-symbols-outlined text-primary text-lg">assignment_turned_in</span> Assessment & Marks Evaluation Scheme
             </h3>
@@ -253,8 +253,8 @@ function ModulePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
             {selectedModule.gradingScheme.map((cat, idx) => (
-              <div key={idx} className="bg-surface-container/60 p-3.5 rounded-xl border border-white/5 space-y-2">
-                <div className="flex justify-between items-center pb-2 border-b border-white/5">
+              <div key={idx} className="bg-surface-container/60 p-3.5 rounded-xl border dark:border-white/5 border-black/5 space-y-2">
+                <div className="flex justify-between items-center pb-2 border-b dark:border-white/5 border-black/5">
                   <span className="font-headline-md text-xs sm:text-sm font-bold text-on-surface flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-primary"></span>
                     {cat.category}
@@ -271,7 +271,7 @@ function ModulePage() {
                         <span className="text-on-surface-variant/60">•</span>
                         <span>{comp.name}</span>
                       </span>
-                      <span className="font-label-mono font-bold text-on-surface text-xs bg-surface-container-low px-2 py-0.5 rounded border border-white/5">
+                      <span className="font-label-mono font-bold text-on-surface text-xs bg-surface-container-low px-2 py-0.5 rounded border dark:border-white/5 border-black/5">
                         {comp.weight}
                       </span>
                     </div>
@@ -311,7 +311,7 @@ function ModulePage() {
                 <p className="text-xs sm:text-sm text-on-surface leading-snug font-medium">
                   {cond.criteria}
                 </p>
-                <div className="pt-2 border-t border-white/5 flex items-center justify-between text-xs text-on-surface-variant">
+                <div className="pt-2 border-t dark:border-white/5 border-black/5 flex items-center justify-between text-xs text-on-surface-variant">
                   <span>Required Pass Mark:</span>
                   <span className="font-mono font-bold text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">{cond.minMarks}</span>
                 </div>
@@ -322,8 +322,8 @@ function ModulePage() {
       )}
 
       {/* Assessment & Lab Tracker Panel */}
-      <div className="glass-card rounded-2xl p-3.5 sm:p-4 border-white/5 space-y-2.5">
-        <div className="flex items-center justify-between pb-2 border-b border-white/5">
+      <div className="glass-card rounded-2xl p-3.5 sm:p-4 dark:border-white/5 border-black/5 space-y-2.5">
+        <div className="flex items-center justify-between pb-2 border-b dark:border-white/5 border-black/5">
           <h3 className="font-headline-md text-xs sm:text-sm font-bold text-on-surface flex items-center gap-1.5 uppercase tracking-wider">
             <span className="material-symbols-outlined text-primary text-base">science</span> Assessment Tracker
           </h3>
@@ -347,7 +347,7 @@ function ModulePage() {
                   className={`px-3 py-2 rounded-lg border transition-all flex items-center justify-between gap-2.5 ${
                     isCompleted
                       ? 'bg-secondary/5 border-secondary/20 hover:border-secondary/35'
-                      : 'bg-surface-container/50 border-white/5 hover:border-white/10'
+                      : 'bg-surface-container/50 dark:border-white/5 border-black/5 hover:dark:border-white/10 border-black/10'
                   }`}
                 >
                   <div className="flex items-center gap-2 min-w-0">
@@ -355,7 +355,7 @@ function ModulePage() {
                     <span className="font-headline-md font-bold text-on-surface text-xs sm:text-sm truncate">
                       {item.title}
                     </span>
-                    <span className="font-label-bold text-[10px] px-1.5 py-0.5 rounded bg-surface-container border border-white/10 text-on-surface-variant/80 font-label-mono shrink-0">
+                    <span className="font-label-bold text-[10px] px-1.5 py-0.5 rounded bg-surface-container border dark:border-white/10 border-black/10 text-on-surface-variant/80 font-label-mono shrink-0">
                       {item.weight}
                     </span>
                   </div>
@@ -381,7 +381,7 @@ function ModulePage() {
                         className={`font-label-bold text-[11px] px-2.5 py-0.5 rounded-md border flex items-center gap-1 ${
                           isCompleted
                             ? 'bg-secondary/15 text-secondary border-secondary/30'
-                            : 'bg-surface-container-highest/80 text-on-surface-variant/70 border-white/10'
+                            : 'bg-surface-container-highest/80 text-on-surface-variant/70 dark:border-white/10 border-black/10'
                         }`}
                       >
                         <span className="material-symbols-outlined text-[13px]">
@@ -401,7 +401,7 @@ function ModulePage() {
       {/* Progress Cards Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
         {/* Card 1: Completed Hours */}
-        <div className="glass-card p-3.5 rounded-xl flex items-center justify-between border-white/5">
+        <div className="glass-card p-3.5 rounded-xl flex items-center justify-between dark:border-white/5 border-black/5">
           <div>
             <span className="text-xs font-label-bold uppercase text-on-surface-variant/80 tracking-wider">Conducted</span>
             <h3 className="text-xl sm:text-2xl font-bold text-secondary mt-0.5">{selectedModule.conductedHours} hrs</h3>
@@ -413,7 +413,7 @@ function ModulePage() {
         </div>
 
         {/* Card 2: Target Hours */}
-        <div className="glass-card p-3.5 rounded-xl flex items-center justify-between border-white/5">
+        <div className="glass-card p-3.5 rounded-xl flex items-center justify-between dark:border-white/5 border-black/5">
           <div>
             <span className="text-xs font-label-bold uppercase text-on-surface-variant/80 tracking-wider">Target</span>
             <h3 className="text-xl sm:text-2xl font-bold text-primary mt-0.5">
@@ -427,7 +427,7 @@ function ModulePage() {
         </div>
 
         {/* Card 3: Remaining Hours */}
-        <div className="glass-card p-3.5 rounded-xl flex items-center justify-between border-white/5">
+        <div className="glass-card p-3.5 rounded-xl flex items-center justify-between dark:border-white/5 border-black/5">
           <div>
             <span className="text-xs font-label-bold uppercase text-on-surface-variant/80 tracking-wider">Remaining</span>
             <h3 className="text-xl sm:text-2xl font-bold text-tertiary mt-0.5">{remainingHours}</h3>
@@ -439,21 +439,21 @@ function ModulePage() {
         </div>
 
         {/* Card 4: Weekly Allocation */}
-        <div className="glass-card p-3.5 rounded-xl flex items-center justify-between border-white/5">
+        <div className="glass-card p-3.5 rounded-xl flex items-center justify-between dark:border-white/5 border-black/5">
           <div>
             <span className="text-xs font-label-bold uppercase text-on-surface-variant/80 tracking-wider">Weekly</span>
             <h3 className="text-xl sm:text-2xl font-bold text-on-surface mt-0.5">{selectedModule.weeklyHours} hrs/wk</h3>
             <p className="text-xs text-on-surface-variant/70 truncate">Venue: {selectedModule.venue}</p>
           </div>
-          <div className="w-10 h-10 rounded-xl bg-surface-container border border-white/5 flex items-center justify-center text-on-surface-variant shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-surface-container border dark:border-white/5 border-black/5 flex items-center justify-center text-on-surface-variant shrink-0">
             <span className="material-symbols-outlined text-xl">calendar_view_week</span>
           </div>
         </div>
       </div>
 
       {/* Progress Bar & Details Panel */}
-      <div className="glass-card rounded-2xl p-4 space-y-3 border-white/5">
-        <div className="flex justify-between items-center pb-2.5 border-b border-white/5">
+      <div className="glass-card rounded-2xl p-4 space-y-3 dark:border-white/5 border-black/5">
+        <div className="flex justify-between items-center pb-2.5 border-b dark:border-white/5 border-black/5">
           <div>
             <h3 className="font-headline-md text-base font-bold text-on-surface">Module Completion Status</h3>
             <p className="text-xs text-on-surface-variant mt-0.5">Real-time lecture hours completion rate for {selectedModule.code}</p>
@@ -462,7 +462,7 @@ function ModulePage() {
         </div>
 
         {/* Visual Progress Bar */}
-        <div className="w-full bg-surface-container-low rounded-full h-3 p-0.5 border border-white/5 overflow-hidden">
+        <div className="w-full bg-surface-container-low rounded-full h-3 p-0.5 border dark:border-white/5 border-black/5 overflow-hidden">
           <div
             className="bg-primary h-full rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(56,189,248,0.5)]"
             style={{ width: `${percentage}%` }}
@@ -471,19 +471,19 @@ function ModulePage() {
 
         {/* Status Breakdown Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
-          <div className="bg-surface-container/60 p-3.5 rounded-xl border border-white/5">
+          <div className="bg-surface-container/60 p-3.5 rounded-xl border dark:border-white/5 border-black/5">
             <span className="text-xs font-label-bold text-on-surface-variant/80 uppercase tracking-wider">Estimated Weeks Left</span>
             <h4 className="font-headline-md font-bold text-on-surface text-base mt-0.5">
               {selectedModule.weeklyHours > 0 ? Math.ceil(remainingHours / selectedModule.weeklyHours) : 0} Weeks
             </h4>
           </div>
 
-          <div className="bg-surface-container/60 p-3.5 rounded-xl border border-white/5">
+          <div className="bg-surface-container/60 p-3.5 rounded-xl border dark:border-white/5 border-black/5">
             <span className="text-xs font-label-bold text-on-surface-variant/80 uppercase tracking-wider">Primary Venue</span>
             <h4 className="font-headline-md font-bold text-on-surface text-base mt-0.5">{selectedModule.venue}</h4>
           </div>
 
-          <div className="bg-surface-container/60 p-3.5 rounded-xl border border-white/5">
+          <div className="bg-surface-container/60 p-3.5 rounded-xl border dark:border-white/5 border-black/5">
             <span className="text-xs font-label-bold text-on-surface-variant/80 uppercase tracking-wider">Course Status</span>
             <h4 className={`font-headline-md font-bold text-base mt-0.5 ${percentage >= 80 ? 'text-secondary' : 'text-primary'}`}>
               {percentage >= 100 ? 'Completed' : percentage >= 50 ? 'On Track' : 'In Progress'}
@@ -536,7 +536,7 @@ function ModulePage() {
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap gap-3 text-xs pt-2 border-t border-white/5">
+                  <div className="flex flex-wrap gap-3 text-xs pt-2 border-t dark:border-white/5 border-black/5">
                     {session.venue && (
                       <span className="flex items-center gap-1 text-on-surface-variant font-label-bold">
                         <span className="material-symbols-outlined text-xs text-primary">location_on</span>
@@ -552,13 +552,13 @@ function ModulePage() {
                   </div>
 
                   {session.topic && (
-                    <div className="pt-2 border-t border-white/5 text-xs">
+                    <div className="pt-2 border-t dark:border-white/5 border-black/5 text-xs">
                       <p className="text-on-surface-variant italic font-body-md text-xs">Note: {session.topic}</p>
                     </div>
                   )}
 
                   {isAdmin && (
-                    <div className="pt-2.5 border-t border-white/5 flex items-center justify-end gap-2">
+                    <div className="pt-2.5 border-t dark:border-white/5 border-black/5 flex items-center justify-end gap-2">
                       <button
                         type="button"
                         onClick={() => handleResetConductedSession(session.date, selectedModule.code)}
@@ -593,8 +593,8 @@ function ModulePage() {
       </div>
 
       {/* Rescheduled Sessions Panel */}
-      <div className="glass-card rounded-2xl p-4 sm:p-5 space-y-3.5 border-white/5">
-        <div className="flex justify-between items-center pb-3 border-b border-white/5">
+      <div className="glass-card rounded-2xl p-4 sm:p-5 space-y-3.5 dark:border-white/5 border-black/5">
+        <div className="flex justify-between items-center pb-3 border-b dark:border-white/5 border-black/5">
           <div>
             <h3 className="font-headline-md text-base sm:text-lg font-bold text-on-surface flex items-center gap-2">
               <span className="material-symbols-outlined text-primary text-xl">update</span>
@@ -629,7 +629,7 @@ function ModulePage() {
                     </span>
                   </div>
 
-                  <div className="flex flex-wrap gap-3 text-xs pt-2 border-t border-white/5">
+                  <div className="flex flex-wrap gap-3 text-xs pt-2 border-t dark:border-white/5 border-black/5">
                     {session.time && (
                       <span className="flex items-center gap-1 text-primary font-label-bold">
                         <span className="material-symbols-outlined text-xs">schedule</span>
@@ -645,13 +645,13 @@ function ModulePage() {
                   </div>
 
                   {session.reason && (
-                    <div className="pt-2 border-t border-white/5 text-xs">
+                    <div className="pt-2 border-t dark:border-white/5 border-black/5 text-xs">
                       <p className="text-on-surface-variant italic font-body-md">"{session.reason}"</p>
                     </div>
                   )}
 
                   {isAdmin && (
-                    <div className="pt-2.5 border-t border-white/5 flex items-center justify-end gap-2">
+                    <div className="pt-2.5 border-t dark:border-white/5 border-black/5 flex items-center justify-end gap-2">
                       <button
                         type="button"
                         onClick={() => handleUncancelSession(session.date, selectedModule.code)}
@@ -730,13 +730,13 @@ function ModulePage() {
                   </div>
 
                   {session.reason && (
-                    <div className="pt-2 border-t border-white/5 text-xs">
+                    <div className="pt-2 border-t dark:border-white/5 border-black/5 text-xs">
                       <p className="text-on-surface-variant italic font-body-md">"{session.reason}"</p>
                     </div>
                   )}
 
                   {isAdmin && (
-                    <div className="pt-2.5 border-t border-white/5 flex items-center justify-end gap-2">
+                    <div className="pt-2.5 border-t dark:border-white/5 border-black/5 flex items-center justify-end gap-2">
                       <button
                         type="button"
                         onClick={() => handleUncancelSession(session.date, selectedModule.code)}

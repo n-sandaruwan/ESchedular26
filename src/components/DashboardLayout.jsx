@@ -75,7 +75,7 @@ function DashboardLayout({ children }) {
           <div className="flex items-center gap-3">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden material-symbols-outlined text-primary hover:opacity-80 transition-opacity cursor-pointer p-1 rounded-lg hover:bg-white/5"
+              className="lg:hidden material-symbols-outlined text-primary hover:opacity-80 transition-opacity cursor-pointer p-1 rounded-lg hover:dark:bg-white/5 bg-black/5"
               aria-label="Toggle Mobile Menu"
             >
               {mobileMenuOpen ? 'close' : 'menu'}
@@ -142,7 +142,7 @@ function DashboardLayout({ children }) {
             className="fixed inset-0 bg-black/70 backdrop-blur-sm"
           ></div>
 
-          <nav className="relative bg-surface-container border-r border-white/10 w-4/5 max-w-xs h-full flex flex-col py-6 px-4 gap-y-4 pt-16 z-50 overflow-y-auto shadow-2xl">
+          <nav className="relative bg-surface-container border-r dark:border-white/10 border-black/10 w-4/5 max-w-xs h-full flex flex-col py-6 px-4 gap-y-4 pt-16 z-50 overflow-y-auto shadow-2xl">
             <div className="flex items-center gap-3 px-2 mb-4">
               <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center">
                 <span className="material-symbols-outlined text-primary text-xl">school</span>
@@ -164,7 +164,7 @@ function DashboardLayout({ children }) {
                     className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl transition-all text-sm font-label-bold ${
                       isActive
                         ? 'bg-primary/10 text-primary border border-primary/30 active-glow'
-                        : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5'
+                        : 'text-on-surface-variant hover:text-on-surface hover:dark:bg-white/5 bg-black/5'
                     }`}
                   >
                     <span className="material-symbols-outlined text-xl">{item.icon}</span>
@@ -174,10 +174,10 @@ function DashboardLayout({ children }) {
               })}
             </div>
 
-            <div className="pt-4 border-t border-white/10 flex flex-col gap-2">
+            <div className="pt-4 border-t dark:border-white/10 border-black/10 flex flex-col gap-2">
               <button
                 onClick={toggleTheme}
-                className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-surface-dim border border-white/5 hover:bg-white/5 transition-all text-sm font-label-bold text-on-surface cursor-pointer"
+                className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-surface-dim border dark:border-white/5 border-black/5 hover:dark:bg-white/5 bg-black/5 transition-all text-sm font-label-bold text-on-surface cursor-pointer"
               >
                 <span className="material-symbols-outlined text-xl">
                   {theme === 'dark' ? 'light_mode' : 'dark_mode'}
@@ -202,7 +202,7 @@ function DashboardLayout({ children }) {
       )}
 
       {/* Desktop Persistent Sidebar Navigation */}
-      <aside className="bg-surface-container/40 backdrop-blur-xl fixed left-0 top-0 h-full w-[260px] z-40 border-r border-white/5 hidden lg:flex flex-col py-8 px-4 gap-y-4 pt-20">
+      <aside className="bg-surface-container/40 backdrop-blur-xl fixed left-0 top-0 h-full w-[260px] z-40 border-r dark:border-white/5 border-black/5 hidden lg:flex flex-col py-8 px-4 gap-y-4 pt-20">
         <div className="flex items-center gap-3 px-3 mb-4">
           <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/30 flex items-center justify-center">
             <span className="material-symbols-outlined text-primary text-xl">school</span>
@@ -223,7 +223,7 @@ function DashboardLayout({ children }) {
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group cursor-pointer text-sm font-label-bold ${
                   isActive
                     ? 'bg-primary/10 text-primary border border-primary/30 active-glow'
-                    : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5'
+                    : 'text-on-surface-variant hover:text-on-surface hover:dark:bg-white/5 bg-black/5'
                 }`}
               >
                 <span className="material-symbols-outlined group-hover:scale-110 transition-transform text-xl">
@@ -235,10 +235,10 @@ function DashboardLayout({ children }) {
           })}
         </div>
 
-        <div className="mt-auto border-t border-white/10 pt-4 px-2 flex flex-col gap-2">
+        <div className="mt-auto border-t dark:border-white/10 border-black/10 pt-4 px-2 flex flex-col gap-2">
           <button
             onClick={toggleTheme}
-            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl bg-surface-dim border border-white/5 hover:bg-white/5 transition-all text-sm font-label-bold text-on-surface cursor-pointer"
+            className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl bg-surface-dim border dark:border-white/5 border-black/5 hover:dark:bg-white/5 bg-black/5 transition-all text-sm font-label-bold text-on-surface cursor-pointer"
           >
             <span className="material-symbols-outlined text-xl">
               {theme === 'dark' ? 'light_mode' : 'dark_mode'}
@@ -258,7 +258,7 @@ function DashboardLayout({ children }) {
       </aside>
 
       {/* Mobile Bottom Navigation Shell */}
-      <nav className="lg:hidden fixed bottom-0 w-full z-50 bg-surface/90 backdrop-blur-xl border-t border-white/5 shadow-[0_-4px_20px_rgba(0,0,0,0.5)] rounded-t-xl h-[72px] flex justify-around items-center px-2 pb-safe">
+      <nav className="lg:hidden fixed bottom-0 w-full z-50 bg-surface/90 backdrop-blur-xl border-t dark:border-white/5 border-black/5 shadow-[0_-4px_20px_rgba(0,0,0,0.5)] rounded-t-xl h-[72px] flex justify-around items-center px-2 pb-safe">
         {!isLabAdmin && (
           <>
             <Link

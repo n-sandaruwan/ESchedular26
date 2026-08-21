@@ -372,11 +372,11 @@ function StudentDashboard() {
           )}
 
           {/* Date Stepper Container */}
-          <div className="flex items-center justify-between bg-surface-container-low rounded-xl p-1 border border-white/5 shadow-sm max-w-xs w-full sm:w-auto">
+          <div className="flex items-center justify-between bg-surface-container-low rounded-xl p-1 border dark:border-white/5 border-black/5 shadow-sm max-w-xs w-full sm:w-auto">
             <button
               onClick={() => handleStepDate(-1)}
               disabled={selectedDate <= SEMESTER_START_DATE}
-              className={`w-touch-target h-touch-target flex items-center justify-center text-on-surface-variant hover:bg-white/5 rounded-lg active:scale-95 transition-all ${
+              className={`w-touch-target h-touch-target flex items-center justify-center text-on-surface-variant hover:dark:bg-white/5 bg-black/5 rounded-lg active:scale-95 transition-all ${
                 selectedDate <= SEMESTER_START_DATE ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'
               }`}
               title={selectedDate <= SEMESTER_START_DATE ? 'Semester starts July 27, 2026' : 'Previous Day'}
@@ -399,7 +399,7 @@ function StudentDashboard() {
 
             <button
               onClick={() => handleStepDate(1)}
-              className="w-touch-target h-touch-target flex items-center justify-center text-on-surface-variant hover:bg-white/5 rounded-lg active:scale-95 transition-all cursor-pointer"
+              className="w-touch-target h-touch-target flex items-center justify-center text-on-surface-variant hover:dark:bg-white/5 bg-black/5 rounded-lg active:scale-95 transition-all cursor-pointer"
               title="Next Day"
             >
               <span className="material-symbols-outlined">chevron_right</span>
@@ -423,7 +423,7 @@ function StudentDashboard() {
           <div className="glass-card rounded-xl p-stack-md">
             
             {/* Header Controls & Status Filters */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-stack-sm mb-stack-md border-b border-white/5 pb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-stack-sm mb-stack-md border-b dark:border-white/5 border-black/5 pb-4">
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="font-headline-md text-headline-md text-on-surface">Daily Lectures</h3>
@@ -451,7 +451,7 @@ function StudentDashboard() {
                     className={`px-2.5 py-1 rounded-lg text-xs font-label-bold transition-all cursor-pointer whitespace-nowrap ${
                       statusFilter === chip.key
                         ? 'bg-primary/20 text-primary border border-primary/40'
-                        : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5'
+                        : 'text-on-surface-variant hover:text-on-surface hover:dark:bg-white/5 bg-black/5'
                     }`}
                   >
                     {chip.label}
@@ -501,7 +501,7 @@ function StudentDashboard() {
                   </button>
                 </div>
               ) : filteredSchedule.length === 0 ? (
-                <div className="p-8 text-center glass-card rounded-xl border border-white/5 my-4">
+                <div className="p-8 text-center glass-card rounded-xl border dark:border-white/5 border-black/5 my-4">
                   <span className="material-symbols-outlined text-4xl text-on-surface-variant mb-2">event_busy</span>
                   <p className="text-on-surface font-semibold">No Lectures Found</p>
                   <p className="text-xs text-on-surface-variant mt-1">No sessions match your filter criteria on this date.</p>
@@ -535,7 +535,7 @@ function StudentDashboard() {
 
                       {/* Main Lecture Card */}
                       <div className={`glass-card rounded-xl p-stack-md transition-all ${
-                        isOngoing ? 'border-primary/40 bg-primary/5 active-glow' : 'hover:bg-white/5'
+                        isOngoing ? 'border-primary/40 bg-primary/5 active-glow' : 'hover:dark:bg-white/5 bg-black/5'
                       }`}>
                         
                         {/* Slot Header */}
@@ -633,7 +633,7 @@ function StudentDashboard() {
                               <span>Class Progress</span>
                               <span>{slot.progressPercent}%</span>
                             </div>
-                            <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+                            <div className="h-2 w-full dark:bg-white/5 bg-black/5 rounded-full overflow-hidden">
                               <div
                                 className="h-full bg-primary rounded-full transition-all duration-500 shadow-[0_0_10px_rgba(56,189,248,0.6)]"
                                 style={{ width: `${slot.progressPercent}%` }}
@@ -644,7 +644,7 @@ function StudentDashboard() {
 
                         {/* Small Note Part if Reason or Topic exists */}
                         {(slot.reason || (slot.logEntry?.topic && slot.logEntry.topic !== 'Regular Class Completed' && slot.logEntry.topic !== 'Regular Lecture Session Completed')) && (
-                          <div className="mt-2.5 p-2 rounded-lg bg-surface-container/50 border border-white/5 flex items-center gap-2">
+                          <div className="mt-2.5 p-2 rounded-lg bg-surface-container/50 border dark:border-white/5 border-black/5 flex items-center gap-2">
                             <span className="material-symbols-outlined text-xs text-primary shrink-0">info</span>
                             <p className="text-xs text-on-surface-variant italic font-body-md">
                               Note: {slot.reason || slot.logEntry.topic}
@@ -654,7 +654,7 @@ function StudentDashboard() {
 
                         {/* Inline Admin Controls (Only visible to Admin) */}
                         {isAdmin && !isHoliday && !isDone && !isCanceled && (
-                          <div className="mt-3 pt-3 border-t border-white/5 flex flex-wrap items-center justify-end gap-2">
+                          <div className="mt-3 pt-3 border-t dark:border-white/5 border-black/5 flex flex-wrap items-center justify-end gap-2">
                             <span className="text-[10px] font-label-bold text-on-surface-variant mr-auto">Admin Controls:</span>
                             {isUnverified ? (
                               <button
@@ -704,7 +704,7 @@ function StudentDashboard() {
 
                         {/* Inline Admin Controls for Canceled Slots */}
                         {isAdmin && !isHoliday && isCanceled && (
-                          <div className="mt-3 pt-3 border-t border-white/5 flex flex-wrap items-center justify-end gap-2">
+                          <div className="mt-3 pt-3 border-t dark:border-white/5 border-black/5 flex flex-wrap items-center justify-end gap-2">
                             <span className="text-[10px] font-label-bold text-on-surface-variant mr-auto">Admin Controls (Canceled Slot):</span>
                             <button
                               onClick={() => handleQuickUncancelClass(slot.module)}
@@ -723,7 +723,7 @@ function StudentDashboard() {
 
                         {/* Inline Admin Controls for Conducted Slots */}
                         {isAdmin && !isHoliday && isDone && (
-                          <div className="mt-3 pt-3 border-t border-white/5 flex flex-wrap items-center justify-end gap-2">
+                          <div className="mt-3 pt-3 border-t dark:border-white/5 border-black/5 flex flex-wrap items-center justify-end gap-2">
                             <span className="text-[10px] font-label-bold text-on-surface-variant mr-auto">Admin Controls (Conducted Class):</span>
                             <button
                               onClick={() => handleResetConductedStatus(slot.module)}
@@ -749,7 +749,7 @@ function StudentDashboard() {
           
           {/* 1. Module Completion Progress */}
           <div className="glass-card rounded-xl p-stack-md space-y-stack-md">
-            <div className="flex items-center justify-between pb-3 border-b border-white/5">
+            <div className="flex items-center justify-between pb-3 border-b dark:border-white/5 border-black/5">
               <h3 className="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-widest text-xs">
                 Course Progress
               </h3>
@@ -772,7 +772,7 @@ function StudentDashboard() {
                         {percent}% ({mod.conductedHours}/{mod.targetHours}h)
                       </span>
                     </div>
-                    <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+                    <div className="h-2 w-full dark:bg-white/5 bg-black/5 rounded-full overflow-hidden">
                       <div
                         className={`h-full rounded-full transition-all duration-500 ${
                           isHigh ? 'bg-secondary shadow-[0_0_10px_rgba(78,222,163,0.3)]' : isMedium ? 'bg-primary shadow-[0_0_10px_rgba(56,189,248,0.3)]' : 'bg-tertiary shadow-[0_0_10px_rgba(255,188,191,0.3)]'
@@ -790,8 +790,8 @@ function StudentDashboard() {
           <SriLankanCalendarWidget selectedDate={selectedDate} onSelectDate={(d) => setSelectedDate(d)} />
 
           {/* 3. Department Announcements Tile (Compact View) */}
-          <div className="glass-card rounded-xl p-stack-md space-y-3 border border-white/10 shadow-lg">
-            <div className="flex items-center justify-between pb-2.5 border-b border-white/10">
+          <div className="glass-card rounded-xl p-stack-md space-y-3 border dark:border-white/10 border-black/10 shadow-lg">
+            <div className="flex items-center justify-between pb-2.5 border-b dark:border-white/10 border-black/10">
               <div className="flex items-center gap-2">
                 <span className="material-symbols-outlined text-primary text-base">campaign</span>
                 <h3 className="font-label-bold text-label-bold text-on-surface uppercase tracking-wider text-xs">
@@ -819,7 +819,7 @@ function StudentDashboard() {
                   <div
                     key={notice.id}
                     onClick={() => setSelectedNotice(notice)}
-                    className="p-3 bg-black/30 hover:bg-white/10 rounded-xl transition-all group border border-white/5 hover:border-primary/40 cursor-pointer shadow-sm relative overflow-hidden"
+                    className="p-3 bg-black/30 hover:dark:bg-white/10 bg-black/10 rounded-xl transition-all group border dark:border-white/5 border-black/5 hover:border-primary/40 cursor-pointer shadow-sm relative overflow-hidden"
                     title="Click to open notice"
                   >
                     <div className="flex items-start gap-2.5">
@@ -852,7 +852,7 @@ function StudentDashboard() {
               <button
                 type="button"
                 onClick={() => setShowAllNoticesModal(true)}
-                className="w-full py-2 px-3 rounded-xl bg-white/5 hover:bg-primary/15 hover:text-primary border border-white/10 hover:border-primary/30 text-on-surface-variant text-xs font-label-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
+                className="w-full py-2 px-3 rounded-xl dark:bg-white/5 bg-black/5 hover:bg-primary/15 hover:text-primary border dark:border-white/10 border-black/10 hover:border-primary/30 text-on-surface-variant text-xs font-label-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm"
               >
                 <span>See More Announcements ({notices.length})</span>
                 <span className="material-symbols-outlined text-sm">arrow_forward</span>
@@ -866,7 +866,7 @@ function StudentDashboard() {
       {/* Enhanced Custom Confirmation Modal for Student Dashboard */}
       {confirmModal.isOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[9999] animate-fade-in">
-          <div className="bg-surface-container border border-white/10 rounded-2xl p-8 max-w-md w-full shadow-2xl space-y-6 text-center transform scale-100 transition-transform">
+          <div className="bg-surface-container border dark:border-white/10 border-black/10 rounded-2xl p-8 max-w-md w-full shadow-2xl space-y-6 text-center transform scale-100 transition-transform">
             
             <div className="w-16 h-16 rounded-full bg-primary/10 border border-primary/30 text-primary flex items-center justify-center mx-auto shadow-[0_0_20px_rgba(56,189,248,0.2)]">
               <span className="material-symbols-outlined text-3xl">info</span>
@@ -879,11 +879,11 @@ function StudentDashboard() {
               </p>
             </div>
             
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 border-t border-white/5">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 border-t dark:border-white/5 border-black/5">
               <button
                 type="button"
                 onClick={() => setConfirmModal({ isOpen: false, title: '', message: '', onConfirm: null })}
-                className="w-full sm:w-auto px-6 py-3 rounded-xl border border-white/10 text-on-surface hover:bg-white/5 hover:text-white transition-all text-sm font-label-bold cursor-pointer"
+                className="w-full sm:w-auto px-6 py-3 rounded-xl border dark:border-white/10 border-black/10 text-on-surface hover:dark:bg-white/5 bg-black/5 hover:text-white transition-all text-sm font-label-bold cursor-pointer"
               >
                 Cancel
               </button>
@@ -902,7 +902,7 @@ function StudentDashboard() {
       {/* Verify & Log Modal */}
       {verifyModal.isOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[9999] animate-fade-in">
-          <div className="bg-surface-container border border-white/10 rounded-2xl p-8 max-w-md w-full shadow-2xl space-y-6 text-center transform scale-100 transition-transform">
+          <div className="bg-surface-container border dark:border-white/10 border-black/10 rounded-2xl p-8 max-w-md w-full shadow-2xl space-y-6 text-center transform scale-100 transition-transform">
             
             <div className="w-16 h-16 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-500 flex items-center justify-center mx-auto shadow-[0_0_20px_rgba(249,115,22,0.2)]">
               <span className="material-symbols-outlined text-3xl">pending_actions</span>
@@ -915,7 +915,7 @@ function StudentDashboard() {
               </p>
             </div>
 
-            <div className="text-left bg-surface-container-low p-4 rounded-xl border border-white/5 space-y-3 text-sm">
+            <div className="text-left bg-surface-container-low p-4 rounded-xl border dark:border-white/5 border-black/5 space-y-3 text-sm">
                <div>
                  <label className="text-on-surface-variant font-label-bold text-xs uppercase block mb-1">Duration (Hours)</label>
                  <input
@@ -924,7 +924,7 @@ function StudentDashboard() {
                    onChange={(e) => setVerifyModal({...verifyModal, hours: Number(e.target.value)})}
                    step="0.5"
                    min="0.5"
-                   className="w-full bg-surface-container border border-white/10 rounded-lg p-3 text-on-surface font-bold focus:border-primary focus:outline-none"
+                   className="w-full bg-surface-container border dark:border-white/10 border-black/10 rounded-lg p-3 text-on-surface font-bold focus:border-primary focus:outline-none"
                  />
                </div>
 
@@ -935,16 +935,16 @@ function StudentDashboard() {
                    placeholder="e.g., Chapter 3 Diode Rectifiers & Tutorial 2"
                    value={verifyModal.note || ''}
                    onChange={(e) => setVerifyModal({...verifyModal, note: e.target.value})}
-                   className="w-full bg-surface-container border border-white/10 rounded-lg p-3 text-xs text-on-surface focus:border-primary focus:outline-none placeholder:text-on-surface-variant/40"
+                   className="w-full bg-surface-container border dark:border-white/10 border-black/10 rounded-lg p-3 text-xs text-on-surface focus:border-primary focus:outline-none placeholder:text-on-surface-variant/40"
                  />
                </div>
             </div>
             
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 border-t border-white/5">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 border-t dark:border-white/5 border-black/5">
               <button
                 type="button"
                 onClick={() => setVerifyModal({ isOpen: false, slot: null, hours: 0, note: '' })}
-                className="w-full sm:w-auto px-6 py-3 rounded-xl border border-white/10 text-on-surface hover:bg-white/5 hover:text-white transition-all text-sm font-label-bold cursor-pointer"
+                className="w-full sm:w-auto px-6 py-3 rounded-xl border dark:border-white/10 border-black/10 text-on-surface hover:dark:bg-white/5 bg-black/5 hover:text-white transition-all text-sm font-label-bold cursor-pointer"
               >
                 Cancel
               </button>
@@ -966,13 +966,13 @@ function StudentDashboard() {
       {/* Notice Details Popup Modal */}
       {selectedNotice && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 z-[9999] animate-fade-in">
-          <div className="bg-surface-container border border-white/10 rounded-2xl p-6 sm:p-8 max-w-lg w-full shadow-2xl space-y-5 transform scale-100 transition-transform relative overflow-hidden">
+          <div className="bg-surface-container border dark:border-white/10 border-black/10 rounded-2xl p-6 sm:p-8 max-w-lg w-full shadow-2xl space-y-5 transform scale-100 transition-transform relative overflow-hidden">
             
             {/* Decorative Glow */}
             <div className="absolute top-0 right-0 w-40 h-40 bg-primary/10 blur-[50px] rounded-full pointer-events-none"></div>
 
             {/* Header */}
-            <div className="flex items-start justify-between gap-3 pb-3 border-b border-white/10 relative z-10">
+            <div className="flex items-start justify-between gap-3 pb-3 border-b dark:border-white/10 border-black/10 relative z-10">
               <div className="flex items-center gap-3">
                 <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${
                   selectedNotice.type === 'Holiday' ? 'bg-tertiary/20 text-tertiary border border-tertiary/30' : selectedNotice.type === 'Canceled' || selectedNotice.type === 'Alert' ? 'bg-error/20 text-error border border-error/30' : 'bg-primary/20 text-primary border border-primary/30'
@@ -996,7 +996,7 @@ function StudentDashboard() {
               <button
                 type="button"
                 onClick={() => { setSelectedNotice(null); setIsEditingNotice(false); }}
-                className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 text-on-surface-variant hover:text-on-surface flex items-center justify-center transition-all cursor-pointer shrink-0"
+                className="w-8 h-8 rounded-full dark:bg-white/5 bg-black/5 hover:dark:bg-white/10 bg-black/10 text-on-surface-variant hover:text-on-surface flex items-center justify-center transition-all cursor-pointer shrink-0"
                 title="Close Modal"
               >
                 <span className="material-symbols-outlined text-lg">close</span>
@@ -1004,7 +1004,7 @@ function StudentDashboard() {
             </div>
 
             {/* Timestamp info */}
-            <div className="flex items-center justify-between text-xs text-on-surface-variant font-label-mono bg-surface-container-low/60 px-3.5 py-2 rounded-xl border border-white/5">
+            <div className="flex items-center justify-between text-xs text-on-surface-variant font-label-mono bg-surface-container-low/60 px-3.5 py-2 rounded-xl border dark:border-white/5 border-black/5">
               <span className="flex items-center gap-1.5">
                 <span className="material-symbols-outlined text-sm text-primary">calendar_month</span>
                 Date: <b className="text-on-surface">{selectedNotice.date}</b>
@@ -1023,7 +1023,7 @@ function StudentDashboard() {
                     type="text"
                     value={editNoticeTitle}
                     onChange={(e) => setEditNoticeTitle(e.target.value)}
-                    className="w-full bg-surface-container-low border border-white/10 rounded-xl p-3 text-xs text-on-surface outline-none focus:border-primary"
+                    className="w-full bg-surface-container-low border dark:border-white/10 border-black/10 rounded-xl p-3 text-xs text-on-surface outline-none focus:border-primary"
                   />
                 </div>
                 <div>
@@ -1032,14 +1032,14 @@ function StudentDashboard() {
                     value={editNoticeContent}
                     onChange={(e) => setEditNoticeContent(e.target.value)}
                     rows={5}
-                    className="w-full bg-surface-container-low border border-white/10 rounded-xl p-3 text-xs text-on-surface outline-none focus:border-primary resize-none"
+                    className="w-full bg-surface-container-low border dark:border-white/10 border-black/10 rounded-xl p-3 text-xs text-on-surface outline-none focus:border-primary resize-none"
                   />
                 </div>
                 <div className="flex justify-end gap-2 pt-2">
                   <button
                     type="button"
                     onClick={() => setIsEditingNotice(false)}
-                    className="px-4 py-2 rounded-xl border border-white/10 text-xs font-label-bold text-on-surface cursor-pointer"
+                    className="px-4 py-2 rounded-xl border dark:border-white/10 border-black/10 text-xs font-label-bold text-on-surface cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -1058,7 +1058,7 @@ function StudentDashboard() {
                 </div>
               </div>
             ) : (
-              <div className="bg-surface-container-low/70 p-4 rounded-xl border border-white/5 max-h-60 overflow-y-auto">
+              <div className="bg-surface-container-low/70 p-4 rounded-xl border dark:border-white/5 border-black/5 max-h-60 overflow-y-auto">
                 <p className="text-sm text-on-surface leading-relaxed whitespace-pre-line font-body-md">
                   {selectedNotice.content}
                 </p>
@@ -1066,7 +1066,7 @@ function StudentDashboard() {
             )}
 
             {/* Footer Controls */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-white/10">
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t dark:border-white/10 border-black/10">
               {isAdmin && !isEditingNotice ? (
                 <div className="flex items-center gap-2">
                   <button
@@ -1114,10 +1114,10 @@ function StudentDashboard() {
       {/* View All Announcements Modal */}
       {showAllNoticesModal && (
         <div className="fixed inset-0 bg-black/75 backdrop-blur-md flex items-center justify-center p-4 z-[9999] animate-fade-in">
-          <div className="bg-surface-container border border-white/10 rounded-2xl p-5 sm:p-6 max-w-2xl w-full shadow-2xl space-y-4 max-h-[85vh] flex flex-col relative overflow-hidden">
+          <div className="bg-surface-container border dark:border-white/10 border-black/10 rounded-2xl p-5 sm:p-6 max-w-2xl w-full shadow-2xl space-y-4 max-h-[85vh] flex flex-col relative overflow-hidden">
             
             {/* Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-white/10 shrink-0">
+            <div className="flex items-center justify-between pb-3 border-b dark:border-white/10 border-black/10 shrink-0">
               <div className="flex items-center gap-2.5">
                 <div className="w-10 h-10 rounded-xl bg-primary/20 border border-primary/30 text-primary flex items-center justify-center">
                   <span className="material-symbols-outlined text-xl">campaign</span>
@@ -1133,7 +1133,7 @@ function StudentDashboard() {
               <button
                 type="button"
                 onClick={() => setShowAllNoticesModal(false)}
-                className="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 text-on-surface-variant hover:text-on-surface flex items-center justify-center transition-all cursor-pointer shrink-0"
+                className="w-8 h-8 rounded-full dark:bg-white/5 bg-black/5 hover:dark:bg-white/10 bg-black/10 text-on-surface-variant hover:text-on-surface flex items-center justify-center transition-all cursor-pointer shrink-0"
               >
                 <span className="material-symbols-outlined text-lg">close</span>
               </button>
@@ -1148,7 +1148,7 @@ function StudentDashboard() {
                     setShowAllNoticesModal(false);
                     setSelectedNotice(notice);
                   }}
-                  className="p-4 bg-black/40 hover:bg-white/10 rounded-xl transition-all group border border-white/10 hover:border-primary/40 cursor-pointer shadow-md space-y-2"
+                  className="p-4 bg-black/40 hover:dark:bg-white/10 bg-black/10 rounded-xl transition-all group border dark:border-white/10 border-black/10 hover:border-primary/40 cursor-pointer shadow-md space-y-2"
                 >
                   <div className="flex items-center justify-between gap-2">
                     <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-label-bold uppercase tracking-wider ${
@@ -1181,11 +1181,11 @@ function StudentDashboard() {
             </div>
 
             {/* Footer */}
-            <div className="pt-3 border-t border-white/10 flex justify-end shrink-0">
+            <div className="pt-3 border-t dark:border-white/10 border-black/10 flex justify-end shrink-0">
               <button
                 type="button"
                 onClick={() => setShowAllNoticesModal(false)}
-                className="px-5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-on-surface text-xs font-label-bold cursor-pointer"
+                className="px-5 py-2 rounded-xl dark:bg-white/10 bg-black/10 hover:dark:bg-white/20 bg-black/20 text-on-surface text-xs font-label-bold cursor-pointer"
               >
                 Close
               </button>

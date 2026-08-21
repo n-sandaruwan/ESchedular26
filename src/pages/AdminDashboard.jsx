@@ -234,7 +234,7 @@ function AdminDashboard() {
     window.location.reload();
   };
 
-  const inputClasses = "bg-surface-container border border-white/5 text-on-surface focus:border-primary outline-none rounded-lg px-3.5 py-2.5 w-full font-body-md text-xs [color-scheme:dark] cursor-pointer";
+  const inputClasses = "bg-surface-container border dark:border-white/5 border-black/5 text-on-surface focus:border-primary outline-none rounded-lg px-3.5 py-2.5 w-full font-body-md text-xs [color-scheme:dark] cursor-pointer";
 
   return (
     <div className="space-y-stack-lg max-w-5xl mx-auto">
@@ -280,7 +280,7 @@ function AdminDashboard() {
 
       {/* SECONDARY SCHEDULE CONTROLS SECTION */}
       <div className="mt-4 flex flex-col gap-4">
-        <div className="flex justify-between items-center pb-2 border-b border-white/5">
+        <div className="flex justify-between items-center pb-2 border-b dark:border-white/5 border-black/5">
           <div>
             <h3 className="font-headline-md text-lg font-bold text-on-surface">Schedule Management Tools</h3>
             <p className="text-xs text-on-surface-variant mt-0.5">Select a tool below to open its control panel.</p>
@@ -295,7 +295,7 @@ function AdminDashboard() {
             className={`p-3 rounded-xl border flex flex-col sm:flex-row items-center justify-center gap-2 cursor-pointer transition-all ${
               activeTab === 'reschedule'
                 ? 'bg-primary/15 border-primary text-primary font-bold active-glow'
-                : 'bg-surface-container/50 border-white/5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
+                : 'bg-surface-container/50 dark:border-white/5 border-black/5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
             }`}
           >
             <span className="material-symbols-outlined text-lg">event_repeat</span>
@@ -308,7 +308,7 @@ function AdminDashboard() {
             className={`p-3 rounded-xl border flex flex-col sm:flex-row items-center justify-center gap-2 cursor-pointer transition-all ${
               activeTab === 'cancel'
                 ? 'bg-error/15 border-error text-error font-bold'
-                : 'bg-surface-container/50 border-white/5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
+                : 'bg-surface-container/50 dark:border-white/5 border-black/5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
             }`}
           >
             <span className="material-symbols-outlined text-lg">event_busy</span>
@@ -321,7 +321,7 @@ function AdminDashboard() {
             className={`p-3 rounded-xl border flex flex-col sm:flex-row items-center justify-center gap-2 cursor-pointer transition-all ${
               activeTab === 'notice'
                 ? 'bg-tertiary/15 border-tertiary text-tertiary font-bold'
-                : 'bg-surface-container/50 border-white/5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
+                : 'bg-surface-container/50 dark:border-white/5 border-black/5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
             }`}
           >
             <span className="material-symbols-outlined text-lg">campaign</span>
@@ -334,7 +334,7 @@ function AdminDashboard() {
             className={`p-3 rounded-xl border flex flex-col sm:flex-row items-center justify-center gap-2 cursor-pointer transition-all ${
               activeTab === 'drive'
                 ? 'bg-secondary/15 border-secondary text-secondary font-bold'
-                : 'bg-surface-container/50 border-white/5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
+                : 'bg-surface-container/50 dark:border-white/5 border-black/5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
             }`}
           >
             <span className="material-symbols-outlined text-lg">table_chart</span>
@@ -347,7 +347,7 @@ function AdminDashboard() {
             className={`p-3 rounded-xl border flex flex-col sm:flex-row items-center justify-center gap-2 cursor-pointer transition-all ${
               activeTab === 'backup'
                 ? 'bg-secondary/15 border-secondary text-secondary font-bold shadow-[0_0_15px_rgba(78,222,163,0.2)]'
-                : 'bg-surface-container/50 border-white/5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
+                : 'bg-surface-container/50 dark:border-white/5 border-black/5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
             }`}
           >
             <span className="material-symbols-outlined text-lg text-secondary">verified_user</span>
@@ -419,7 +419,7 @@ function AdminDashboard() {
               </div>
             </div>
 
-            <div className="flex flex-col gap-2 bg-surface-container/40 p-3 rounded-lg border border-white/5">
+            <div className="flex flex-col gap-2 bg-surface-container/40 p-3 rounded-lg border dark:border-white/5 border-black/5">
               <span className="text-[11px] font-label-bold uppercase text-on-surface-variant flex items-center gap-1">
                 <span className="material-symbols-outlined text-xs text-primary">schedule</span>
                 4. Time Slot Range
@@ -453,10 +453,10 @@ function AdminDashboard() {
 
               <div className="flex flex-wrap items-center gap-1.5 pt-1">
                 <span className="text-[10px] font-label-bold text-on-surface-variant">Presets:</span>
-                <button type="button" onClick={() => handleApplyPresetTime('08:30', '10:30')} className="px-2 py-0.5 rounded bg-surface-container border border-white/5 text-[10px] font-label-bold text-primary hover:bg-primary/10 cursor-pointer">08:30-10:30</button>
-                <button type="button" onClick={() => handleApplyPresetTime('10:30', '11:30')} className="px-2 py-0.5 rounded bg-surface-container border border-white/5 text-[10px] font-label-bold text-primary hover:bg-primary/10 cursor-pointer">10:30-11:30</button>
-                <button type="button" onClick={() => handleApplyPresetTime('12:30', '14:30')} className="px-2 py-0.5 rounded bg-surface-container border border-white/5 text-[10px] font-label-bold text-primary hover:bg-primary/10 cursor-pointer">12:30-02:30</button>
-                <button type="button" onClick={() => handleApplyPresetTime('14:30', '16:30')} className="px-2 py-0.5 rounded bg-surface-container border border-white/5 text-[10px] font-label-bold text-primary hover:bg-primary/10 cursor-pointer">02:30-04:30</button>
+                <button type="button" onClick={() => handleApplyPresetTime('08:30', '10:30')} className="px-2 py-0.5 rounded bg-surface-container border dark:border-white/5 border-black/5 text-[10px] font-label-bold text-primary hover:bg-primary/10 cursor-pointer">08:30-10:30</button>
+                <button type="button" onClick={() => handleApplyPresetTime('10:30', '11:30')} className="px-2 py-0.5 rounded bg-surface-container border dark:border-white/5 border-black/5 text-[10px] font-label-bold text-primary hover:bg-primary/10 cursor-pointer">10:30-11:30</button>
+                <button type="button" onClick={() => handleApplyPresetTime('12:30', '14:30')} className="px-2 py-0.5 rounded bg-surface-container border dark:border-white/5 border-black/5 text-[10px] font-label-bold text-primary hover:bg-primary/10 cursor-pointer">12:30-02:30</button>
+                <button type="button" onClick={() => handleApplyPresetTime('14:30', '16:30')} className="px-2 py-0.5 rounded bg-surface-container border dark:border-white/5 border-black/5 text-[10px] font-label-bold text-primary hover:bg-primary/10 cursor-pointer">02:30-04:30</button>
               </div>
             </div>
 
@@ -544,7 +544,7 @@ function AdminDashboard() {
             {/* Currently Canceled / Modified Slots for cancelDate */}
             {cancelAvailableModules.filter(m => m.status === 'Canceled').length > 0 && (
               <div className="glass-card p-stack-md rounded-xl flex flex-col gap-3 border-t-4 border-t-secondary bg-secondary/5">
-                <div className="flex justify-between items-center pb-2 border-b border-white/5">
+                <div className="flex justify-between items-center pb-2 border-b dark:border-white/5 border-black/5">
                   <div>
                     <h5 className="font-bold text-sm text-on-surface flex items-center gap-1.5">
                       <span className="material-symbols-outlined text-secondary text-sm">history_toggle_off</span>
@@ -559,7 +559,7 @@ function AdminDashboard() {
 
                 <div className="space-y-2">
                   {cancelAvailableModules.filter(m => m.status === 'Canceled').map((slot, idx) => (
-                    <div key={idx} className="p-3 rounded-lg bg-surface-container border border-white/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div key={idx} className="p-3 rounded-lg bg-surface-container border dark:border-white/5 border-black/5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                       <div>
                         <div className="flex items-center gap-2">
                           <span className="font-bold text-xs text-on-surface">{slot.module}</span>
@@ -673,7 +673,7 @@ function AdminDashboard() {
             </div>
 
             {showScriptModal && (
-              <div className="p-4 bg-black/40 border border-white/10 rounded-xl space-y-2 text-xs">
+              <div className="p-4 bg-black/40 border dark:border-white/10 border-black/10 rounded-xl space-y-2 text-xs">
                 <p className="font-bold text-on-surface">Instructions to set up Google Webhook in 1 minute:</p>
                 <ol className="list-decimal list-inside space-y-1 text-on-surface-variant text-[11px]">
                   <li>Open your Google Sheet in Google Drive.</li>
@@ -682,7 +682,7 @@ function AdminDashboard() {
                 </ol>
                 <textarea
                   readOnly
-                  className="w-full h-36 bg-black p-3 font-mono text-[10px] text-secondary rounded border border-white/10"
+                  className="w-full h-36 bg-black p-3 font-mono text-[10px] text-secondary rounded border dark:border-white/10 border-black/10"
                   value={GOOGLE_APPS_SCRIPT_TEMPLATE}
                 />
               </div>
@@ -707,7 +707,7 @@ function AdminDashboard() {
 
             {/* Cloud Sync Status Metrics */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="p-3 bg-surface-container/60 border border-white/5 rounded-xl flex items-center gap-3">
+              <div className="p-3 bg-surface-container/60 border dark:border-white/5 border-black/5 rounded-xl flex items-center gap-3">
                 <div className="w-9 h-9 rounded-lg bg-secondary/20 text-secondary flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-lg animate-pulse">cloud_done</span>
                 </div>
@@ -717,7 +717,7 @@ function AdminDashboard() {
                 </div>
               </div>
 
-              <div className="p-3 bg-surface-container/60 border border-white/5 rounded-xl flex items-center gap-3">
+              <div className="p-3 bg-surface-container/60 border dark:border-white/5 border-black/5 rounded-xl flex items-center gap-3">
                 <div className="w-9 h-9 rounded-lg bg-primary/20 text-primary flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-lg">storage</span>
                 </div>
@@ -727,7 +727,7 @@ function AdminDashboard() {
                 </div>
               </div>
 
-              <div className="p-3 bg-surface-container/60 border border-white/5 rounded-xl flex items-center gap-3">
+              <div className="p-3 bg-surface-container/60 border dark:border-white/5 border-black/5 rounded-xl flex items-center gap-3">
                 <div className="w-9 h-9 rounded-lg bg-tertiary/20 text-tertiary flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-lg">history</span>
                 </div>
@@ -741,7 +741,7 @@ function AdminDashboard() {
             {/* Action Buttons */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
               {/* 1. Download Backup */}
-              <div className="p-4 bg-surface-container/40 border border-white/10 rounded-xl space-y-3">
+              <div className="p-4 bg-surface-container/40 border dark:border-white/10 border-black/10 rounded-xl space-y-3">
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-secondary">download</span>
                   <h5 className="font-bold text-xs text-on-surface">1. Download Full Database Backup</h5>
@@ -764,7 +764,7 @@ function AdminDashboard() {
               </div>
 
               {/* 2. Restore Backup */}
-              <div className="p-4 bg-surface-container/40 border border-white/10 rounded-xl space-y-3">
+              <div className="p-4 bg-surface-container/40 border dark:border-white/10 border-black/10 rounded-xl space-y-3">
                 <div className="flex items-center gap-2">
                   <span className="material-symbols-outlined text-primary">upload_file</span>
                   <h5 className="font-bold text-xs text-on-surface">2. Restore Database from File</h5>
@@ -806,7 +806,7 @@ function AdminDashboard() {
       {/* Enhanced Custom Confirmation Modal */}
       {confirmModal.isOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-[9999] animate-fade-in">
-          <div className="bg-surface-container border border-white/10 rounded-2xl p-8 max-w-md w-full shadow-2xl space-y-6 text-center transform scale-100 transition-transform">
+          <div className="bg-surface-container border dark:border-white/10 border-black/10 rounded-2xl p-8 max-w-md w-full shadow-2xl space-y-6 text-center transform scale-100 transition-transform">
             
             <div className="w-16 h-16 rounded-full bg-primary/10 border border-primary/30 text-primary flex items-center justify-center mx-auto shadow-[0_0_20px_rgba(56,189,248,0.2)]">
               <span className="material-symbols-outlined text-3xl">info</span>
@@ -819,11 +819,11 @@ function AdminDashboard() {
               </p>
             </div>
             
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 border-t border-white/5">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 border-t dark:border-white/5 border-black/5">
               <button
                 type="button"
                 onClick={() => setConfirmModal({ isOpen: false, title: '', message: '', onConfirm: null })}
-                className="w-full sm:w-auto px-6 py-3 rounded-xl border border-white/10 text-on-surface hover:bg-white/5 hover:text-white transition-all text-sm font-label-bold cursor-pointer"
+                className="w-full sm:w-auto px-6 py-3 rounded-xl border dark:border-white/10 border-black/10 text-on-surface hover:dark:bg-white/5 bg-black/5 hover:text-white transition-all text-sm font-label-bold cursor-pointer"
               >
                 Cancel
               </button>

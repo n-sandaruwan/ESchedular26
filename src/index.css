@@ -163,19 +163,19 @@
 }
 
 .glow-blue {
-  box-shadow: 0 0 20px rgba(56, 189, 248, 0.15), inset 0 0 10px rgba(56, 189, 248, 0.05);
-  border-color: rgba(56, 189, 248, 0.3);
+  box-shadow: 0 0 20px rgba(var(--color-primary), 0.15), inset 0 0 10px rgba(var(--color-primary), 0.05);
+  border-color: rgba(var(--color-primary), 0.3);
 }
 
 .glow-emerald {
-  box-shadow: 0 0 25px rgba(78, 222, 163, 0.2), inset 0 0 12px rgba(78, 222, 163, 0.08);
-  border-color: rgba(78, 222, 163, 0.4);
+  box-shadow: 0 0 25px rgba(var(--color-secondary), 0.2), inset 0 0 12px rgba(var(--color-secondary), 0.08);
+  border-color: rgba(var(--color-secondary), 0.4);
 }
 
 .ongoing-glow {
-  background: rgba(0, 165, 114, 0.08);
-  border: 1px solid rgba(78, 222, 163, 0.3);
-  box-shadow: 0 0 20px rgba(0, 165, 114, 0.15), inset 0 0 12px rgba(78, 222, 163, 0.05);
+  background: rgba(var(--color-secondary-container), 0.08);
+  border: 1px solid rgba(var(--color-secondary-fixed), 0.3);
+  box-shadow: 0 0 20px rgba(var(--color-secondary-container), 0.15), inset 0 0 12px rgba(var(--color-secondary-fixed), 0.05);
 }
 
 .glow-accent {
@@ -213,8 +213,8 @@
 .day-tab-active-bg {
   position: absolute;
   height: calc(100% - 6px);
-  background: #38bdf8;
-  box-shadow: 0 0 15px rgba(56, 189, 248, 0.6);
+  background: rgb(var(--color-primary));
+  box-shadow: 0 0 15px rgba(var(--color-primary), 0.6);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 0;
 }
@@ -227,8 +227,8 @@
 }
 
 .filter-chip:focus-within {
-  border-color: #38bdf8;
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.2);
+  border-color: rgb(var(--color-primary));
+  box-shadow: 0 0 10px rgba(var(--color-primary), 0.2);
 }
 
 .poya-badge {
@@ -256,14 +256,14 @@
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #05070a;
+  background: rgba(var(--color-surface-container-highest), 0.5);
 }
 ::-webkit-scrollbar-thumb {
-  background: #161b22;
+  background: rgba(var(--color-outline-variant), 0.8);
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #38bdf8;
+  background: rgb(var(--color-primary));
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */

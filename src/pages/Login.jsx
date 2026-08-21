@@ -123,7 +123,7 @@ function Login() {
       <InteractiveShaderBackground />
       <div className="bg-mesh"></div>
 
-      <div className="glass-card p-6 sm:p-8 rounded-2xl max-w-md w-full relative z-10 flex flex-col gap-6 border border-white/10 shadow-[0_0_30px_rgba(56,189,248,0.15)] mx-2">
+      <div className="glass-card p-6 sm:p-8 rounded-2xl max-w-md w-full relative z-10 flex flex-col gap-6 border dark:border-white/10 border-black/10 shadow-[0_0_30px_rgba(56,189,248,0.15)] mx-2">
 
         {/* Header */}
         <div className="text-center">
@@ -177,22 +177,22 @@ function Login() {
         </form>
 
         <div className="flex items-center gap-4 my-2">
-          <div className="h-px bg-white/10 flex-1"></div>
+          <div className="h-px dark:bg-white/10 bg-black/10 flex-1"></div>
           <span className="text-[10px] uppercase font-label-bold text-on-surface-variant/60 tracking-wider">or continue with</span>
-          <div className="h-px bg-white/10 flex-1"></div>
+          <div className="h-px dark:bg-white/10 bg-black/10 flex-1"></div>
         </div>
 
         <button
           type="button"
           onClick={handleGoogleLogin}
           disabled={loading}
-          className="flex items-center justify-center gap-3 w-full py-3.5 rounded-xl bg-surface-dim dark:bg-white/5 border border-white/10 hover:bg-surface-container-high hover:border-white/20 transition-all text-sm font-label-bold text-on-surface cursor-pointer disabled:opacity-50 shadow-sm active:scale-[0.98]"
+          className="flex items-center justify-center gap-3 w-full py-3.5 rounded-xl bg-surface-dim dark:bg-white/5 border dark:border-white/10 border-black/10 hover:bg-surface-container-high hover:dark:border-white/20 border-black/20 transition-all text-sm font-label-bold text-on-surface cursor-pointer disabled:opacity-50 shadow-sm active:scale-[0.98]"
         >
           <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5" />
           Sign in with Google
         </button>
 
-        <div className="pt-4 border-t border-white/5 flex flex-col gap-3 mt-1">
+        <div className="pt-4 border-t dark:border-white/5 border-black/5 flex flex-col gap-3 mt-1">
           <div className="text-center">
             <Link
               to="/"

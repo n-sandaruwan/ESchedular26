@@ -54,7 +54,7 @@ function SriLankanCalendarWidget({ selectedDate, onSelectDate }) {
     <div className="glass-card rounded-xl p-stack-md flex flex-col gap-4 overflow-hidden relative">
       <div className="absolute top-[-20%] right-[-10%] w-32 h-32 bg-tertiary/10 blur-[40px] rounded-full"></div>
       
-      <div className="flex justify-between items-center pb-3 border-b border-white/5 relative z-10">
+      <div className="flex justify-between items-center pb-3 border-b dark:border-white/5 border-black/5 relative z-10">
         <div className="flex items-center gap-2">
           <span className="material-symbols-outlined text-tertiary">brightness_3</span>
           <h3 className="font-label-bold text-label-bold text-on-surface uppercase tracking-widest text-xs">
@@ -63,7 +63,7 @@ function SriLankanCalendarWidget({ selectedDate, onSelectDate }) {
         </div>
 
         {/* Month Switcher Controls */}
-        <div className="flex items-center gap-1 bg-surface-container-low px-2 py-1 rounded-lg border border-white/5">
+        <div className="flex items-center gap-1 bg-surface-container-low px-2 py-1 rounded-lg border dark:border-white/5 border-black/5">
           <button
             onClick={handlePrevMonth}
             className="text-on-surface-variant hover:text-on-surface p-0.5 cursor-pointer"
@@ -112,10 +112,10 @@ function SriLankanCalendarWidget({ selectedDate, onSelectDate }) {
           const isPast = dateStr < todayDateStr;
           const isBeforeSemester = dateStr < SEMESTER_START_DATE;
 
-          let dayStyle = 'bg-surface-container/40 border-white/5 text-on-surface hover:bg-surface-container';
+          let dayStyle = 'bg-surface-container/40 dark:border-white/5 border-black/5 text-on-surface hover:bg-surface-container';
 
           if (isBeforeSemester) {
-            dayStyle = 'bg-surface-container-low/20 border-white/5 text-on-surface-variant/20 cursor-not-allowed opacity-40';
+            dayStyle = 'bg-surface-container-low/20 dark:border-white/5 border-black/5 text-on-surface-variant/20 cursor-not-allowed opacity-40';
           } else if (isSelected) {
             dayStyle = 'bg-primary text-on-primary font-bold border-primary shadow-[0_0_12px_rgba(56,189,248,0.6)] cursor-pointer';
           } else if (isToday) {
@@ -127,7 +127,7 @@ function SriLankanCalendarWidget({ selectedDate, onSelectDate }) {
               dayStyle = 'bg-pink-500/20 border-pink-500/50 text-pink-400 font-bold ring-1 ring-pink-500/30 shadow-[0_0_8px_rgba(236,72,153,0.3)] cursor-pointer';
             }
           } else if (isPast) {
-            dayStyle = 'bg-surface-container-low/30 border-white/5 text-on-surface-variant/40 cursor-pointer';
+            dayStyle = 'bg-surface-container-low/30 dark:border-white/5 border-black/5 text-on-surface-variant/40 cursor-pointer';
           }
 
           return (
@@ -150,7 +150,7 @@ function SriLankanCalendarWidget({ selectedDate, onSelectDate }) {
       </div>
 
       {/* Sri Lanka Holidays List Feed */}
-      <div className="mt-2 pt-3 border-t border-white/5 flex flex-col gap-2 relative z-10">
+      <div className="mt-2 pt-3 border-t dark:border-white/5 border-black/5 flex flex-col gap-2 relative z-10">
         <span className="text-[11px] font-label-bold uppercase text-on-surface-variant flex items-center gap-1">
           <span className="material-symbols-outlined text-xs text-tertiary">event</span>
           Upcoming Holidays
@@ -160,7 +160,7 @@ function SriLankanCalendarWidget({ selectedDate, onSelectDate }) {
             <button
               key={i}
               onClick={() => onSelectDate && onSelectDate(h.date)}
-              className="flex items-center justify-between bg-surface-container-low p-2 rounded-xl border border-white/5 hover:border-tertiary/40 text-left transition-colors cursor-pointer"
+              className="flex items-center justify-between bg-surface-container-low p-2 rounded-xl border dark:border-white/5 border-black/5 hover:border-tertiary/40 text-left transition-colors cursor-pointer"
             >
               <div className="flex items-center gap-2">
                 <span className="text-sm">{h.icon}</span>

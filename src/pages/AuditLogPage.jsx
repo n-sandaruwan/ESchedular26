@@ -22,7 +22,7 @@ function AuditLogPage() {
           </p>
         </div>
 
-        <div className="hidden sm:flex items-center gap-2 bg-surface-container px-3.5 py-2 rounded-xl border border-white/5">
+        <div className="hidden sm:flex items-center gap-2 bg-surface-container px-3.5 py-2 rounded-xl border dark:border-white/5 border-black/5">
           <span className="material-symbols-outlined text-primary text-base">history</span>
           <span className="font-label-mono text-xs text-on-surface-variant">{logs.length} Actions Logged</span>
         </div>
@@ -36,7 +36,7 @@ function AuditLogPage() {
           logs.map((item) => (
             <div
               key={item.id}
-              className="bg-surface-container/60 border border-white/5 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-white/5 transition-colors"
+              className="bg-surface-container/60 border dark:border-white/5 border-black/5 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:dark:bg-white/5 bg-black/5 transition-colors"
             >
               <div className="flex items-start gap-3.5">
                 <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary mt-0.5 shrink-0">
@@ -53,7 +53,7 @@ function AuditLogPage() {
                 </div>
               </div>
 
-              <div className="text-right flex sm:flex-col justify-between items-end border-t sm:border-t-0 border-white/5 pt-2 sm:pt-0">
+              <div className="text-right flex sm:flex-col justify-between items-end border-t sm:border-t-0 dark:border-white/5 border-black/5 pt-2 sm:pt-0">
                 <span className="font-label-mono text-xs text-primary font-semibold">{item.timestamp}</span>
               </div>
             </div>

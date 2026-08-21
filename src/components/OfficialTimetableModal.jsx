@@ -14,10 +14,10 @@ function OfficialTimetableModal({ isOpen, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
-      <div className="bg-surface border border-white/10 rounded-2xl max-w-5xl w-full p-5 shadow-2xl space-y-4">
+      <div className="bg-surface border dark:border-white/10 border-black/10 rounded-2xl max-w-5xl w-full p-5 shadow-2xl space-y-4">
         
         {/* Modal Controls Bar */}
-        <div className="flex items-center justify-between pb-3 border-b border-white/10">
+        <div className="flex items-center justify-between pb-3 border-b dark:border-white/10 border-black/10">
           <div>
             <h3 className="text-lg font-bold text-on-surface flex items-center gap-2">
               <span className="material-symbols-outlined text-primary">picture_as_pdf</span>
@@ -36,7 +36,7 @@ function OfficialTimetableModal({ isOpen, onClose }) {
             </button>
             <button
               onClick={onClose}
-              className="p-2 rounded-xl bg-surface-container border border-white/5 text-on-surface-variant hover:text-on-surface cursor-pointer"
+              className="p-2 rounded-xl bg-surface-container border dark:border-white/5 border-black/5 text-on-surface-variant hover:text-on-surface cursor-pointer"
               title="Close Preview"
             >
               <span className="material-symbols-outlined text-base">close</span>
@@ -45,7 +45,7 @@ function OfficialTimetableModal({ isOpen, onClose }) {
         </div>
 
         {/* Embedded Exact PDF Preview */}
-        <div className="w-full h-[75vh] rounded-xl overflow-hidden bg-surface-container border border-white/10 relative">
+        <div className="w-full h-[75vh] rounded-xl overflow-hidden bg-surface-container border dark:border-white/10 border-black/10 relative">
           <iframe
             src="./TimeTable-Elec.pdf#toolbar=1&navpanes=0"
             title="Official Timetable PDF Preview"

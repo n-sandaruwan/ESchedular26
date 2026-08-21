@@ -1570,7 +1570,7 @@ function LabTrackerPage() {
                           setSelectedGroupCode(session.group_code);
                           setActiveTab('leader');
                         }}
-                        className="px-2.5 py-1 rounded-lg bg-surface-container-high dark:bg-white/10 hover:bg-white/20 text-on-surface border border-transparent text-[11px] font-label-bold cursor-pointer transition-colors flex items-center gap-1"
+                        className="px-2.5 py-1 rounded-lg bg-surface-container-high dark:bg-white/10 hover:dark:bg-white/20 bg-black/20 text-on-surface border border-transparent text-[11px] font-label-bold cursor-pointer transition-colors flex items-center gap-1"
                       >
                         <span>Mark Now</span>
                         <span className="material-symbols-outlined text-xs">arrow_forward</span>

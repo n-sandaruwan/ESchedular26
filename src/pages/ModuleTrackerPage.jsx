@@ -38,7 +38,7 @@ function ModuleTrackerPage() {
     <div className="space-y-4 max-w-5xl mx-auto">
       
       {/* Sleek Header Toolbar */}
-      <div className="glass-card rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 border-white/5 shadow-sm">
+      <div className="glass-card rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 dark:border-white/5 border-black/5 shadow-sm">
         <div className="flex items-center gap-3">
           <div className="w-11 h-11 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
             <span className="material-symbols-outlined text-2xl">view_module</span>
@@ -55,7 +55,7 @@ function ModuleTrackerPage() {
         </div>
 
         {/* Compact Search Bar */}
-        <div className="relative bg-surface-container-low border border-white/10 rounded-xl px-3.5 py-2 flex items-center gap-2 sm:w-72">
+        <div className="relative bg-surface-container-low border dark:border-white/10 border-black/10 rounded-xl px-3.5 py-2 flex items-center gap-2 sm:w-72">
           <span className="material-symbols-outlined text-primary text-base">search</span>
           <input
             type="text"
@@ -70,7 +70,7 @@ function ModuleTrackerPage() {
       {/* Rectangular Module Tiles Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {filteredModules.length === 0 ? (
-          <div className="col-span-full p-8 text-center glass-card rounded-2xl border border-white/5">
+          <div className="col-span-full p-8 text-center glass-card rounded-2xl border dark:border-white/5 border-black/5">
             <span className="material-symbols-outlined text-4xl text-on-surface-variant mb-2">menu_book</span>
             <p className="text-on-surface font-semibold text-base">No Modules Found</p>
             <p className="text-xs sm:text-sm text-on-surface-variant mt-1">Try a different search query.</p>
@@ -80,7 +80,7 @@ function ModuleTrackerPage() {
             <div
               key={mod.code}
               onClick={() => navigate(`/modules/${mod.code}`)}
-              className="glass-card rounded-xl p-4 border border-white/5 hover:border-primary/50 hover:bg-white/[0.04] transition-all cursor-pointer group flex items-center justify-between gap-3.5 shadow-sm"
+              className="glass-card rounded-xl p-4 border dark:border-white/5 border-black/5 hover:border-primary/50 hover:bg-white/[0.04] transition-all cursor-pointer group flex items-center justify-between gap-3.5 shadow-sm"
             >
               <div className="space-y-1.5 flex-1 min-w-0">
                 <div className="flex items-center gap-2">

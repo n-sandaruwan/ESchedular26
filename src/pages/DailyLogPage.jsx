@@ -112,7 +112,7 @@ function DailyLogPage() {
       <div className="glass-card p-4 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
           {/* Search Box */}
-          <div className="flex items-center bg-surface-container px-3 py-2 rounded-lg border border-white/5 w-full sm:w-72 focus-within:border-primary">
+          <div className="flex items-center bg-surface-container px-3 py-2 rounded-lg border dark:border-white/5 border-black/5 w-full sm:w-72 focus-within:border-primary">
             <span className="material-symbols-outlined text-on-surface-variant text-base mr-2">search</span>
             <input
               type="text"
@@ -127,7 +127,7 @@ function DailyLogPage() {
           <select
             value={selectedModule}
             onChange={(e) => setSelectedModule(e.target.value)}
-            className="bg-surface-container border border-white/5 text-on-surface text-xs rounded-lg px-3 py-2 outline-none font-label-bold cursor-pointer"
+            className="bg-surface-container border dark:border-white/5 border-black/5 text-on-surface text-xs rounded-lg px-3 py-2 outline-none font-label-bold cursor-pointer"
           >
             <option value="ALL">All Modules</option>
             <option value="EE3203">EE3203 - Measurements</option>
@@ -148,11 +148,11 @@ function DailyLogPage() {
       </div>
 
       {/* Spreadsheet Data Grid */}
-      <div className="glass-card rounded-xl overflow-hidden border border-white/5">
+      <div className="glass-card rounded-xl overflow-hidden border dark:border-white/5 border-black/5">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-surface-container-low/80 border-b border-white/5 text-xs font-label-bold text-on-surface-variant uppercase tracking-wider">
+              <tr className="bg-surface-container-low/80 border-b dark:border-white/5 border-black/5 text-xs font-label-bold text-on-surface-variant uppercase tracking-wider">
                 <th className="p-4">Date</th>
                 <th className="p-4">Module</th>
                 <th className="p-4 text-center">Conducted Hours</th>
@@ -171,10 +171,10 @@ function DailyLogPage() {
                 </tr>
               ) : (
                 filteredLogs.map((log) => (
-                  <tr key={log.id} className="hover:bg-white/5 transition-colors">
+                  <tr key={log.id} className="hover:dark:bg-white/5 bg-black/5 transition-colors">
                     <td className="p-4 font-label-mono text-xs text-primary font-semibold">{log.date}</td>
                     <td className="p-4">
-                      <span className="font-label-mono text-xs px-2 py-0.5 bg-surface-container border border-white/10 rounded font-bold text-on-surface">
+                      <span className="font-label-mono text-xs px-2 py-0.5 bg-surface-container border dark:border-white/10 border-black/10 rounded font-bold text-on-surface">
                         {log.module}
                       </span>
                     </td>
