@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { weeklyTimetable } from '../data/timetableData';
-import { getSriLankaDateObj } from '../utils/dateUtils';
-
+import { getSriLankaDateObj, SEMESTER_START_DATE } from '../utils/dateUtils';
+import { getHolidayForDate } from '../data/sriLankaHolidaysData';
 function TimetablePage() {
   const days = [
     { fullName: 'Monday', short: 'Mon', key: 'Monday' },
@@ -53,8 +53,16 @@ function TimetablePage() {
     const startMin = slot.startMin || 510;
     const endMin = slot.endMin || 630;
 
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const todayDateStr = `${yyyy}-${mm}-${dd}`;
+    const isVacation = todayDateStr >= '2026-08-17' && todayDateStr <= '2026-08-30';
+    const isPreSemester = todayDateStr < SEMESTER_START_DATE;
+    const isHoliday = !!getHolidayForDate(todayDateStr);
+
     let status = slot.status || 'Scheduled';
-    if (isToday) {
+    if (isToday && !isVacation && !isPreSemester && !isHoliday) {
       if (nowMin > endMin) status = 'Conducted';
       else if (nowMin >= startMin && nowMin <= endMin) status = 'Ongoing';
       else status = 'Upcoming';
