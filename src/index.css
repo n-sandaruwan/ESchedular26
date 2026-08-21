@@ -120,11 +120,14 @@
 
   html {
     font-size: 18px;
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
   }
   body {
     background-color: rgb(var(--color-background));
     color: rgb(var(--color-on-background));
     -webkit-tap-highlight-color: transparent;
+    -webkit-overflow-scrolling: touch;
     font-family: 'Inter', sans-serif;
     font-size: 1rem;
     line-height: 1.5;
@@ -140,13 +143,19 @@
   height: 100%;
   z-index: -1;
   pointer-events: none;
+  transform: translateZ(0);
+  will-change: transform;
 }
 
 .glass-card {
   background: var(--glass-bg);
   backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: transform;
 }
 
 .glass-card:hover {
@@ -157,9 +166,12 @@
 .pulse-card {
   background: var(--glass-bg);
   backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
   position: relative;
   overflow: hidden;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .glow-blue {
