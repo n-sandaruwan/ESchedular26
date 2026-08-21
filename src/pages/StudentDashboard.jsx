@@ -244,6 +244,9 @@ function StudentDashboard() {
   };
 
   const getComputedSchedule = (dateStr) => {
+    if (dateStr >= '2026-08-17' && dateStr <= '2026-08-30') return [];
+    if (dateStr < SEMESTER_START_DATE) return [];
+    
     const rawSlots = getModulesForDate(dateStr);
     const nowMin = currentTime.getHours() * 60 + currentTime.getMinutes();
     const isToday = dateStr === todayDateStr;
