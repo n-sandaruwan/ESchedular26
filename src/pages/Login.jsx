@@ -78,18 +78,37 @@ function Login() {
     setError('');
     setLoading(true);
 
-    const cleanEmail = email.trim().toLowerCase();
+    const cleanInput = email.trim().toLowerCase();
     const cleanPass = password.trim();
+
+    // Direct Credential Pairs matching user_rules
+    if ((cleanInput === 'admin' || cleanInput === 'admin@escheduler.com') && (cleanPass === '987321' || cleanPass === '987')) {
+      localStorage.setItem('mis_role', 'admin');
+      localStorage.setItem('mis_user', 'Department Administrator');
+      localStorage.removeItem('mis_lab_admin_strict');
+      navigate('/admin');
+      setLoading(false);
+      return;
+    }
+
+    if ((cleanInput === 'labadmin' || cleanInput === 'labadmin@escheduler.com') && cleanPass === '654') {
+      localStorage.setItem('mis_role', 'lab_admin');
+      localStorage.setItem('mis_user', 'Lab Administrator');
+      localStorage.setItem('mis_lab_admin_group', 'EE01');
+      navigate('/lab-tracker?tab=leader');
+      setLoading(false);
+      return;
+    }
 
     try {
       if (!auth) throw new Error("Firebase Authentication is not configured.");
 
-      const userCredential = await signInWithEmailAndPassword(auth, cleanEmail, cleanPass);
+      const userCredential = await signInWithEmailAndPassword(auth, cleanInput, cleanPass);
       handleRoleVerification(userCredential.user.uid);
     } catch (err) {
       console.error(err);
-      if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password') {
-        setError('Invalid email or password. Please check your credentials.');
+      if (err.code === 'auth/invalid-credential' || err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-email') {
+        setError('Invalid username/email or password. Please check your credentials.');
       } else {
         setError(err.message || 'An error occurred during sign in.');
       }
@@ -139,17 +158,36 @@ function Login() {
           </div>
         )}
 
+        {/* Credentials Guide */}
+        <div className="p-3.5 rounded-xl bg-primary/10 border border-primary/20 text-xs flex flex-col gap-2">
+          <div className="font-bold text-primary flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
+            <span className="material-symbols-outlined text-base">key</span> Demo Credentials Guide
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-on-surface font-mono text-[11px]">
+            <div className="p-2 rounded bg-surface-container/50 dark:bg-black/30 border border-primary/10">
+              <span className="font-bold text-primary block">Full Admin</span>
+              <div>User: <span className="font-bold">admin</span></div>
+              <div>Pass: <span className="font-bold">987321</span> / <span className="font-bold">987</span></div>
+            </div>
+            <div className="p-2 rounded bg-surface-container/50 dark:bg-black/30 border border-primary/10">
+              <span className="font-bold text-primary block">Lab Admin</span>
+              <div>User: <span className="font-bold">labadmin</span></div>
+              <div>Pass: <span className="font-bold">654</span></div>
+            </div>
+          </div>
+        </div>
+
         {/* Secure Form */}
         <form onSubmit={handleLogin} className="flex flex-col gap-5">
           <div className="flex flex-col gap-2">
-            <label className="text-xs font-label-bold uppercase text-on-surface-variant tracking-wider">Email</label>
+            <label className="text-xs font-label-bold uppercase text-on-surface-variant tracking-wider">Username or Email</label>
             <input
               className="input-glass p-3.5 rounded-xl text-on-surface text-sm font-body-md focus:border-primary outline-none transition-all"
-              type="email"
+              type="text"
               required
               value={email}
               onChange={e => setEmail(e.target.value)}
-              placeholder="Email Address"
+              placeholder="admin or labadmin or Email"
               disabled={loading}
             />
           </div>

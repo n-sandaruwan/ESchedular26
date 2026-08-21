@@ -37,9 +37,9 @@ const SplashScreen = ({ onComplete }) => {
         DEIE 26
       </div>
 
-      {/* EShedullar */}
+      {/* ESchedular26 */}
       <div className={`mt-3 text-lg md:text-xl font-medium tracking-wider text-gray-400 transition-all duration-700 transform ${step >= 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-        EShedullar
+        ESchedular26
       </div>
 
     </div>
