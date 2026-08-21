@@ -11,7 +11,8 @@ import { auth } from '../firebase';
 export const AUTHORIZED_UIDS = {
   ADMINS: [
     'qgGyu7Qwy6QeV9apAiz3E2NL0zE2',
-    'TEwc06RhhlSYrvX5lxqj4oWqudw2'
+    'TEwc06RhhlSYrvX5lxqj4oWqudw2',
+    'b87r7LcjnHRPqNVSximVm7ntUTh1'
   ],
   LAB_ADMINS: [
     'j4MpEMaYyqRZmuxXvgI5Mjwn0zi1' // Generic Lab Admin (can switch groups)
